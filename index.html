@@ -749,6 +749,13 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .acard-art { position: relative; }
 .lent-ov { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: inherit; background: rgba(0,0,0,.62); color: #fff; text-align: center; padding: 8px; cursor: context-menu; backdrop-filter: grayscale(1); }
 .lent-ov b { font-size: 14px; } .lent-ov small { font-size: 12px; opacity: .85; } .lent-ov i { font-style: normal; }
+.st-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 4px 0 12px; }
+.st-k { display: flex; gap: 8px; flex-wrap: wrap; } .st-k > div { display: flex; flex-direction: column; padding: 8px 14px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); min-width: 92px; } .st-k b { font-size: 17px; } .st-k span { font-size: 11.5px; color: var(--ink2); }
+.st-cols { display: grid; grid-template-columns: 1.2fr .9fr 1fr; gap: 24px; align-items: start; } .st-h { font-size: 15px; margin: 0 0 6px; }
+.st-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 3px 8px; border-radius: 8px; cursor: pointer; } .st-row:hover { background: var(--hover); }
+.st-n { color: var(--ink3); font-size: 12px; text-align: right; } .st-m, .st-v { display: flex; flex-direction: column; min-width: 0; } .st-v { text-align: right; }
+.st-m b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-m small, .st-v small { font-size: 11.5px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-v b { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+@media (max-width: 1150px) { .st-cols { grid-template-columns: 1fr 1fr; } } @media (max-width: 760px) { .st-cols { grid-template-columns: 1fr; } }
 /* song panel: three fields on one row */
 .three { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .three .lab { margin-top: 10px; } .three .picker, .three .sel { width: 100%; }
 /* FL Studio projects screen */
@@ -1593,12 +1600,20 @@ LIBVIEWS.cds = () => { const a = cdList(); return `
   <div class="cdgrid">${a.map((c, n) => `<div class="cdcard" role="button" tabindex="0" data-act="cdp-view" data-id="${c.id}" style="--n:${n}"><div class="cdjewel"><span class="cdj-art">${albumArt(c)}</span><i class="cdj-hinge"></i><i class="cdj-gloss"></i></div><b>${esc(c.name)}</b><span>${esc(projArtist(c) || (KINDS[c.type] || ''))}</span><button class="acard-play" data-act="cdp-play" data-id="${c.id}" aria-label="Play ${esc(c.name)}">${ico('play', 18)}</button></div>`).join('') || '<p class="faint">No CDs yet. Design one in the CD Creator.</p>'}</div>`; };
 LIBVIEWS.stats = () => {
   const ts = S.tracks.filter(t => t.plays || t.listened), plays = ts.reduce((a, t) => a + (t.plays || 0), 0), secs = ts.reduce((a, t) => a + (t.listened || 0), 0);
-  const hm = x => { x = Math.round(x); const h = Math.floor(x / 3600), m = Math.floor(x % 3600 / 60); return h ? `${h} hr ${m} min` : m ? `${m} min` : `${x} sec`; };
-  const top = ts.slice().sort((a, b) => (b.plays || 0) - (a.plays || 0) || (b.listened || 0) - (a.listened || 0)).slice(0, 15);
-  const projs = S.cols.filter(c => !isFolder(c)).map(c => ({ c, p: colTracks(c).reduce((a, t) => a + (t.plays || 0), 0), s: colTracks(c).reduce((a, t) => a + (t.listened || 0), 0) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 8);
-  return `<div class="stats-k">${[['Plays', plays], ['Time listened', hm(secs)], ['Average play', plays ? hm(secs / plays) : '–'], ['Songs played', ts.length]].map(([l, v]) => `<div><span>${l}</span><b>${v}</b></div>`).join('')}</div>
-    <h3 class="srow-h">Most played songs</h3>${top.length ? `<div class="stats-t">${top.map((t, i) => `<div><span class="mk-n">${i + 1}</span><span class="meta"><b>${esc(dispTitle(t))}</b><span>${esc(dispArtist(t))}</span></span><span class="mono">${t.plays || 0} ${t.plays === 1 ? 'play' : 'plays'}</span><span class="mono">${hm(t.listened || 0)}</span><span class="mono">${t.plays ? hm((t.listened || 0) / t.plays) + ' avg' : ''}</span></div>`).join('')}</div>` : '<p class="faint">No plays yet. A play counts after 30 seconds, or half a short song.</p>'}
-    ${projs.length ? `<h3 class="srow-h">Most played projects</h3><div class="stats-t">${projs.map((x, i) => `<div><span class="mk-n">${i + 1}</span><span class="meta"><b>${esc(x.c.name)}</b><span>${esc(projArtist(x.c))}</span></span><span class="mono">${x.p} plays</span><span class="mono">${hm(x.s)}</span><span></span></div>`).join('')}</div>` : ''}`;
+  const hm = x => { x = Math.round(x); const h = Math.floor(x / 3600), m = Math.floor(x % 3600 / 60); return h ? `${h}h ${m}m` : m ? `${m}m` : `${x}s`; };
+  const by = S.statSort || 'plays', key = { plays: o => o.p, time: o => o.s, avg: o => o.p ? o.s / o.p : 0 }[by];
+  const songs = ts.map(t => ({ t, p: t.plays || 0, s: t.listened || 0 })).sort((a, b) => key(b) - key(a)).slice(0, 10);
+  const projs = S.cols.filter(c => !isFolder(c)).map(c => ({ c, p: colTracks(c).reduce((a, t) => a + (t.plays || 0), 0), s: colTracks(c).reduce((a, t) => a + (t.listened || 0), 0) })).filter(x => x.s > 0 || x.p > 0).sort((a, b) => key(b) - key(a)).slice(0, 10);
+  const am = new Map(); ts.forEach(t => songArtists(t).forEach(a => { const k = a.toLowerCase(); const r = am.get(k) || { name: a, p: 0, s: 0 }; r.p += t.plays || 0; r.s += t.listened || 0; am.set(k, r); }));
+  const arts = [...am.values()].sort((a, b) => key(b) - key(a)).slice(0, 10);
+  const val = o => by === 'plays' ? `${o.p} ${o.p === 1 ? 'play' : 'plays'}` : by === 'time' ? hm(o.s) : (o.p ? hm(o.s / o.p) + ' avg' : '–');
+  const sub = o => by === 'plays' ? hm(o.s) : `${o.p} ${o.p === 1 ? 'play' : 'plays'}`;
+  const row = (i, title, who, o, attrs) => `<div class="st-row" ${attrs}><span class="st-n">${i + 1}</span><span class="st-m"><b>${esc(title)}</b><small>${esc(who)}</small></span><span class="st-v"><b>${val(o)}</b><small>${sub(o)}</small></span></div>`;
+  return `<div class="st-top"><div class="st-k">${[['Plays', plays], ['Listened', hm(secs)], ['Avg play', plays ? hm(secs / plays) : '–'], ['Songs played', ts.length]].map(([l, v]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div>
+      ${seg('statsort', [['plays', 'Plays'], ['time', 'Time listened'], ['avg', 'Avg per play']], by, 'stat-sort')}</div>
+    <div class="st-cols"><section><h3 class="st-h">Songs</h3>${songs.map((o, i) => row(i, dispTitle(o.t), dispArtist(o.t), o, `data-act="play" data-id="${o.t.id}" role="button"`)).join('') || '<p class="faint small">Play something and it shows up here.</p>'}</section>
+      <section><h3 class="st-h">Artists</h3>${arts.map((o, i) => row(i, o.name, '', o, `data-act="stat-artist" data-k="${esc(o.name)}" role="button"`)).join('') || '<p class="faint small">Nothing played yet.</p>'}</section>
+      <section><h3 class="st-h">Projects</h3>${projs.map((o, i) => row(i, o.c.name, projArtist(o.c), o, `data-act="col" data-id="${o.c.id}" role="button"`)).join('') || '<p class="faint small">Nothing played yet.</p>'}</section></div>`;
 };
 function libMine() {
   const a = S.cols.filter(c => isMine(c) && shown(c));
@@ -3466,6 +3481,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.12.2', d: '2026-11-16', items: ['Stats fit on one screen: totals in a compact strip, your most played songs, artists and projects side by side, and buttons to sort by plays, time listened or average per play. Click a row to play the song or open the project.'] },
   { v: '1.12.1', d: '2026-11-16', items: ['Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover.'] },
   { v: '1.12.0', d: '2026-11-16', items: ['Library has an Archive tab. Archived projects are saved as they were and can\'t be edited; right-click one and choose New version to keep working on a copy.', 'Albums you own: a $ button on the album page sells it (when the artist allows resale). Lending moved into Share.', 'A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.', 'Second-hand albums are now in the Marketplace instead of the Music Store.'] },
   { v: '1.11.7', d: '2026-11-15', items: ['Artist page: pick a colour for the artist\'s round picture and for the header (image button on the header). Or use one of their project covers as the picture or header.'] },
@@ -4564,6 +4580,8 @@ function act(a, el, e) {
     case 'add-track': openModal('addtrack', id || S.colId); break;
     case 'at-add': { const c = col(UI.modal && UI.modal.id); if (c && !c.tracks.includes(id)) { c.tracks.push(id); save(); renderList(); renderSide(); const l = $('#at-list'); if (l) l.innerHTML = addTrackResults(c.id, ($('#at-q') || {}).value); toast('Added ' + dispTitle(trk(id))); } break; }
     case 'at-conv': openModal('conv', null, { colId: id }); break;
+    case 'stat-artist': S.libTab = 'artists'; UI.libArtist = k; refresh(); break;
+    case 'stat-sort': S.statSort = k; save(); renderMain(); break;
     case 'lib-artist': UI.libArtist = k || null; renderMain(); break;
     case 'art-play': case 'art-shuffle': { const a = el.dataset.act; const ids = artistSongs(k).sort((x, y) => (y.plays || 0) - (x.plays || 0)).map(t => t.id); if (ids.length) playQueue(ids, a === 'art-shuffle'); break; }
     case 'art-menu': { const r = el.getBoundingClientRect(), has = kind => !!(srcs['artist:' + kind + ':' + k] || artCover(k, kind));
