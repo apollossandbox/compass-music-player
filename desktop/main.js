@@ -200,7 +200,38 @@ function modsList() {
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/* ---------- converter: links (YouTube and other video sites) through yt-dlp, fetched on first use ---------- */
+const ytBin = () => process.env.COMPASS_YTDLP || path.join(app.getPath('userData'), 'bin', process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
+async function ensureYt() {
+  const f = ytBin(); if (fs.existsSync(f)) return f;
+  const name = process.platform === 'win32' ? 'yt-dlp.exe' : process.platform === 'darwin' ? 'yt-dlp_macos' : 'yt-dlp';
+  const r = await fetch('https://github.com/yt-dlp/yt-dlp/releases/latest/download/' + name); if (!r.ok) throw new Error('Could not download the link tool (yt-dlp): HTTP ' + r.status);
+  fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f + '.part', Buffer.from(await r.arrayBuffer())); fs.renameSync(f + '.part', f); try { fs.chmodSync(f, 0o755); } catch (e) {}
+  return f;
+}
+function ytGet(url) {
+  return new Promise(async (resolve, reject) => {
+    let bin; try { bin = await ensureYt(); } catch (e) { return reject(e); }
+    const tmp = fs.mkdtempSync(path.join(app.getPath('temp'), 'compass-'));
+    const p = spawn(bin, ['--no-playlist', '--no-progress', '-f', 'bestaudio/best', '-o', path.join(tmp, '%(title).120B.%(ext)s'), '--print', 'after_move:filepath', url], { windowsHide: true });
+    let out = '', err = ''; p.stdout.on('data', d => out += d); p.stderr.on('data', d => err += d);
+    const timer = setTimeout(() => { p.kill(); reject(new Error('The download took too long')); }, 15 * 60 * 1000);
+    p.on('error', e => { clearTimeout(timer); reject(e); });
+    p.on('close', code => { clearTimeout(timer);
+      const file = out.trim().split(/\r?\n/).filter(Boolean).pop();
+      if (code !== 0 || !file || !fs.existsSync(file)) return reject(new Error((err.trim().split(/\r?\n/).pop() || 'The link could not be downloaded').replace(/^ERROR:\s*/, '')));
+      try { const data = fs.readFileSync(file); resolve({ name: path.basename(file), data }); } catch (e) { reject(e); } finally { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {} } });
+  });
+}
+
 app.whenReady().then(() => {
+  ipcMain.handle('tp-conv-link', async (e, url) => { try { if (typeof url !== 'string' || !/^https?:\/\/\S+$/i.test(url.trim())) throw new Error('Paste a full link starting with http'); const r = await ytGet(url.trim()); return { ok: true, name: r.name, data: r.data }; } catch (err) { return { ok: false, error: String(err && err.message || err) }; } });
+  ipcMain.handle('tp-conv-save', async (e, name, data, dir, pick) => {
+    if (pick || !dir || !fs.existsSync(dir)) { const r = await dialog.showOpenDialog(win, { title: 'Save converted files in…', properties: ['openDirectory', 'createDirectory'] }); if (r.canceled) return null; dir = r.filePaths[0]; }
+    let f = path.join(dir, cleanName(name)); const ext = path.extname(f), base = f.slice(0, -ext.length); for (let i = 2; fs.existsSync(f); i++) f = `${base} (${i})${ext}`;
+    fs.writeFileSync(f, Buffer.from(data)); return { dir, file: f };
+  });
+  ipcMain.handle('tp-conv-reveal', (e, f) => { if (typeof f === 'string' && fs.existsSync(f)) shell.showItemInFolder(f); });
   require('./online').register(ipcMain); // Google sign-in + online profile (hidden until online.json exists)
   ipcMain.handle('tp-mods-list', () => modsList());
   ipcMain.handle('tp-mods-folder', async () => { const dir = modsDir(); fs.mkdirSync(dir, { recursive: true });

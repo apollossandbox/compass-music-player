@@ -1,11 +1,20 @@
 {
-  "version": "1.10.1",
+  "version": "1.11.0",
   "file": "Compass-Setup.exe",
-  "size": 82299808,
-  "sha256": "7403c2afb76926aa0e51281f463c86027a740b5ebae9539ee1901df744178ea3",
-  "notes": "Launcher tile fix",
+  "size": 82350203,
+  "sha256": "eeb5a71c729a6e7fd46f340c5b58e97ecc1c70675bd04ad9fb746ed8c69ea822",
+  "notes": "Converter, add a track, artist sorting",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.11.0",
+      "d": "2026-11-15",
+      "items": [
+        "Convert: turn a YouTube or video link, a video file or an audio file into an MP3 or WAV. Save it to All songs, a project, or a folder you choose. Library › Convert.",
+        "Right-click anywhere on a project page, or a project in the sidebar, to Add a track: search your songs, or get one from a link or file.",
+        "Sort by artist: in the Library project grid and in All songs."
+      ]
+    },
     {
       "v": "1.10.1",
       "d": "2026-11-15",
@@ -172,13 +181,6 @@
       "items": [
         "Simpler logo.",
         "New projects use your artist name from Settings › Profile."
-      ]
-    },
-    {
-      "v": "1.7.4",
-      "d": "2026-11-12",
-      "items": [
-        "New logo: a compass record on a turntable with a red tonearm."
       ]
     }
   ]

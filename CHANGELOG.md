@@ -2,6 +2,12 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.0 · 2026-11-15
+
+- Convert: turn a YouTube or video link, a video file or an audio file into an MP3 or WAV. Save it to All songs, a project, or a folder you choose. Library › Convert.
+- Right-click anywhere on a project page, or a project in the sidebar, to Add a track: search your songs, or get one from a link or file.
+- Sort by artist: in the Library project grid and in All songs.
+
 ## 1.10.1 · 2026-11-15
 
 - Launcher: the FL Studio tile buttons fit again (Projects is now a folder icon).

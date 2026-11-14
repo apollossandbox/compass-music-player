@@ -719,6 +719,9 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .colhead.ro > span:nth-child(4), .colhead.ro > span:nth-child(5), .list.ro .row .pill, .list.ro .row .c-add { display: none; }
 .list.ro .discol .row { grid-template-columns: 36px minmax(0, 1fr) 46px 32px; }
 .acct-pic { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.lib-sort { display: flex; justify-content: flex-end; margin: -6px 0 8px; } .lib-sort .sel { width: auto; }
+.at-list { display: flex; flex-direction: column; gap: 2px; max-height: 46vh; overflow-y: auto; margin-top: 8px; }
+.at-r { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) 44px; gap: 10px; align-items: center; padding: 8px 10px; border: 0; border-radius: 8px; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; } .at-r:hover { background: var(--hover); } .at-r b, .at-r span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .at-r span, .at-r i { color: var(--ink2); font-size: 12.5px; font-style: normal; } .at-r i { text-align: right; }
 /* song panel: three fields on one row */
 .three { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .three .lab { margin-top: 10px; } .three .picker, .three .sel { width: 100%; }
 /* FL Studio projects screen */
@@ -1286,7 +1289,7 @@ const listIds = () => curListIds.length ? curListIds : S.tracks.map(t => t.id);
 function visibleTracks() {
   const q = S.q.toLowerCase();
   let a = S.tracks.filter(t => (S.filter === 'all' || t.status === S.filter) && (!q || (dispTitle(t) + ' ' + dispArtist(t) + ' ' + t.tags + ' ' + t.key).toLowerCase().includes(q)));
-  const by = { added: (x, y) => y.added - x.added, title: (x, y) => x.title.localeCompare(y.title), status: (x, y) => Object.keys(ST).indexOf(x.status) - Object.keys(ST).indexOf(y.status), bpm: (x, y) => (x.bpm || 0) - (y.bpm || 0) };
+  const by = { added: (x, y) => y.added - x.added, title: (x, y) => x.title.localeCompare(y.title), artist: (x, y) => dispArtist(x).localeCompare(dispArtist(y), undefined, { sensitivity: 'base' }) || x.title.localeCompare(y.title), status: (x, y) => Object.keys(ST).indexOf(x.status) - Object.keys(ST).indexOf(y.status), bpm: (x, y) => (x.bpm || 0) - (y.bpm || 0) };
   return a.sort(by[S.sort] || by.added);
 }
 /* a project can have several discs; songs keep one order in c.tracks and each song belongs to a disc */
@@ -1490,6 +1493,7 @@ function renderList() {
 }
 
 const albumArt = c => artOf(c) ? `<img src="${artOf(c)}" alt="" draggable="false" loading="lazy" decoding="async">` : isFolder(c) && kidsOf(c).length ? folderArt(c) : `<span class="acard-ph" style="${cover(c.h1, c.h2)}"></span>${isMine(c) ? `<span class="acard-disc">${ico('disc', 44)}</span>` : ''}`;
+const libSorted = a => { const k = S.libSort || 'recent', nm = (x, y) => x.name.localeCompare(y.name, undefined, { numeric: true, sensitivity: 'base' }); return k === 'recent' ? a : [...a].sort(k === 'name' ? nm : (x, y) => (projArtist(x) || '~').localeCompare(projArtist(y) || '~', undefined, { sensitivity: 'base' }) || nm(x, y)); };
 function projCard(c, n, all) {
   const same = !!all && all.length > 1 && new Set(all.map(projArtist)).size < 2;
   const ts = colTracks(c), k = pcolors(c), year = c.targetDate ? fdate(c.targetDate) : '';
@@ -1567,12 +1571,12 @@ function renderLibrary(m) {
   const projects = S.libTab === 'projects';
   m.innerHTML = `<header class="head">
     <div><h1>Library</h1><p class="faint">${libSummary()}</p></div>
-    <div class="hact"><button class="btn" data-act="qr-scan" aria-label="Scan QR" title="Scan QR">${ico('qr', 16)}</button><button class="btn primary" data-act="add">${ico('upload', 16)} Add music</button></div>
+    <div class="hact"><button class="btn" data-act="qr-scan" aria-label="Scan QR" title="Scan QR">${ico('qr', 16)}</button><button class="btn" data-act="conv-open" title="Convert & download: links, videos, audio">${ico('link', 16)} Convert</button><button class="btn primary" data-act="add">${ico('upload', 16)} Add music</button></div>
   </header>
   <div class="tools">${seg('libtab', [['projects', 'Projects'], ['mine', 'Digital albums'], ['tracks', 'All songs'], ...LIBTABS_EXTRA], S.libTab === 'archived' ? 'projects' : S.libTab, 'libtab')}
   ${S.libTab !== 'tracks' ? '' : `<label class="search box">${ico('search', 16)}<input id="q" type="search" placeholder="Search songs" value="${esc(S.q)}" autocomplete="off"></label>
-    <label class="sel box"><span class="faint">Sort</span><select id="sort"><option value="added">Recently added</option><option value="title">Title</option><option value="status">Status</option><option value="bpm">Tempo</option></select></label>`}</div>
-  ${S.libTab === 'mine' ? libMine() : S.libTab === 'archived' ? libArchived() : LIBVIEWS[S.libTab] ? LIBVIEWS[S.libTab]() : projects ? `<div class="pgrid">${S.cols.filter(c => !isMine(c) && shown(c)).map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="newcol" style="--n:${S.cols.length}" aria-label="New project"><div class="acard-art"><span class="acard-ph plus">${ico('plus', 34)}</span></div><div class="acard-t">New project</div></div></div>${S.cols.some(c => c.archived && !isMine(c)) ? `<button class="btn sm lib-arch" data-act="libtab" data-k="archived">Archived (${S.cols.filter(c => c.archived && !isMine(c)).length})</button>` : ''}`
+    <label class="sel box"><span class="faint">Sort</span><select id="sort"><option value="added">Recently added</option><option value="title">Title</option><option value="artist">Artist</option><option value="status">Status</option><option value="bpm">Tempo</option></select></label>`}</div>
+  ${S.libTab === 'mine' ? libMine() : S.libTab === 'archived' ? libArchived() : LIBVIEWS[S.libTab] ? LIBVIEWS[S.libTab]() : projects ? `<div class="lib-sort"><label class="sel box"><span class="faint">Sort</span><select data-libsort aria-label="Sort projects">${[['recent', 'Recent'], ['name', 'Name'], ['artist', 'Artist']].map(([k, l]) => `<option value="${k}" ${(S.libSort || 'recent') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div><div class="pgrid">${libSorted(S.cols.filter(c => !isMine(c) && shown(c))).map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="newcol" style="--n:${S.cols.length}" aria-label="New project"><div class="acard-art"><span class="acard-ph plus">${ico('plus', 34)}</span></div><div class="acard-t">New project</div></div></div>${S.cols.some(c => c.archived && !isMine(c)) ? `<button class="btn sm lib-arch" data-act="libtab" data-k="archived">Archived (${S.cols.filter(c => c.archived && !isMine(c)).length})</button>` : ''}`
     : `<div class="tools"><div class="chips">${['all', ...Object.keys(ST)].map(k => `<button class="chip ${S.filter === k ? 'on' : ''}" data-act="filter" data-k="${k}">${k === 'all' ? 'All' : ST[k]} <em>${counts[k]}</em></button>`).join('')}</div></div>${colhead}<div id="list" class="list"></div>`}`;
   const so = $('#sort'); if (so) so.value = S.sort;
 }
@@ -1748,6 +1752,20 @@ function openModal(kind, id, x = {}) {
     h = `<h2>Sell ${esc(c.name)}</h2><p class="faint small" style="margin:0">${edLabel(a.tk, a.r)}. Ownership moves to the buyer when they pay.</p>
     <label class="lab" for="sl-price">Price (USD)</label><input class="field" id="sl-price" type="number" min="1" step=".01" value="20">
     <p class="faint small" id="sl-split" style="margin:6px 0 0"></p>`;
+  } else if (kind === 'conv') {
+    const desk = !!(window.tpDesktop && tpDesktop.conv); UI.convFiles = [];
+    h = `<h2>Convert & download</h2><p class="faint small" style="margin:0">Turn a link, a video or an audio file into an MP3 or WAV. Only download music you have the rights to.</p>
+    ${desk ? `<label class="lab" for="cv-url">Link</label><input class="field" id="cv-url" placeholder="Paste a YouTube or video link" autocomplete="off">` : ''}
+    <div class="crow" style="margin-top:8px"><button class="btn sm" data-act="cv-pick">${ico('upload', 14)} ${desk ? 'Or choose' : 'Choose'} video or audio files…</button><span class="faint small" id="cv-files"></span></div>
+    <div class="two"><div><label class="lab">Format</label>${seg('cvfmt', [['mp3', 'MP3'], ['wav', 'WAV']], S.convFmt || 'mp3', 'cv-fmt', 'full')}</div>
+      <div><label class="lab" for="cv-dest">Save to</label><div class="sel box wide"><select id="cv-dest"><option value="songs">All songs</option>${S.cols.filter(c => !isMine(c) && !isFolder(c) && !c.archived).map(c => `<option value="${c.id}" ${x.colId === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}${desk ? `<option value="folder">A folder on this computer…</option>` : ''}</select></div></div></div>
+    <p class="faint small" id="cv-st" role="status" style="margin:8px 0 0"></p>`;
+  } else if (kind === 'addtrack') {
+    const c = col(id);
+    h = `<h2>Add a track to ${esc(c.name)}</h2>
+    <label class="search box" style="margin-top:8px">${ico('search', 15)}<input id="at-q" type="search" placeholder="Search your songs" autocomplete="off" aria-label="Search your songs"></label>
+    <div class="at-list" id="at-list">${addTrackResults(id, '')}</div>
+    <div class="crow" style="margin-top:8px"><button class="btn sm" data-act="at-conv" data-id="${id}">${ico('link', 14)} From a link or video…</button><button class="btn sm" data-act="add">${ico('upload', 14)} Audio files…</button></div>`;
   } else if (kind === 'feat') {
     const t = trk(id);
     h = `<h2>Features</h2><p class="faint small" style="margin:0">${esc(t ? t.title : '')}</p>
@@ -1769,9 +1787,10 @@ function openModal(kind, id, x = {}) {
     <div class="dropzone" id="m-drop">${ico('import', 26)}<b>Drop the .zip here</b><span class="faint small">or loose audio and image files</span><button class="btn sm primary" data-act="zip-pick">Choose files</button></div>
     <p class="faint small" id="m-status" role="status"></p>`;
   }
-  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
+  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
   md.classList.toggle('wide', kind === 'meta' || kind === 'lstyle'); md.classList.toggle('clogm', kind === 'changelog' || kind === 'qr');
   if (kind === 'qr') qrStart();
+  if (kind === 'addtrack') setTimeout(() => { const i = $('#at-q'); if (i) i.focus(); }, 60);
   if (kind === 'lend' || kind === 'sell') splitPreview();
   if (kind === 'feat') { fxPaint(); setTimeout(() => { const i = $('#fx-in'); if (i) i.focus(); }, 60); }
   md.inert = false; $('#scrim').classList.add('open'); requestAnimationFrame(() => { md.classList.add('open'); applySlides(); const f = $('input,select', md); if (f) { f.focus(); if (f.select) f.select(); } });
@@ -3380,6 +3399,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.11.0', d: '2026-11-15', items: ['Convert: turn a YouTube or video link, a video file or an audio file into an MP3 or WAV. Save it to All songs, a project, or a folder you choose. Library › Convert.', 'Right-click anywhere on a project page, or a project in the sidebar, to Add a track: search your songs, or get one from a link or file.', 'Sort by artist: in the Library project grid and in All songs.'] },
   { v: '1.10.1', d: '2026-11-15', items: ['Launcher: the FL Studio tile buttons fit again (Projects is now a folder icon).'] },
   { v: '1.10.0', d: '2026-11-15', items: ['Compass tokens (preview): albums you own show a Verified badge with their edition (open, or numbered like #014/500). Click it for the full ownership history.', 'Lend an album to someone for 24 hours, 7 days or 30 days (free or paid). While it is out, you can\'t play it; it comes back on its own when time runs out, or they can return it early.', 'Sell tradable collector editions in the Store\'s new Resale tab. Every sale pays the artist 5% and Compass 2.5%; the seller gets 92.5%. No $0 transfers.', 'Release settings: open or numbered collector editions, whether owners can lend or resell, and Stop selling (people who bought it keep it).', 'Settings › Ownership › Load sample tokens to try it all. Runs on this computer for now; the server version comes next.'] },
   { v: '1.9.3', d: '2026-11-14', items: ['Export button on every project and digital album, next to Share.', 'Digital albums: no more Read-only bar, and no Status or Added columns.'] },
@@ -3926,6 +3946,60 @@ function parseName(name, opt = {}) {
   return { title: s || String(name).replace(/\.[^.]+$/, ''), num, disc };
 }
 const startsNumbered = names => names.length > 1 && names.every(n => /^\s*\d{1,3}\b/.test(n));
+/* ---------- converter: links, videos and audio files → MP3 or WAV, into All songs, a project, or a folder ---------- */
+const LAME_URL = 'https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';
+function loadLame() { if (window.lamejs) return Promise.resolve(true); return new Promise(res => { const sc = document.createElement('script'); sc.src = LAME_URL; sc.onload = () => res(!!window.lamejs); sc.onerror = () => res(false); document.head.appendChild(sc); }); }
+async function decodeAny(ab) { const ac = new (window.AudioContext || window.webkitAudioContext)(); try { return await ac.decodeAudioData(ab); } finally { try { ac.close(); } catch (e) {} } }
+function encWav(b) {
+  const ch = Math.min(2, b.numberOfChannels), n = b.length, sr = b.sampleRate, out = new DataView(new ArrayBuffer(44 + n * ch * 2)), w = (o, t) => [...t].forEach((c, i) => out.setUint8(o + i, c.charCodeAt(0)));
+  w(0, 'RIFF'); out.setUint32(4, 36 + n * ch * 2, true); w(8, 'WAVEfmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, ch, true); out.setUint32(24, sr, true); out.setUint32(28, sr * ch * 2, true); out.setUint16(32, ch * 2, true); out.setUint16(34, 16, true); w(36, 'data'); out.setUint32(40, n * ch * 2, true);
+  const d = [...Array(ch)].map((_, i) => b.getChannelData(i)); let o = 44; for (let i = 0; i < n; i++) for (let c = 0; c < ch; c++) { const v = Math.max(-1, Math.min(1, d[c][i])); out.setInt16(o, v < 0 ? v * 32768 : v * 32767, true); o += 2; }
+  return new Blob([out.buffer], { type: 'audio/wav' });
+}
+async function encMp3(b, onPct) {
+  if (!(await loadLame())) throw new Error("The MP3 encoder didn't load. Choose WAV instead.");
+  const ch = Math.min(2, b.numberOfChannels), enc = new lamejs.Mp3Encoder(ch, b.sampleRate, 192), toI = a => { const r = new Int16Array(a.length); for (let i = 0; i < a.length; i++) { const v = Math.max(-1, Math.min(1, a[i])); r[i] = v < 0 ? v * 32768 : v * 32767; } return r; };
+  const L = toI(b.getChannelData(0)), Rr = ch > 1 ? toI(b.getChannelData(1)) : null, parts = [], step = 1152;
+  for (let i = 0; i < L.length; i += step) { const m = Rr ? enc.encodeBuffer(L.subarray(i, i + step), Rr.subarray(i, i + step)) : enc.encodeBuffer(L.subarray(i, i + step)); if (m.length) parts.push(new Uint8Array(m));
+    if (i % (step * 400) === 0) { if (onPct) onPct(i / L.length); await new Promise(r => setTimeout(r, 0)); } }
+  const end = enc.flush(); if (end.length) parts.push(new Uint8Array(end)); return new Blob(parts, { type: 'audio/mpeg' });
+}
+async function addAudioBlob(blob, title, colId) {
+  const f = new File([blob], title + (blob.type === 'audio/mpeg' ? '.mp3' : '.wav'), { type: blob.type }), t = newTrack(f, title, ''), url = URL.createObjectURL(f);
+  t.dur = await probeDur(url); srcs[t.id] = url; S.tracks.push(t); await DB.put(t.id, f); const c = colId && col(colId); if (c && !isMine(c)) c.tracks.push(t.id);
+  save(); queueAnalysis([keyOf(t)]); return t;
+}
+const convTitle = name => String(name || 'Untitled').replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[_]+/g, ' ').replace(/\s*[\[(](official( music)? (video|audio)|lyrics?( video)?|visualizer|hd|4k)[\])]/ig, '').trim() || 'Untitled';
+async function convRun() {
+  const st = t => { const e = $('#cv-st'); if (e) e.textContent = t; }, fmt = ($('#modal [data-act="cv-fmt"].on') || { dataset: { k: 'mp3' } }).dataset.k, dest = ($('#cv-dest') || {}).value || 'songs';
+  const url = ($('#cv-url') || {}).value ? $('#cv-url').value.trim() : '', files = UI.convFiles || [], jobs = [];
+  if (url) jobs.push({ link: url }); files.forEach(f => jobs.push({ file: f }));
+  if (!jobs.length) return toast('Paste a link or choose a file first');
+  if (url && !(window.tpDesktop && tpDesktop.conv)) return toast('Links need the Compass app for Windows');
+  const btn = $('#modal [data-act="cv-ok"]'); if (btn) btn.disabled = true; UI.convBusy = true; let done = 0, last = null;
+  for (const j of jobs) {
+    try {
+      let ab, name;
+      if (j.link) { st('Downloading from the link… (the first time also fetches the download tool)'); const r = await tpDesktop.conv.link(j.link); if (!r || !r.ok) throw new Error((r && r.error) || 'Download failed'); ab = r.data.buffer.slice(r.data.byteOffset, r.data.byteOffset + r.data.byteLength); name = r.name; }
+      else { ab = await j.file.arrayBuffer(); name = j.file.name; }
+      st(`Reading ${convTitle(name)}…`); const buf = await decodeAny(ab).catch(() => { throw new Error(`${convTitle(name)} has no audio Compass can read`); });
+      st(`Making ${fmt.toUpperCase()}…`); const out = fmt === 'wav' ? encWav(buf) : await encMp3(buf, p => st(`Making MP3… ${Math.round(p * 100)}%`)), title = convTitle(name);
+      if (dest === 'folder') { const r = await tpDesktop.conv.save(title + '.' + fmt, new Uint8Array(await out.arrayBuffer()), S.convDir || '', !S.convDir); if (!r) throw new Error('No folder chosen'); S.convDir = r.dir; save(); last = r.file; }
+      else last = await addAudioBlob(out, title, dest === 'songs' ? null : dest);
+      done++;
+    } catch (e) { toast(e.message || String(e)); }
+  }
+  UI.convBusy = false; if (btn) btn.disabled = false;
+  if (!done) { st('Nothing was converted.'); return; }
+  UI.convFiles = []; closeModal(); refresh();
+  toast(dest === 'folder' ? `Saved ${done} file${done > 1 ? 's' : ''} to ${S.convDir.split(/[\\/]/).pop()}` : `Added ${done} song${done > 1 ? 's' : ''}${dest !== 'songs' && col(dest) ? ' to ' + col(dest).name : ''}`);
+  if (dest === 'folder' && last && tpDesktop.conv.reveal) tpDesktop.conv.reveal(last);
+}
+function addTrackResults(colId, q) {
+  const c = col(colId), have = new Set(c ? c.tracks : []), Q = String(q || '').trim().toLowerCase();
+  const r = S.tracks.filter(t => !have.has(t.id) && (!Q || (dispTitle(t) + ' ' + dispArtist(t)).toLowerCase().includes(Q))).sort((a, b) => (b.added || 0) - (a.added || 0)).slice(0, 40);
+  return r.length ? r.map(t => `<button class="at-r" data-act="at-add" data-id="${t.id}"><b>${esc(dispTitle(t))}</b><span>${esc(dispArtist(t))}</span><i>${fmt(t.dur || 0)}</i></button>`).join('') : `<p class="faint small">${Q ? 'No songs match.' : 'Every song is already in this project.'}</p>`;
+}
 function newTrack(f, title, artist, extra = {}) {
   const id = uid(), h = hash(title + id); extra.ext = extra.ext || extOf(f);
   return { id, title, artist: artist || '', features: [], featInTitle: false, status: 'demo', bpm: 0, key: '', dur: 180, h1: h % 360, h2: (h >> 3) % 360, tags: '', lyrics: '', added: Date.now(), file: true, versions: [], ver: id, ...extra };
@@ -4401,6 +4475,13 @@ function act(a, el, e) {
     case 'tok-samples': tokenSamples(true); break;
     case 'tok-samples-rm': askSure('Remove the sample tokens?', 'The sample albums and their history are removed. Your own projects are not touched.', 'Remove').then(ok => { if (ok) tokenSamples(false); }); break;
     case 'rel-ed': { $$('#modal [data-act="rel-ed"]').forEach(b => b.classList.toggle('on', b === el)); applySlides(); const box = $('#rel-colbox'); if (box) box.classList.toggle('hide-folder', k !== 'collector'); break; }
+    case 'conv-open': openModal('conv', null, { colId: id || (S.view === 'collection' ? S.colId : null) }); break;
+    case 'cv-fmt': { $$('#modal [data-act="cv-fmt"]').forEach(b => b.classList.toggle('on', b === el)); S.convFmt = k; applySlides(); break; }
+    case 'cv-pick': { const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true; inp.accept = 'audio/*,video/*,.mkv,.webm,.mp4,.mov,.m4a,.flac'; inp.onchange = () => { UI.convFiles = [...inp.files]; const s2 = $('#cv-files'); if (s2) s2.textContent = UI.convFiles.map(f => f.name).join(', '); }; inp.click(); break; }
+    case 'cv-ok': if (!UI.convBusy) convRun(); break;
+    case 'add-track': openModal('addtrack', id || S.colId); break;
+    case 'at-add': { const c = col(UI.modal && UI.modal.id); if (c && !c.tracks.includes(id)) { c.tracks.push(id); save(); renderList(); renderSide(); const l = $('#at-list'); if (l) l.innerHTML = addTrackResults(c.id, ($('#at-q') || {}).value); toast('Added ' + dispTitle(trk(id))); } break; }
+    case 'at-conv': openModal('conv', null, { colId: id }); break;
     case 'feat-open': openFeatures(id || S.editId); break;
     case 'fx-pick': fxAdd(k); break;
     case 'fx-rm': fxRead(); UI.fx.list.splice(+el.closest('.fx-row').dataset.fx, 1); fxPaint(); break;
@@ -4435,6 +4516,7 @@ document.addEventListener('click', e => {
   act(el.dataset.act, el, e);
 });
 document.addEventListener('input', e => {
+  if (e.target.id === 'at-q') { const l = $('#at-list'); if (l && UI.modal) l.innerHTML = addTrackResults(UI.modal.id, e.target.value); return; }
   if (e.target.id === 'ln-price' || e.target.id === 'sl-price') { splitPreview(); return; }
   if (e.target.id === 'fx-in') { fxSuggest(e.target.value); return; }
   if (e.target.id === 'fl-q') { UI.flQ = e.target.value; UI.flPage = 1; flAllPaint(); return; }
@@ -4457,6 +4539,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.dataset.libsort !== undefined) { S.libSort = t.value; save(); renderMain(); return; }
   if (t.dataset.modtoggle) { const id = t.dataset.modtoggle; S.mods = { ...(S.mods || {}), [id]: t.checked }; save(); const m = MODS.list.find(x => x.id === id); if (m) { if (t.checked) modStart(m); else modStop(id); } toast(t.checked ? 'Mod on' : 'Mod off'); return; }
   if (t.dataset.flv) { S.flView = { ...(S.flView || {}), [t.dataset.flv]: t.value }; UI.flPage = 1; save(); flAllPaint(); return; }
   if (t.id === 'qr-cam') { qrStart(t.value); return; }
@@ -4978,6 +5061,10 @@ function digitalMenuBase(c) {
 function projectMenu(c) { const base = projectMenuBase(c), mi = isFolder(c) ? [] : modItems('project', c.id); return mi.length ? [...base, { sep: 1 }, ...mi] : base; }
 function projectMenuBase(c) {
   if (isMine(c) && !isFolder(c)) return digitalMenu(c);
+  if (!isFolder(c)) return projectMenuInner(c).flatMap((x, i) => i === 0 ? [x, { label: 'Add a track…', act: 'add-track', id: c.id, icon: 'plus' }] : [x]);
+  return projectMenuInner(c);
+}
+function projectMenuInner(c) {
   return [{ head: c.name + (projArtist(c) ? ' · ' + projArtist(c) : '') }, ...(S.view === 'collection' && S.colId === c.id ? [] : [{ label: 'Open', act: 'col', id: c.id, icon: 'grid' }, { label: 'Play', act: 'play-col', id: c.id, icon: 'play' }, { sep: 1 }]),
     { label: 'Edit details…', act: 'proj-edit', id: c.id, icon: 'edit' }, { sep: 1 },
     { label: 'Duplicate', act: 'ctx-dupcol', id: c.id, icon: 'copy' }, ...(isFolder(c) ? [] : [{ label: 'Make deluxe', act: 'ctx-deluxe', id: c.id, icon: 'disc' }]), { label: 'New sequel…', act: 'ctx-sequel', id: c.id, icon: 'plus' }, { sep: 1 },
@@ -4995,6 +5082,8 @@ function projectMenuBase(c) {
 function onContext(e) {
   if (e.target.closest('input, textarea, select, [contenteditable]')) return;
   const t = e.target; let menu = null;
+  if (S.view === 'collection' && t.closest('#main') && !t.closest('.row, .dischead, .flr, input, textarea, select, button, a, .modal') && col(S.colId) && !isMine(col(S.colId)) && !isFolder(col(S.colId))) {
+    e.preventDefault(); ctxMenu(e.clientX, e.clientY, [{ head: col(S.colId).name }, { label: 'Add a track…', act: 'add-track', id: S.colId, icon: 'plus' }, { label: 'Add audio files…', act: 'add', icon: 'upload' }, { label: 'Convert & download…', act: 'conv-open', id: S.colId, icon: 'link' }]); return; }
   { const tile = t.closest('.daw[data-daw]'); if (tile && window.tpDesktop) { e.preventDefault(); const id = tile.dataset.daw, name = (DAWS.find(d => d[0] === id) || [, id])[1];
       const vers = [...(((UI.dawScan || {}).versions || {})[id] || [])], custom = (S.daws || {})[id]; if (custom && !vers.some(v => v.path === custom)) vers.unshift({ label: name + ' (added by you)', path: custom });
       const cur = (S.dawPick || {})[id] || custom || (UI.dawScan || {})[id];
