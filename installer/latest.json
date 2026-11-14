@@ -1,11 +1,20 @@
 {
-  "version": "1.11.0",
+  "version": "1.11.1",
   "file": "Compass-Setup.exe",
-  "size": 82350203,
-  "sha256": "eeb5a71c729a6e7fd46f340c5b58e97ecc1c70675bd04ad9fb746ed8c69ea822",
-  "notes": "Converter, add a track, artist sorting",
+  "size": 82351146,
+  "sha256": "e8ab165b44fa1613b2fab50b2bfa5bdf1f22c6acf1d0fcf703c67b0d718332fc",
+  "notes": "Artists tab, CD player button, Deezer photos",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.11.1",
+      "d": "2026-11-15",
+      "items": [
+        "Library: new Artists tab (between All songs and Stats). Click an artist to see their songs. Songs named \"Artist - Title\" count for that artist.",
+        "CD player moved to a button at the top, left of Scan QR.",
+        "Artist photos come from Deezer when the name matches exactly."
+      ]
+    },
     {
       "v": "1.11.0",
       "d": "2026-11-15",
@@ -173,14 +182,6 @@
       "d": "2026-11-12",
       "items": [
         "Logo centered, tonearm moved to the top right, and a thin rim so it shows on dark backgrounds."
-      ]
-    },
-    {
-      "v": "1.7.5",
-      "d": "2026-11-12",
-      "items": [
-        "Simpler logo.",
-        "New projects use your artist name from Settings › Profile."
       ]
     }
   ]

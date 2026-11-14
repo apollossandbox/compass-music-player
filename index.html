@@ -722,6 +722,12 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .lib-sort { display: flex; justify-content: flex-end; margin: -6px 0 8px; } .lib-sort .sel { width: auto; }
 .at-list { display: flex; flex-direction: column; gap: 2px; max-height: 46vh; overflow-y: auto; margin-top: 8px; }
 .at-r { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) 44px; gap: 10px; align-items: center; padding: 8px 10px; border: 0; border-radius: 8px; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; } .at-r:hover { background: var(--hover); } .at-r b, .at-r span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .at-r span, .at-r i { color: var(--ink2); font-size: 12.5px; font-style: normal; } .at-r i { text-align: right; }
+.art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px; margin-top: 6px; }
+.art-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px; border: 0; border-radius: 12px; background: none; color: var(--ink); font: inherit; cursor: pointer; text-align: center; min-width: 0; } .art-card:hover { background: var(--hover); }
+.art-card b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .art-card small { color: var(--ink2); }
+.art-av { width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center; font-size: 40px; font-weight: 800; color: #fff; background: hsl(var(--h, 200) 45% 32%) center/cover; }
+.art-head { display: flex; align-items: center; gap: 14px; margin: 4px 0 8px; } .art-head h2 { margin: 0; font-size: 22px; }
+.hact .btn.on { background: var(--ink); color: var(--onink); }
 /* song panel: three fields on one row */
 .three { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .three .lab { margin-top: 10px; } .three .picker, .three .sel { width: 100%; }
 /* FL Studio projects screen */
@@ -1288,7 +1294,7 @@ let curListIds = [];
 const listIds = () => curListIds.length ? curListIds : S.tracks.map(t => t.id);
 function visibleTracks() {
   const q = S.q.toLowerCase();
-  let a = S.tracks.filter(t => (S.filter === 'all' || t.status === S.filter) && (!q || (dispTitle(t) + ' ' + dispArtist(t) + ' ' + t.tags + ' ' + t.key).toLowerCase().includes(q)));
+  let a = S.tracks.filter(t => (S.libTab !== 'artists' || !UI.libArtist || songArtists(t).some(x => x.toLowerCase() === UI.libArtist.toLowerCase())) && (S.filter === 'all' || t.status === S.filter) && (!q || (dispTitle(t) + ' ' + dispArtist(t) + ' ' + t.tags + ' ' + t.key).toLowerCase().includes(q)));
   const by = { added: (x, y) => y.added - x.added, title: (x, y) => x.title.localeCompare(y.title), artist: (x, y) => dispArtist(x).localeCompare(dispArtist(y), undefined, { sensitivity: 'base' }) || x.title.localeCompare(y.title), status: (x, y) => Object.keys(ST).indexOf(x.status) - Object.keys(ST).indexOf(y.status), bpm: (x, y) => (x.bpm || 0) - (y.bpm || 0) };
   return a.sort(by[S.sort] || by.added);
 }
@@ -1529,7 +1535,23 @@ function renderMain() {
 }
 
 const meVerified = n => !!(S.concept && S.concept.verified) && !!n && (!S.concept.artist || S.concept.artist === 'Artist Name' || n.trim().toLowerCase() === S.concept.artist.trim().toLowerCase());
-const LIBTABS_EXTRA = [['cds', 'CD player'], ['stats', 'Stats']], LIBVIEWS = {};
+const LIBTABS_EXTRA = [['artists', 'Artists'], ['stats', 'Stats']], LIBVIEWS = {};
+/* artists: from the song's artist, else its project's artist, else an "Artist - Title" file name */
+const songArtists = t => { const a = (t.artist || '').trim() || projArtist(projOf(t)) || ((t.title.match(/^(.+?)\s+-\s+.+$/) || [])[1] || '').trim(); return a ? a.split(/\s*(?:,|&|\bx\b|\bfeat\.?|\bft\.?)\s*/i).map(x => x.trim()).filter(Boolean) : ['Unknown artist']; };
+function artistIndex() { const m = new Map(); S.tracks.forEach(t => songArtists(t).forEach(a => { const k = a.toLowerCase(); if (!m.has(k)) m.set(k, { name: a, songs: 0, dur: 0 }); const r = m.get(k); r.songs++; r.dur += t.dur || 0; })); return [...m.values()].sort((x, y) => y.songs - x.songs || x.name.localeCompare(y.name)); }
+function artistPic(name) {
+  const k = name.toLowerCase(), C = S.artistPics = S.artistPics || {};
+  if (srcs['artist:pic:' + name]) return srcs['artist:pic:' + name];
+  if (k in C) return C[k] || '';
+  if (window.tpDesktop && tpDesktop.deezer && name !== 'Unknown artist' && !(UI.dzBusy = UI.dzBusy || {})[k]) { UI.dzBusy[k] = 1;
+    tpDesktop.deezer.artist(name).then(r => { C[k] = r && r.picture ? r.picture : ''; save(); if (C[k] && S.view === 'library' && S.libTab === 'artists') { const el = $(`.art-card[data-k="${CSS.escape(name)}"] .art-av`); if (el) { el.style.backgroundImage = `url(${C[k]})`; el.textContent = ''; } } }).catch(() => {}); }
+  return '';
+}
+LIBVIEWS.artists = () => {
+  if (UI.libArtist) return `<div class="art-head"><button class="btn sm" data-act="lib-artist" data-k="">${ico('chevL', 13)} Artists</button><h2>${esc(UI.libArtist)}</h2></div>${colhead}<div id="list" class="list"></div>`;
+  const A = artistIndex(), pic = artistPic;
+  return `<div class="art-grid">${A.map((a, i) => `<button class="art-card" data-act="lib-artist" data-k="${esc(a.name)}" style="--n:${i}"><span class="art-av" style="${pic(a.name) ? `background-image:url(${pic(a.name)})` : `--h:${[...a.name].reduce((h, c) => h + c.charCodeAt(0), 0) % 360}`}">${pic(a.name) ? '' : esc(a.name.slice(0, 1).toUpperCase())}</span><b>${esc(a.name)}</b><small>${plural(a.songs, 'song')}</small></button>`).join('') || '<p class="faint">No songs yet.</p>'}</div>`;
+};
 /* a digital album stays in the CD Creator if it started as your project or has a CD design; imported albums don't */
 const cdOk = c => !!c && !isFolder(c) && (!isMine(c) || c.fromProject !== false || !!(S.cd.designs && S.cd.designs[c.id]));
 const cdList = () => S.cols.filter(c => cdOk(c) && !c.archived);
@@ -1562,6 +1584,7 @@ function libSummary() {
   if (tab === 'mine') { const a = S.cols.filter(c => isMine(c) && !isFolder(c) && !c.archived), ts = songsOf(a); return [plural(a.length, 'digital album'), plural(ts.length, 'song'), ts.length ? total(ts) : ''].filter(Boolean).join(' · '); }
   if (tab === 'tracks' || tab === 'stats') return [plural(S.tracks.length, 'song'), S.tracks.length ? total(S.tracks) : ''].filter(Boolean).join(' · ');
   if (tab === 'cds') return plural(cdList().length, 'CD');
+  if (tab === 'artists') return UI.libArtist ? plural(S.tracks.filter(t => songArtists(t).some(a => a.toLowerCase() === UI.libArtist.toLowerCase())).length, 'song') : plural(artistIndex().length, 'artist');
   if (tab === 'archived') return plural(S.cols.filter(c => c.archived).length, 'archived project');
   const a = S.cols.filter(c => !isMine(c) && !isFolder(c) && !c.archived), f = S.cols.filter(c => isFolder(c) && !isMine(c) && !c.archived).length, ts = songsOf(a);
   return [plural(a.length, 'project'), f ? plural(f, 'folder') : '', plural(ts.length, 'song'), ts.length ? total(ts) : ''].filter(Boolean).join(' · ');
@@ -1571,7 +1594,7 @@ function renderLibrary(m) {
   const projects = S.libTab === 'projects';
   m.innerHTML = `<header class="head">
     <div><h1>Library</h1><p class="faint">${libSummary()}</p></div>
-    <div class="hact"><button class="btn" data-act="qr-scan" aria-label="Scan QR" title="Scan QR">${ico('qr', 16)}</button><button class="btn" data-act="conv-open" title="Convert & download: links, videos, audio">${ico('link', 16)} Convert</button><button class="btn primary" data-act="add">${ico('upload', 16)} Add music</button></div>
+    <div class="hact"><button class="btn ${S.libTab === 'cds' ? 'on' : ''}" data-act="libtab" data-k="cds" aria-label="CD player" title="CD player">${ico('disc', 16)}</button><button class="btn" data-act="qr-scan" aria-label="Scan QR" title="Scan QR">${ico('qr', 16)}</button><button class="btn" data-act="conv-open" title="Convert & download: links, videos, audio">${ico('link', 16)} Convert</button><button class="btn primary" data-act="add">${ico('upload', 16)} Add music</button></div>
   </header>
   <div class="tools">${seg('libtab', [['projects', 'Projects'], ['mine', 'Digital albums'], ['tracks', 'All songs'], ...LIBTABS_EXTRA], S.libTab === 'archived' ? 'projects' : S.libTab, 'libtab')}
   ${S.libTab !== 'tracks' ? '' : `<label class="search box">${ico('search', 16)}<input id="q" type="search" placeholder="Search songs" value="${esc(S.q)}" autocomplete="off"></label>
@@ -3399,6 +3422,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.11.1', d: '2026-11-15', items: ['Library: new Artists tab (between All songs and Stats). Click an artist to see their songs. Songs named "Artist - Title" count for that artist.', 'CD player moved to a button at the top, left of Scan QR.', 'Artist photos come from Deezer when the name matches exactly.'] },
   { v: '1.11.0', d: '2026-11-15', items: ['Convert: turn a YouTube or video link, a video file or an audio file into an MP3 or WAV. Save it to All songs, a project, or a folder you choose. Library › Convert.', 'Right-click anywhere on a project page, or a project in the sidebar, to Add a track: search your songs, or get one from a link or file.', 'Sort by artist: in the Library project grid and in All songs.'] },
   { v: '1.10.1', d: '2026-11-15', items: ['Launcher: the FL Studio tile buttons fit again (Projects is now a folder icon).'] },
   { v: '1.10.0', d: '2026-11-15', items: ['Compass tokens (preview): albums you own show a Verified badge with their edition (open, or numbered like #014/500). Click it for the full ownership history.', 'Lend an album to someone for 24 hours, 7 days or 30 days (free or paid). While it is out, you can\'t play it; it comes back on its own when time runs out, or they can return it early.', 'Sell tradable collector editions in the Store\'s new Resale tab. Every sale pays the artist 5% and Compass 2.5%; the seller gets 92.5%. No $0 transfers.', 'Release settings: open or numbered collector editions, whether owners can lend or resell, and Stop selling (people who bought it keep it).', 'Settings › Ownership › Load sample tokens to try it all. Runs on this computer for now; the server version comes next.'] },
@@ -4414,7 +4438,7 @@ function act(a, el, e) {
     case 'ctx-delcol': trashProject(col(id)); break;
     case 'nav': closeDrawer(); if (el.dataset.view === 'cd') S.cd.home = true; S.view = el.dataset.view; refresh(); break;
     case 'col': closeDrawer(); S.view = 'collection'; S.colId = id; refresh(); break;
-    case 'libtab': S.libTab = k; refresh(); break;
+    case 'libtab': S.libTab = k; UI.libArtist = null; refresh(); break;
     case 'ptab': S.projTab = k; UI.cdSel = null; refresh(); if (k === 'cd') requestAnimationFrame(() => { const ps = $('#ps'); if (ps) ps.scrollIntoView({ block: 'start', behavior: 'smooth' }); }); break;
     case 'newcol': { closeDrawer(); const c = newProject(); S.cols.push(c); S.view = 'collection'; S.colId = c.id; refresh(); UI.mCover = null; openModal('proj', c.id, { isNew: true }); break; }
     case 'add': $('#file').accept = S.view === 'library' ? 'audio/*,.zip,application/zip' : 'audio/*'; $('#file').click(); break;
@@ -4482,6 +4506,7 @@ function act(a, el, e) {
     case 'add-track': openModal('addtrack', id || S.colId); break;
     case 'at-add': { const c = col(UI.modal && UI.modal.id); if (c && !c.tracks.includes(id)) { c.tracks.push(id); save(); renderList(); renderSide(); const l = $('#at-list'); if (l) l.innerHTML = addTrackResults(c.id, ($('#at-q') || {}).value); toast('Added ' + dispTitle(trk(id))); } break; }
     case 'at-conv': openModal('conv', null, { colId: id }); break;
+    case 'lib-artist': UI.libArtist = k || null; renderMain(); $('#main').scrollTop = 0; break;
     case 'feat-open': openFeatures(id || S.editId); break;
     case 'fx-pick': fxAdd(k); break;
     case 'fx-rm': fxRead(); UI.fx.list.splice(+el.closest('.fx-row').dataset.fx, 1); fxPaint(); break;

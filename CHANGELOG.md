@@ -2,6 +2,12 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.1 · 2026-11-15
+
+- Library: new Artists tab (between All songs and Stats). Click an artist to see their songs. Songs named "Artist - Title" count for that artist.
+- CD player moved to a button at the top, left of Scan QR.
+- Artist photos come from Deezer when the name matches exactly.
+
 ## 1.11.0 · 2026-11-15
 
 - Convert: turn a YouTube or video link, a video file or an audio file into an MP3 or WAV. Save it to All songs, a project, or a folder you choose. Library › Convert.
