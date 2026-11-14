@@ -6,7 +6,6 @@ contextBridge.exposeInMainWorld('tpDesktop', {
   flp: { recent: (dirs, opened, n) => ipcRenderer.invoke('tp-fl-recent', dirs, opened, n), all: (dirs, kind, bdir) => ipcRenderer.invoke('tp-fl-all', dirs, kind, bdir), reveal: file => ipcRenderer.invoke('tp-fl-reveal', file), open: (file, exe) => ipcRenderer.invoke('tp-fl-open', file, exe), pick: what => ipcRenderer.invoke('tp-fl-pick', what) },
   daw: { scan: () => ipcRenderer.invoke('tp-daw-scan'), icon: f => ipcRenderer.invoke('tp-daw-icon', f), open: f => ipcRenderer.invoke('tp-daw-open', f), locate: n => ipcRenderer.invoke('tp-daw-locate', n) },
   saveToDownloads: (name, data) => ipcRenderer.invoke('tp-save-downloads', name, data),
-  deezer: { artist: name => ipcRenderer.invoke('tp-dz-artist', name) },
   conv: { link: url => ipcRenderer.invoke('tp-conv-link', url), save: (name, data, dir, pick) => ipcRenderer.invoke('tp-conv-save', name, data, dir, pick), reveal: f => ipcRenderer.invoke('tp-conv-reveal', f) },
   mods: { list: () => ipcRenderer.invoke('tp-mods-list'), folder: () => ipcRenderer.invoke('tp-mods-folder') },
   account: { status: () => ipcRenderer.invoke('tp-acct-status'), signIn: () => ipcRenderer.invoke('tp-acct-signin'), signOut: () => ipcRenderer.invoke('tp-acct-signout'), profile: () => ipcRenderer.invoke('tp-acct-profile'), save: p => ipcRenderer.invoke('tp-acct-save', p) },

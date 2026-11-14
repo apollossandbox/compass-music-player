@@ -2,11 +2,15 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.2 · 2026-11-15
+
+- Artists tab redesigned: artists down the side with round pictures; each artist page has a header image, their picture, your play count and their 10 most played songs, and their albums and projects, with Play and Shuffle. Add or change the picture and header with the image button.
+- Removed the automatic Deezer photo lookup for now.
+
 ## 1.11.1 · 2026-11-15
 
-- Library: new Artists tab (between All songs and Stats). Click an artist to see their songs. Songs named "Artist - Title" count for that artist.
+- Library: new Artists tab (between All songs and Stats): artists down the side, and each artist gets a page with their picture, a header image, how often you played them, and their songs, most played first. Add your own pictures with the image button on the header. Songs named "Artist - Title" count for that artist.
 - CD player moved to a button at the top, left of Scan QR.
-- Artist photos come from Deezer when the name matches exactly.
 
 ## 1.11.0 · 2026-11-15
 

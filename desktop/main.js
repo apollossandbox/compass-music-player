@@ -225,11 +225,6 @@ function ytGet(url) {
 }
 
 app.whenReady().then(() => {
-  // Deezer's public API (no key) for artist photos; asked from here because Deezer doesn't allow calls from inside pages
-  ipcMain.handle('tp-dz-artist', async (e, name) => { try { if (typeof name !== 'string' || !name.trim()) return null; const base = process.env.COMPASS_DEEZER || 'https://api.deezer.com';
-    const r = await fetch(base + '/search/artist?limit=5&q=' + encodeURIComponent(name.trim())); if (!r.ok) return null; const j = await r.json(), list = (j && j.data) || [];
-    const hit = list.find(a => String(a.name).toLowerCase() === name.trim().toLowerCase()) || null; // only an exact name match, never a guess
-    return hit ? { id: hit.id, name: hit.name, picture: hit.picture_medium || hit.picture || '', fans: hit.nb_fan || 0, link: hit.link || '' } : null; } catch (err) { return null; } });
   ipcMain.handle('tp-conv-link', async (e, url) => { try { if (typeof url !== 'string' || !/^https?:\/\/\S+$/i.test(url.trim())) throw new Error('Paste a full link starting with http'); const r = await ytGet(url.trim()); return { ok: true, name: r.name, data: r.data }; } catch (err) { return { ok: false, error: String(err && err.message || err) }; } });
   ipcMain.handle('tp-conv-save', async (e, name, data, dir, pick) => {
     if (pick || !dir || !fs.existsSync(dir)) { const r = await dialog.showOpenDialog(win, { title: 'Save converted files in…', properties: ['openDirectory', 'createDirectory'] }); if (r.canceled) return null; dir = r.filePaths[0]; }

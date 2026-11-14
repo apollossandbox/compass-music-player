@@ -1,18 +1,25 @@
 {
-  "version": "1.11.1",
+  "version": "1.11.2",
   "file": "Compass-Setup.exe",
-  "size": 82351146,
-  "sha256": "e8ab165b44fa1613b2fab50b2bfa5bdf1f22c6acf1d0fcf703c67b0d718332fc",
-  "notes": "Artists tab, CD player button, Deezer photos",
+  "size": 82351573,
+  "sha256": "f7b6ca99ade1aec45257a66b5bae94ff0bf9d333bc291917245a598026069766",
+  "notes": "Artist pages, no Deezer",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.11.2",
+      "d": "2026-11-15",
+      "items": [
+        "Artists tab redesigned: artists down the side with round pictures; each artist page has a header image, their picture, your play count and their 10 most played songs, and their albums and projects, with Play and Shuffle. Add or change the picture and header with the image button.",
+        "Removed the automatic Deezer photo lookup for now."
+      ]
+    },
     {
       "v": "1.11.1",
       "d": "2026-11-15",
       "items": [
-        "Library: new Artists tab (between All songs and Stats). Click an artist to see their songs. Songs named \"Artist - Title\" count for that artist.",
-        "CD player moved to a button at the top, left of Scan QR.",
-        "Artist photos come from Deezer when the name matches exactly."
+        "Library: new Artists tab (between All songs and Stats): artists down the side, and each artist gets a page with their picture, a header image, how often you played them, and their songs, most played first. Add your own pictures with the image button on the header. Songs named \"Artist - Title\" count for that artist.",
+        "CD player moved to a button at the top, left of Scan QR."
       ]
     },
     {
@@ -175,13 +182,6 @@
       "d": "2026-11-12",
       "items": [
         "Logo: only the record turns now, slowly. No more spinning or speeding up on hover."
-      ]
-    },
-    {
-      "v": "1.7.6",
-      "d": "2026-11-12",
-      "items": [
-        "Logo centered, tonearm moved to the top right, and a thin rim so it shows on dark backgrounds."
       ]
     }
   ]
