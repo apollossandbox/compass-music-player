@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.7 · 2026-11-16
+
+- Reordering songs only animates the disc you’re moving them on; the other discs stay still.
+
 ## 1.13.6 · 2026-11-16
 
 - Publish moves the project out of Projects: you get the digital album in Digital albums and the project in Archive. New version in Archive brings it back to work on.

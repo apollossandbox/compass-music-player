@@ -649,7 +649,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .blob { display: none; }
 .main.enter > * { animation-duration: .28s; }
 .pcard, .lcard, .acard, .cdcard, .cdf, .scard { animation-duration: .3s !important; animation-delay: calc(min(var(--n, 0), 10) * 18ms) !important; }
-.list > .row, .discol > .row { content-visibility: auto; contain-intrinsic-size: auto 52px; }
+.list > .row, .discol > .row { content-visibility: auto; contain-intrinsic-size: auto 52px; } .flip-now .list > .row, .flip-now .discol > .row { content-visibility: visible; }
 .pgrid > * { content-visibility: auto; contain-intrinsic-size: auto 260px; }
 
 /* QR scanner */
@@ -3548,6 +3548,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.7', d: '2026-11-16', items: ['Reordering songs only animates the disc you’re moving them on; the other discs stay still.'] },
   { v: '1.13.6', d: '2026-11-16', items: ['Publish moves the project out of Projects: you get the digital album in Digital albums and the project in Archive. New version in Archive brings it back to work on.'] },
   { v: '1.13.5', d: '2026-11-16', items: ['Notifications now show at the bottom right, above the player.'] },
   { v: '1.13.4', d: '2026-11-16', items: ['Sidebar: CD Creator moved under Launcher.'] },
@@ -4939,7 +4940,8 @@ document.addEventListener('drop', e => { if (!UI.colDrag) return; const a = e.ta
 document.addEventListener('dragend', () => { UI.colDrag = null; $$('.acard.over, .acard.dragging').forEach(x => x.classList.remove('over', 'dragging')); });
 document.addEventListener('dragstart', e => { const r = e.target.closest && e.target.closest('.row'); if (r) { dragId = r.dataset.id; e.dataTransfer.setData('text/plain', 'track:' + r.dataset.id); e.dataTransfer.effectAllowed = 'copyMove'; requestAnimationFrame(() => r.classList.add('dragging')); } });
 document.addEventListener('dragstart', e => { const h = e.target.closest && e.target.closest('.dischead[draggable]'); if (h) { e.dataTransfer.setData('text/plain', 'disc:' + h.dataset.disc); e.dataTransfer.effectAllowed = 'move'; } });
-document.addEventListener('dragover', e => { const h = e.target.closest && (e.target.closest('.dischead') || (!e.target.closest('.row') && e.target.closest('.discol'))); if (h && S.view === 'collection') { e.preventDefault(); $$('.dischead.over').forEach(x => x !== h && x.classList.remove('over')); h.classList.add('over'); } });
+const ownDisc = h => { const c = S.view === 'collection' && col(S.colId); return !!(dragId && c && hasDiscs(c) && c.tracks.includes(dragId) && h.dataset.disc === discOf(c, dragId)); };
+document.addEventListener('dragover', e => { const h = e.target.closest && (e.target.closest('.dischead') || (!e.target.closest('.row') && e.target.closest('.discol'))); if (h && ownDisc(h)) { $$('.dischead.over, .discol.over').forEach(x => x.classList.remove('over')); return; } if (h && S.view === 'collection') { e.preventDefault(); $$('.dischead.over').forEach(x => x !== h && x.classList.remove('over')); h.classList.add('over'); } });
 document.addEventListener('dragend', () => { dragId = null; $$('.dischead.over').forEach(x => x.classList.remove('over')); $$('.dragging, .over').forEach(x => x.classList.remove('dragging', 'over')); });
 document.addEventListener('dragover', e => {
   if (!UI.psDrag && e.dataTransfer && [...e.dataTransfer.types].includes('Files') && e.target.closest && e.target.closest('#ps')) {
@@ -4958,10 +4960,12 @@ document.addEventListener('dragover', e => {
 });
 document.addEventListener('dragleave', e => { if (!e.relatedTarget || !(e.relatedTarget.closest && e.relatedTarget.closest('#ps'))) cdDropHint(''); if (!e.relatedTarget) { $('#drop').hidden = true; const z = $('#m-drop'); if (z) z.classList.remove('hot'); } });
 function flipSwap(c, a, b) {
-  const before = {}; $$('#list .row').forEach(r => before[r.dataset.id] = r.getBoundingClientRect().top);
+  document.body.classList.add('flip-now'); clearTimeout(flipSwap.t); flipSwap.t = setTimeout(() => document.body.classList.remove('flip-now'), 700); // rows measured at their real height, not content-visibility's placeholder
+  const top = r => r.getBoundingClientRect().top - $('#list').getBoundingClientRect().top, before = {}; $$('#list .row').forEach(r => before[r.dataset.id] = top(r));
   const i = c.tracks.indexOf(a), j = c.tracks.indexOf(b); [c.tracks[i], c.tracks[j]] = [c.tracks[j], c.tracks[i]];
   renderList(); save(); curListIds = c.tracks.filter(trk);
-  $$('#list .row').forEach(r => { const dy = (before[r.dataset.id] ?? 0) - r.getBoundingClientRect().top; if (dy) { r.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.32,1.18,.46,1)' }); } });
+  const discs = hasDiscs(c) ? new Set([discOf(c, a), discOf(c, b)]) : null; // only the disc(s) the songs are on move
+  $$('#list .row').forEach(r => { if (discs) { const dc = r.closest('.discol'); if (!dc || !discs.has(dc.dataset.disc)) return; } const dy = (before[r.dataset.id] ?? top(r)) - top(r); if (Math.abs(dy) >= 1) { r.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.32,1.18,.46,1)' }); } });
   toast(`Swapped songs ${i + 1} and ${j + 1}`);
 }
 document.addEventListener('drop', e => {
@@ -4971,6 +4975,7 @@ document.addEventListener('drop', e => {
   const row = e.target.closest && e.target.closest('.row[data-row="col"]'), d = e.target.closest && e.target.closest('[data-drop]'), txt = e.dataTransfer.getData('text/plain');
   $$('.dropping, .over').forEach(x => x.classList.remove('dropping', 'over'));
   { const dh = e.target.closest && (e.target.closest('.dischead') || (!e.target.closest('.row') && e.target.closest('.discol'))), c = S.view === 'collection' && col(S.colId);
+    if (dh && c && hasDiscs(c) && txt.startsWith('track:') && dh.dataset.disc === discOf(c, txt.slice(6))) { $$('.dischead.over').forEach(x => x.classList.remove('over')); return; }
     if (dh && c && hasDiscs(c)) { e.preventDefault(); $$('.dischead.over').forEach(x => x.classList.remove('over'));
       if (txt.startsWith('track:')) { const ids = UI.sel.size > 1 && UI.sel.has(txt.slice(6)) ? [...UI.sel] : [txt.slice(6)]; ids.forEach(id => { if (c.tracks.includes(id)) (c.discOf = c.discOf || {})[id] = dh.dataset.disc; }); save(); renderList(); toast('Moved to ' + discLabel(c, c.discs.find(d => d.id === dh.dataset.disc))); return; }
       if (txt.startsWith('disc:')) { const a = c.discs.findIndex(d => d.id === txt.slice(5)), b = c.discs.findIndex(d => d.id === dh.dataset.disc); if (a >= 0 && b >= 0 && a !== b) { c.discOf = c.discOf || {}; c.tracks.forEach(id => { c.discOf[id] = discOf(c, id); }); const [d] = c.discs.splice(a, 1); c.discs.splice(b, 0, d); save(); renderList(); } return; } } }
