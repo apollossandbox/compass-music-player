@@ -757,6 +757,39 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .st-m b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-m small, .st-v small { font-size: 11.5px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-v b { font-size: 12.5px; font-variant-numeric: tabular-nums; }
 @media (max-width: 1150px) { .st-cols { grid-template-columns: 1fr 1fr; } } @media (max-width: 760px) { .st-cols { grid-template-columns: 1fr; } }
 .brand .brand-t { font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-transform: none; letter-spacing: 0; }
+
+/* Store page */
+.sp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; margin-top: 6px; align-items: start; }
+.sp-media { position: sticky; top: 0; max-width: calc(100vh - 290px); } .sp-main { aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); display: grid; place-items: center; position: relative; }
+.sp-main img { width: 100%; height: 100%; object-fit: contain; } .sp-main .acard-ph { position: absolute; inset: 0; }
+.sp-3d { position: absolute; inset: 0; } .sp-3d canvas { width: 100% !important; height: 100% !important; display: block; cursor: grab; }
+.sp-dial { display: flex; gap: 8px; margin-top: 10px; } .sp-dial button { width: 56px; height: 56px; padding: 0; border-radius: 8px; overflow: hidden; border: 2px solid transparent; background: var(--panel); cursor: pointer; opacity: .7; } .sp-dial button.on { border-color: var(--ink); opacity: 1; } .sp-dial img { width: 100%; height: 100%; object-fit: cover; }
+.sp-hint { text-align: center; margin: 8px 0 0; }
+.sp-info h1 { font-size: clamp(28px, 3.2vw, 44px); line-height: 1.05; margin: 0; letter-spacing: -.02em; }
+.sp-artist { border: 0; background: none; padding: 0; margin: 6px 0 0; color: var(--ink); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer; } .sp-artist:hover { text-decoration: underline; }
+.sp-meta { color: var(--ink2); font-size: 13px; margin: 6px 0 0; } .sp-desc { font-size: 14px; line-height: 1.5; margin: 12px 0 0; color: var(--ink); opacity: .9; }
+.sp-eds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 18px 0 0; }
+.sp-ed { display: grid; grid-template-columns: 1fr auto; text-align: left; gap: 2px 8px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; cursor: pointer; } .sp-ed.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.sp-ed b { font-size: 15px; } .sp-ed span { font-weight: 800; text-align: right; } .sp-ed small { grid-column: 1 / -1; color: var(--ink2); font-size: 12px; }
+.sp-buy { display: flex; align-items: center; gap: 14px; margin: 16px 0 0; } .sp-price { font-size: 26px; } .sp-buy .btn { padding: 11px 26px; }
+.sp-fine { margin: 6px 0 0; }
+.sp-tracks { display: flex; flex-direction: column; margin-top: 16px; border-top: 1px solid var(--line); max-height: max(170px, calc(100vh - 610px)); overflow-y: auto; }
+.sp-tr { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto 18px; gap: 10px; align-items: center; padding: 7px 4px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.sp-tr:hover, .sp-tr.on { background: var(--hover); } .sp-tr span, .sp-tr i { color: var(--ink2); font-size: 12.5px; font-style: normal; } .sp-tr b { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sa-head { display: flex; align-items: center; gap: 20px; margin: 10px 0 18px; } .sa-head h1 { margin: 0; }
+@media (max-width: 980px) { .sp { grid-template-columns: 1fr; } .sp-media { position: static; } }
+/* Publish */
+.pub-pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: var(--onink); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.pub-pill:disabled { background: none; color: var(--ink3); border-color: var(--line); cursor: not-allowed; }
+.pb-grid { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 12px; align-items: center; margin-top: 8px; } .pb-grid .lab { margin: 0; }
+.pb-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .pb-row .field { width: 96px; padding-top: 7px; padding-bottom: 7px; } .pb-cur { color: var(--ink2); font-weight: 700; }
+.pb-ws { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin-top: 6px; } .pb-ws label { display: flex; align-items: center; gap: 6px; font-size: 13px; } .pb-ws label > span:first-child { min-width: 84px; } .pb-ws .field { width: 90px; padding-top: 6px; padding-bottom: 6px; }
+.three.four { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 10px; } .three.four .sel.box.wide, .three.four .sel.box.wide select { width: 100%; } .three.four .lab { display: block; }
+/* Wholesale */
+.ws-list { display: flex; flex-direction: column; gap: 6px; } .ws-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+.ws-cov { width: 48px; height: 48px; border-radius: 6px; overflow: hidden; position: relative; display: block; } .ws-cov img, .ws-cov > span { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ws-t { display: flex; flex-direction: column; min-width: 0; } .ws-t b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ws-t small { color: var(--ink2); }
+.ws-tiers { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 /* song panel: three fields on one row */
 .three { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .three .lab { margin-top: 10px; } .three .picker, .three .sel { width: 100%; }
 /* FL Studio projects screen */
@@ -1162,6 +1195,7 @@ const pgrad = c => { const k = pcolors(c); return `linear-gradient(135deg, ${k.j
 const feats = t => (t.features || []).map(s => s.trim()).filter(Boolean);
 const featPlace = (t, n) => (t.featPlace && t.featPlace[n]) || (t.featInTitle ? 'title' : 'artist');
 const featsIn = (t, where) => feats(t).filter(n => featPlace(t, n) === where);
+const CONTENT_TAG = { bonus: 'Bonus', demo: 'Demo', instrumental: 'Instrumental', interlude: 'Interlude' };
 const dispTitle = t => t.title + (featsIn(t, 'title').length ? ` (feat. ${andList(featsIn(t, 'title'))})` : '');
 const artistOf = () => {
   const typed = (S.concept.artist || '').trim(); if (typed && typed !== 'Artist Name') return typed;
@@ -1342,6 +1376,8 @@ function addDisc(c, name, ids) {
 const discLabel = (c, d) => d.name || 'Disc ' + (c.discs.indexOf(d) + 1);
 /* digital albums (My Music), folders that hold projects, archive */
 const isMine = c => !!(c && c.mine);
+const CONTENT = [['main', 'Main'], ['bonus', 'Bonus'], ['demo', 'Demo'], ['instrumental', 'Instrumental'], ['interlude', 'Interlude']];
+const publishBlock = c => { const ts = colTracks(c); if (!ts.length) return 'Add songs first'; const n = ts.filter(t => t.status !== 'final').length; return n ? `Mark every song Final to publish (${n} left)` : ''; };
 const isFrozen = c => !!(c && (c.mine || c.archived)); // digital albums and archived projects can't be edited
 const kidsOf = f => (f && f.kids || []).map(col).filter(Boolean);
 const shown = c => !c.archived && !c.parent;
@@ -1555,7 +1591,8 @@ function renderMain() {
   const m = $('#main'); m.dataset.cd = S.view === 'cd' ? 'page' : '';
   const vkey = S.view + ':' + (S.view === 'collection' ? S.colId : S.view === 'library' ? S.libTab : '');
   const enter = renderMain.last !== vkey; renderMain.last = vkey;
-  if (S.view !== 'launcher') { UI.flScreen = false; UI.lRecent = null; } // leaving the Launcher closes the FL Studio screen; recent list reloads on return
+  if (S.view !== 'launcher') { UI.flScreen = false; UI.lRecent = null; }
+  if (S.view !== 'store' && (UI.spId || UI.spArtist)) { UI.spId = null; UI.spArtist = null; spLeave(); } // leaving the Launcher closes the FL Studio screen; recent list reloads on return
   modGate(); modTick();
   m.classList.toggle('enter', enter);
   if (S.view === 'library') renderLibrary(m);
@@ -1669,6 +1706,7 @@ function renderProject(m) {
       <div class="pact">
         <button class="playbig" data-act="play-col" data-id="${c.id}" aria-label="${playing ? 'Pause' : 'Play'}" title="${playing ? 'Pause' : 'Play'}">${ico(playing ? 'pause' : 'play', 22)}</button>
         ${isFrozen(c) ? '' : `<button class="ico pa" data-act="add" title="Add songs" aria-label="Add songs">${ico('plus', 20)}</button>`}
+        ${!isFrozen(c) && !isFolder(c) ? (b => `<button class="pub-pill" data-act="publish" data-id="${c.id}" ${b ? `disabled title="${esc(b)}"` : 'title="Publish as a digital album"'}>${ico('upload', 14)} Publish</button>`)(publishBlock(c)) : ''}
         ${isMine(c) && S.ledger && (() => { const a = Ledger.access(c); return a.state === 'owned' && a.tk.tradable && a.r.resale; })() ? `<button class="ico pa" data-act="tok-sell" data-id="${c.id}" title="Sell this album" aria-label="Sell this album">${ico('dollar', 20)}</button>` : ''}
         ${isFolder(c) ? '' : `<button class="ico pa" data-act="ctx-dlproj" data-id="${c.id}" title="Export" aria-label="Export">${ico('update', 20)}</button>`}
         <span class="pa-share"><button class="ico pa" data-act="share" aria-label="Share" title="Share">${ico('share', 20)}</button>
@@ -1825,6 +1863,25 @@ function openModal(kind, id, x = {}) {
     const c = col(id), a = Ledger.access(c);
     h = `<h2>Adjust lending time</h2><p class="faint small" style="margin:0">${esc(c.name)} is with ${esc(handleOf(a.loan.to))} until ${new Date(a.loan.until).toLocaleString()}.</p>
     <label class="lab">Give it back in</label>${seg('lnfor', LOAN_TIMES, '604800000', 'ln-for', 'full')}<p class="faint small" style="margin:6px 0 0">Counted from now.</p>`;
+  } else if (kind === 'publish') {
+    const c = col(id), R = c.release || {}, n = colTracks(c).length, dp = R.digital ?? (n <= 1 ? .99 : n <= 6 ? 4.99 : 9.99), W = R.wholesale || {};
+    h = `<h2>${c.release ? 'Store settings' : 'Publish'} · ${esc(c.name)}</h2>
+    <div class="pb-grid">
+      <label class="lab" for="pb-price">Price</label><div class="pb-row"><span class="pb-cur">$</span><input class="field" id="pb-price" type="number" min="0" step=".01" value="${dp}"><span class="faint small">0 = free</span></div>
+      <label class="lab" for="pb-qty">Copies</label><div class="pb-row"><input class="field" id="pb-qty" type="number" min="1" step="1" value="${R.size || 500}" ${R.size ? '' : 'disabled'}><label class="check"><input type="checkbox" id="pb-unl" ${R.size ? '' : 'checked'}><span>Unlimited</span></label></div>
+      <label class="lab">CD</label><div class="pb-row" id="pb-cdbox"><label class="check"><input type="checkbox" id="pb-cdon" ${R.cd != null ? 'checked' : ''}><span>Sell a CD</span></label><span class="pb-cur">$</span><input class="field" id="pb-cd" type="number" min="0" step=".01" value="${R.cd ?? 14.99}" ${R.cd != null ? '' : 'disabled'} title="CD price (includes the digital album)"><span class="faint small">includes digital</span></div>
+      <label class="lab" for="pb-up">CD upgrade</label><div class="pb-row" id="pb-upbox"><span class="pb-cur">$</span><input class="field" id="pb-up" type="number" min="0" step=".01" value="${R.cdUpgrade ?? 9.99}" ${R.cd != null ? '' : 'disabled'}><span class="faint small">for people who own the digital</span></div>
+      <label class="lab" for="pb-desc">Description</label><textarea class="field" id="pb-desc" rows="2" maxlength="400" placeholder="A line or two for the Store page">${esc(R.desc || c.desc || '')}</textarea>
+    </div>
+    <details class="mdet" ${R.resale ? 'open' : ''}><summary>Resale</summary>
+      <label class="check"><input type="checkbox" id="pb-rs" ${R.resale ? 'checked' : ''}><span>Owners can resell it in the Marketplace</span></label>
+      <div id="pb-rsbox" class="pb-row ${R.resale ? '' : 'hide-folder'}"><span class="faint small">Seller keeps</span><input class="field" id="pb-share" type="number" min="0" max="97.5" step=".5" value="${R.sellerShare ?? 92.5}"><span class="faint small">% · max price $</span><input class="field" id="pb-max" type="number" min="1" step=".01" value="${R.maxResale ?? ''}" placeholder="none"></div>
+      <p class="faint small" style="margin:4px 0 0">You get the rest of each resale after Compass's 2.5%.</p></details>
+    <details class="mdet" ${R.wholesale ? 'open' : ''}><summary>Wholesale</summary>
+      <label class="check"><input type="checkbox" id="pb-ws" ${R.wholesale ? 'checked' : ''}><span>Sell code packs to vendors (redeemable on Compass)</span></label>
+      <div id="pb-wsbox" class="pb-ws ${R.wholesale ? '' : 'hide-folder'}">${[500, 1500, 5000, 10000].map(q => `<label><span>${q.toLocaleString()} codes</span><span class="pb-cur">$</span><input class="field" data-ws="${q}" type="number" min="0" step=".01" value="${W[q] ?? ''}" placeholder="per album"></label>`).join('')}</div>
+      <p class="faint small" style="margin:4px 0 0">Each code must cost less than the Store price, and bigger packs can't cost more per code.</p></details>
+    <p class="faint small" id="pb-err" role="alert" style="margin:6px 0 0;color:#e5484d"></p>`;
   } else if (kind === 'sell') {
     const c = col(id), a = Ledger.access(c);
     h = `<h2>Sell ${esc(c.name)}</h2><p class="faint small" style="margin:0">${edLabel(a.tk, a.r)}. Ownership moves to the buyer when they pay.</p>
@@ -1870,7 +1927,7 @@ function openModal(kind, id, x = {}) {
     <div class="dropzone" id="m-drop">${ico('import', 26)}<b>Drop the .zip here</b><span class="faint small">or loose audio and image files</span><button class="btn sm primary" data-act="zip-pick">Choose files</button></div>
     <p class="faint small" id="m-status" role="status"></p>`;
   }
-  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' || kind === 'artcov' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'loanadj' ? '<button class="btn primary" data-act="la-ok">Save</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
+  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' || kind === 'artcov' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'publish' && (col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}${kind === 'publish' ? `<button class="btn primary" data-act="pb-save">${(col(id) || {}).release ? 'Save' : 'Put in the Store'}</button>` : ''}${kind === 'loanadj' ? '<button class="btn primary" data-act="la-ok">Save</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
   md.classList.toggle('wide', kind === 'meta' || kind === 'lstyle'); md.classList.toggle('clogm', kind === 'changelog' || kind === 'qr');
   if (kind === 'qr') qrStart();
   if (kind === 'addtrack') setTimeout(() => { const i = $('#at-q'); if (i) i.focus(); }, 60);
@@ -2302,7 +2359,7 @@ function init3D() {
     cv.addEventListener('pointerdown', e => {
       if (e.button === 2) return;
       cv.setPointerCapture(e.pointerId);
-      if (UI.vw || S.cd.lock) { C3.orbit = { x: e.clientX, y: e.clientY }; cv.style.cursor = 'grabbing'; if (UI.vw) { UI.vw.auto = false; renderViewerBar(); } return; }
+      if (UI.vw || S.cd.lock || S.view === 'store') { if (S.view === 'store') UI.spHeld = true; C3.orbit = { x: e.clientX, y: e.clientY }; cv.style.cursor = 'grabbing'; if (UI.vw) { UI.vw.auto = false; renderViewerBar(); } return; }
       const tool = S.cd.tool || 'move';
       if (tool === 'text') { const hp = pick(e); if (hp) cdPlaceText(hp.sheet, hp.x, hp.y); return; }
       const h = tool === 'move' ? pick(e) : null;
@@ -2439,8 +2496,8 @@ function renderVwList() {
 function storePreview(id) {
   const t = trk(id); if (!t) return; clearTimeout(UI.prevT); playTrack(id, [id]); if (UI.vw) UI.vw.playing = true;
   setTimeout(() => { try { const d = Engine.dur() || verDur(t); if (d > 60) Engine.seek(d * .35); } catch (e) { } }, 250);
-  UI.prevT = setTimeout(() => { if (S.cur === id && S.playing) { toggle(); toast('Preview ended. Buy the CD to hear the rest.'); } }, 30000);
-  toast('Previewing ' + dispTitle(t) + ' (30 seconds)'); renderViewerBar(); renderVwList();
+  UI.prevT = setTimeout(() => { if (S.cur === id && S.playing) { toggle(); toast('Preview ended. Buy it to hear the rest.'); if (S.view === 'store') renderMain(); } }, 30000);
+  toast('Previewing ' + dispTitle(t) + ' (30 seconds)'); if (UI.vw) { renderViewerBar(); renderVwList(); }
 }
 function vwTrack(k) { if (UI.vw && UI.vw.store) { const c = cdCol(), ts = colTracks(c), i = ts.findIndex(t => t.id === S.cur), n = ts[i < 0 ? 0 : (i + k + ts.length) % ts.length]; if (n) storePreview(n.id); return; } const c = cdCol(); if (!c) return; const ts = colTracks(c), i = ts.findIndex(t => t.id === S.cur), n = ts[i < 0 ? 0 : (i + k + ts.length) % ts.length]; if (n) { playTrack(n.id, ts.map(t => t.id)); if (UI.vw) UI.vw.playing = true; renderViewerBar(); renderVwList(); } }
 function vwHelp() { toast('Space play · ←/→ song · [ ] CD · O open · D disc · A spin · -/= speed · R reset · L songs · H hide · V video · Esc close'); }
@@ -3482,6 +3539,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.0', d: '2026-11-16', items: ['Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.', 'Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.', 'Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.', 'Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition.'] },
   { v: '1.12.4', d: '2026-11-16', items: ['Sidebar: the Compass logo next to Music Player, in Arial bold.'] },
   { v: '1.12.3', d: '2026-11-16', items: ['New name: Compass Music Player. The sidebar shows the Compass logo with Music Player.'] },
   { v: '1.12.2', d: '2026-11-16', items: ['Stats fit on one screen: totals in a compact strip, your most played songs, artists and projects side by side, and buttons to sort by plays, time listened or average per play. Click a row to play the song or open the project.'] },
@@ -3560,17 +3618,80 @@ function checkWhatsNew() {
 if (window.tpDesktop && tpDesktop.onChangelog) tpDesktop.onChangelog(d => openChangelog(d && d.changelog, d && d.since));
 
 /* ---------- Music Store: a storefront for music, digital and physical ---------- */
+/* ---------- Store page: one release, its images, editions and songs ---------- */
+const SP_PANELS = [['front', 'Front'], ['tray', 'Back'], ['disc', 'Disc'], ['trayIn', 'Back tray']];
+const usd = v => v == null ? '' : v ? '$' + (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'Free';
+async function spRenderPanels(c) {
+  const key = c.id + ':' + (S.cd.mod && S.cd.mod[c.id] || 0); if (UI.spPanels && UI.spPanels.key === key) return UI.spPanels.imgs;
+  const d = design(c), imgs = {}, ls = Object.values(d).flatMap(sd => (sd && sd.layers) || []); try { await waitFonts(ls); } catch (e) {}
+  await Promise.all(ls.filter(l => l.type === 'img').map(l => new Promise(r => { if (getImg(l.src) || !imgCache[l.src]) return r(); imgCache[l.src].addEventListener('load', r, { once: true }); imgCache[l.src].addEventListener('error', r, { once: true }); setTimeout(r, 4000); })));
+  for (const [k] of SP_PANELS) { const sh = SHEETS[k]; if (!sh || !d[k]) continue; const sc = 5, cv = document.createElement('canvas');
+    cv.width = Math.round((sh.w + 2 * BLEED) * sc); cv.height = Math.round((sh.h + 2 * BLEED) * sc); try { const x = cv.getContext('2d'); paintSheet(x, k, d[k], sc, d); if (!spBlank(x, cv)) imgs[k] = cv.toDataURL('image/jpeg', .9); } catch (e) {} }
+  UI.spPanels = { key, imgs }; return imgs;
+}
+function spBlank(x, cv) { const D = x.getImageData(0, 0, cv.width, cv.height).data; let lo = 765, hi = 0; for (let i = 0; i < D.length; i += 4 * 37) { const v = D[i] + D[i + 1] + D[i + 2]; if (v < lo) lo = v; if (v > hi) hi = v; } return hi - lo < 24; }
+function spImages(c) { const out = []; if (artFull(c)) out.push(['cover', 'Cover', artFull(c)]); const P = UI.spPanels && UI.spPanels.key.startsWith(c.id + ':') ? UI.spPanels.imgs : {}; SP_PANELS.forEach(([k, l]) => { if (P[k]) out.push([k, l, P[k]]); }); return out; }
+function renderStorePage(m) {
+  const c = col(UI.spId); if (!c || !c.release) { UI.spId = null; return renderStore(m); }
+  const R = c.release, ed = UI.spEd === 'cd' && R.cd != null ? 'cd' : R.digital != null ? 'digital' : 'cd', imgs = spImages(c), cur = imgs.find(x => x[0] === UI.spImg) || imgs[0];
+  if (!UI.spPanels || !UI.spPanels.key.startsWith(c.id + ':')) spRenderPanels(c).then(() => { if (S.view === 'store' && UI.spId === c.id) renderMain(); });
+  const ts = colTracks(c), A = projArtist(c), price = ed === 'cd' ? R.cd : R.digital;
+  const stock = R.size ? `${Math.max(0, R.size - (R.sold || 0))} of ${R.size} left` : '';
+  m.innerHTML = `<button class="fl-back" data-act="sp-back">${ico('chevL', 14)} Music Store</button>
+    <div class="sp">
+      <div class="sp-media"><div class="sp-main" id="sp-main">${ed === 'cd' ? '<div class="sp-3d" id="sp-3d"></div>' : cur ? `<img src="${cur[2]}" alt="${esc(cur[1])}">` : `<span class="acard-ph" style="${cover(c.h1, c.h2)}"></span>`}</div>
+        ${ed === 'cd' ? '<p class="faint small sp-hint">Drag to turn the case.</p>' : imgs.length > 1 ? `<div class="sp-dial" role="tablist">${imgs.map(([k, l, u]) => `<button class="${cur && cur[0] === k ? 'on' : ''}" data-act="sp-img" data-k="${k}" title="${l}" aria-label="${l}"><img src="${u}" alt=""></button>`).join('')}</div>` : ''}</div>
+      <div class="sp-info">
+        <h1>${esc(c.name)}</h1>
+        <button class="sp-artist" data-act="sp-artist" data-k="${esc(A)}">${esc(A || 'Unknown artist')}</button>
+        <p class="sp-meta">${[KINDS[c.type] || 'Album', plural(ts.length, 'song'), total(ts), c.targetDate && c.released ? new Date(c.targetDate + 'T12:00').getFullYear() : ''].filter(Boolean).join(' · ')}</p>
+        ${R.desc || c.desc ? `<p class="sp-desc">${esc(R.desc || c.desc)}</p>` : ''}
+        <div class="sp-eds">${R.digital != null ? `<button class="sp-ed ${ed === 'digital' ? 'on' : ''}" data-act="sp-ed" data-k="digital"><b>Digital</b><span>${usd(R.digital)}</span><small>${R.edition === 'collector' ? 'Numbered edition' : 'Download and stream'}</small></button>` : ''}
+          ${R.cd != null ? `<button class="sp-ed ${ed === 'cd' ? 'on' : ''}" data-act="sp-ed" data-k="cd"><b>CD</b><span>${usd(R.cd)}</span><small>Includes the digital album</small></button>` : ''}</div>
+        <div class="sp-buy"><b class="sp-price">${usd(price)}</b><button class="btn primary" data-act="store-buy" data-id="${c.id}">${ed === 'cd' ? 'Buy CD' : 'Buy'}</button></div>
+        <p class="faint small sp-fine">${[stock, ed === 'digital' && R.cd != null && R.cdUpgrade != null ? `Own the digital? Add the CD for ${usd(R.cdUpgrade)}` : ''].filter(Boolean).join(' · ')}</p>
+        <div class="sp-tracks">${ts.map((t, i) => `<button class="sp-tr ${S.cur === t.id && S.playing ? 'on' : ''}" data-act="sp-prev" data-id="${t.id}"><span>${i + 1}</span><b>${esc(dispTitle(t))}</b><i>${fmt(verDur(t))}</i>${ico(S.cur === t.id && S.playing ? 'pause' : 'play', 12)}</button>`).join('')}</div>
+        <p class="faint small sp-fine">Click a song for a 30-second preview.</p>
+      </div></div>`;
+  if (ed === 'cd') spMount3D(c);
+}
+function spMount3D(c) {
+  const box = $('#sp-3d'); if (!box) return; design(c); const g = init3D(); if (!g) { box.innerHTML = `<img src="${artFull(c) || ''}" alt="">`; return; }
+  if (!UI.spSaved) UI.spSaved = { tx: C3.tx, ty: C3.ty, tz: C3.tz, open: S.cd.open, disc: S.cd.discOut, colId: S.cd.colId };
+  const fresh = UI.spSaved.at !== c.id; UI.spSaved.at = c.id; S.cd.colId = c.id; S.cd.open = false; S.cd.discOut = false;
+  box.appendChild(g.r.domElement); C3.w = 0; if (fresh) { C3.tx = -.12; C3.ty = -.45; C3.tz = 36; } buildCase(); cdPaintTex();
+  if (!g.running) { g.running = true; requestAnimationFrame(loop3D); }
+  clearInterval(UI.spSpin); UI.spSpin = setInterval(() => { if (!document.getElementById('sp-3d') || !C3) return clearInterval(UI.spSpin); if (!C3.orbit && !UI.spHeld) { UI.spT = (UI.spT || 0) + .016; C3.ty = -.45 + Math.sin(UI.spT * .7) * .38; } }, 16);
+}
+function spLeave() {
+  clearInterval(UI.spSpin); const v = UI.spSaved; UI.spSaved = null; if (!v) return;
+  S.cd.colId = v.colId; S.cd.open = v.open; S.cd.discOut = v.disc; if (C3) { C3.tx = v.tx; C3.ty = v.ty; C3.tz = v.tz; C3.w = 0; if (C3.r.domElement.isConnected) C3.r.domElement.remove(); buildCase(); }
+}
+function renderArtistStore(m) {
+  const A = UI.spArtist, rel = S.cols.filter(c => c.release && !c.release.delisted && !c.archived && projArtists(c).some(a => a.toLowerCase() === A.toLowerCase()));
+  m.innerHTML = `<button class="fl-back" data-act="sp-back">${ico('chevL', 14)} Music Store</button>
+    <header class="sa-head">${artAv(A, 'art-big')}<div><small class="faint">Artist</small><h1>${esc(A)}</h1><p class="faint">${plural(rel.length, 'release')}</p></div></header>
+    <div class="sgrid">${rel.map((c, n) => `<div class="scard" style="--n:${n}" data-act="sp-open" data-id="${c.id}" role="button" tabindex="0"><div class="acard-art">${albumArt(c)}</div><b>${esc(c.name)}</b><span>${KINDS[c.type] || 'Album'}</span><em>${usd(c.release.digital ?? c.release.cd)}</em></div>`).join('') || '<p class="faint">Nothing in the Store yet.</p>'}</div>`;
+}
 function renderStore(m) {
+  if (UI.spArtist) return renderArtistStore(m);
+  if (UI.spId) return renderStorePage(m);
   const tab = UI.storeTab === 'resale' ? 'digital' : UI.storeTab || 'digital'; const rel = S.cols.filter(c => c.release && !c.release.delisted && !c.archived && (tab === 'physical' ? c.release.cd != null : c.release.digital != null)).sort((a, b) => (b.release.at || 0) - (a.release.at || 0));
   const price = c => tab === 'physical' ? c.release.cd : c.release.digital, money = v => v ? '$' + v.toFixed(2) : 'Free';
-  const card = (c, n) => `<div class="scard" style="--n:${n}" data-act="${tab === 'physical' ? 'store-cd' : 'col'}" data-id="${c.id}" role="button" tabindex="0"><div class="acard-art">${tab === 'physical' ? `<span class="scd" style="${pcov(c)}"><i></i></span>` : albumArt(c)}</div><b>${esc(c.name)}</b><span>${esc(projArtist(c) || 'Unknown artist')}</span><em>${tab === 'physical' ? 'CD · Jewel case' : (KINDS[c.type] || 'Album') + ' · ' + colTracks(c).length + (colTracks(c).length === 1 ? ' song' : ' songs')}</em><button class="btn sm buy" data-act="store-buy" data-id="${c.id}" title="Checkout coming soon">${money(price(c))}</button></div>`;
+  const card = (c, n) => `<div class="scard" style="--n:${n}" data-act="sp-open" data-k="${tab === 'physical' ? 'cd' : 'digital'}" data-id="${c.id}" role="button" tabindex="0"><div class="acard-art">${tab === 'physical' ? `<span class="scd" style="${pcov(c)}"><i></i></span>` : albumArt(c)}</div><b>${esc(c.name)}</b><span>${esc(projArtist(c) || 'Unknown artist')}</span><em>${tab === 'physical' ? 'CD · Jewel case' : (KINDS[c.type] || 'Album') + ' · ' + colTracks(c).length + (colTracks(c).length === 1 ? ' song' : ' songs')}</em><button class="btn sm buy" data-act="store-buy" data-id="${c.id}" title="Checkout coming soon">${money(price(c))}</button></div>`;
   const hero = rel[0];
-  m.innerHTML = `<header class="head"><div><h1>Music Store</h1><p class="faint">Your releases as buyers see them. Checkout coming soon.</p></div></header>
+  m.innerHTML = `<header class="head"><div><h1>Music Store</h1><p class="faint">New music from artists. Click an album for its page.</p></div></header>
     <div class="tools">${seg('storetab', [['digital', 'Digital'], ['physical', 'Physical']], tab, 'store-tab')}</div>
-    ${hero ? `<section class="shero" style="${pcovFull(hero)}"><div><small>New ${tab === 'physical' ? 'on CD' : 'release'}</small><h2>${esc(hero.name)}</h2><p>${esc(projArtist(hero) || '')}</p><div class="crow"><button class="btn primary" data-act="play-col" data-id="${hero.id}">${ico('play', 15)} Listen</button><button class="btn buy" data-act="store-buy" data-id="${hero.id}">${money(price(hero))}</button></div></div></section>` : ''}
-    ${rel.length ? `<h3 class="srow-h">${tab === 'physical' ? 'CDs' : 'Releases'}</h3><div class="sgrid">${rel.map(card).join('')}</div>` : `<div class="empty"><p><b>Nothing ${tab === 'physical' ? 'on CD' : 'released'} yet</b></p><p class="faint">Right-click a project or album and choose <b>Release…</b></p></div>`}`;
+    ${hero ? `<section class="shero" style="${pcovFull(hero)}"><div><small>New ${tab === 'physical' ? 'on CD' : 'release'}</small><h2>${esc(hero.name)}</h2><p>${esc(projArtist(hero) || '')}</p><div class="crow"><button class="btn primary" data-act="sp-open" data-k="${tab === 'physical' ? 'cd' : 'digital'}" data-id="${hero.id}">View album</button></div></div></section>` : ''}
+    ${rel.length ? `<h3 class="srow-h">${tab === 'physical' ? 'CDs' : 'Releases'}</h3><div class="sgrid">${rel.map(card).join('')}</div>` : `<div class="empty"><p><b>Nothing ${tab === 'physical' ? 'on CD' : 'released'} yet</b></p><p class="faint">Publish a project to put it here.</p></div>`}`;
 }
 /* Store › Resale: collector editions people are selling. Every sale pays the artist 5% and Compass 2.5%. */
+function wholesaleHTML() {
+  const W = S.cols.filter(c => c.release && c.release.wholesale && !c.release.delisted && !c.archived);
+  return `<h3 class="srow-h" style="margin-top:28px">Wholesale</h3><p class="faint small" style="margin:-4px 0 10px">Code packs for shops and vendors. Each code redeems one copy on Compass.</p>
+  ${W.length ? `<div class="ws-list">${W.map(c => `<div class="ws-row"><span class="ws-cov">${albumArt(c)}</span><span class="ws-t"><b>${esc(c.name)}</b><small>${esc(projArtist(c))} · Store ${usd(c.release.digital)}</small></span>
+    <span class="ws-tiers">${Object.entries(c.release.wholesale).map(([q, v]) => `<button class="btn sm" data-act="ws-buy" data-id="${c.id}" data-k="${q}" ${c.release.size && c.release.size - (c.release.sold || 0) < +q ? `disabled title="Only ${c.release.size - (c.release.sold || 0)} copies left"` : `title="${(+q).toLocaleString()} codes at ${usd(v)} each"`}>${(+q).toLocaleString()} · ${usd(v)}/ea</button>`).join('')}</span></div>`).join('')}</div>` : '<p class="faint">No wholesale packs yet. Artists turn it on when they publish.</p>'}`;
+}
 function resaleHTML() {
   const L = Object.values(LG().listings).filter(l => l.status === 'ACTIVE').map(l => { const tk = LG().tokens[l.token], r = tk && LG().releases[tk.rel]; return tk && r && !r.delisted ? { l, tk, r } : null; }).filter(Boolean);
   const card = ({ l, tk, r }) => { const src = col(r.colId) || col(r.srcId); return `<div class="rcard"><div class="acard-art">${src ? albumArt(src) : '<span class="acard-ph"></span>'}</div>
@@ -3585,12 +3706,12 @@ function renderMarket(m) {
   const producers = [];
   m.innerHTML = `<section class="mk-hero"><h1>Marketplace</h1><p>Beats, kits, loops and project files from producers.</p>
       <label class="mk-search">${ico('search', 18)}<input placeholder="Search beats, kits, producers" aria-label="Search the marketplace"><button class="btn primary">Search</button></label>
-      <div class="chips">${genres.map(g => `<button class="chip">${g}</button>`).join('')}</div><p class="faint small">Coming soon. Nothing is for sale yet.</p></section>
+      <div class="chips">${genres.map(g => `<button class="chip">${g}</button>`).join('')}</div><p class="faint small">Beats and kits are coming soon.</p></section>
     <h3 class="srow-h">Trending beats</h3>
     <div class="mk-list">${ts.map((t, i) => `<div class="mk-row"><span class="mk-n">${i + 1}</span><button class="mk-play" data-act="play" data-id="${t.id}" aria-label="Play">${ico(S.cur === t.id && S.playing ? 'pause' : 'play', 14)}</button><span class="mk-cov" style="${tcov(t)}"></span><span class="meta"><b>${esc(dispTitle(t))}</b><span>${esc(dispArtist(t) || 'Producer')}</span></span><span class="mono">${t.bpm ? t.bpm + ' BPM' : ''}</span><span class="mono">${esc(t.key || '')}</span><button class="btn sm" disabled>$29.99</button></div>`).join('') || '<p class="faint">No beats yet.</p>'}</div>
     <h3 class="srow-h">Top producers</h3><div class="mk-prod">${producers.map(n => `<div><span class="mk-av">${esc(n.slice(0, 1).toUpperCase())}</span><b>${esc(n)}</b></div>`).join('') || '<p class="faint">No producers yet.</p>'}</div>
     <h3 class="srow-h">Sound kits</h3><p class="faint">No kits yet.</p>
-    ${S.ledger ? resaleHTML() : ''}`;
+    ${wholesaleHTML()}${S.ledger ? resaleHTML() : ''}`;
 }
 /* ---------- Launcher: find the DAWs on this computer and open them ---------- */
 const DAWS = [['fl', 'FL Studio'], ['ableton', 'Ableton Live'], ['logic', 'Logic Pro'], ['studioone', 'Studio One'], ['reaper', 'REAPER'], ['cubase', 'Cubase'], ['bitwig', 'Bitwig Studio'], ['protools', 'Pro Tools'], ['reason', 'Reason'], ['garageband', 'GarageBand']];
@@ -3975,7 +4096,7 @@ function openDrawer(id) {
   <label class="lab" for="d-title">Title</label><input class="field" id="d-title" data-f="title" value="${esc(t.title)}">
   <label class="lab" for="d-artist">Main artist</label><input class="field" id="d-artist" data-f="artist" value="${esc(t.artist)}" placeholder="${esc(artistOf())} (project artist)">
   <div class="crow" style="margin-top:8px"><button class="btn sm" data-act="meta-open" data-id="${t.id}">${ico('list', 14)} Details & credits</button><button class="btn sm" data-act="feat-open" data-id="${t.id}" title="${esc(feats(t).join(', ') || 'Add featured artists')}">${ico('user', 14)} Features${feats(t).length ? ' · ' + feats(t).length : ''}</button><button class="btn sm" data-act="meta-export" data-id="${t.id}" title="Save this song's info as a text file">${ico('save', 14)} Export info</button></div>
-  <div class="three"><div><label class="lab">Status</label>${picker('tstatus', '', ST, t.status, 'status')}</div><div><label class="lab" for="d-bpm">BPM</label><input class="field" id="d-bpm" data-f="bpm" type="number" min="0" max="300" value="${t.bpm || ''}"></div><div><label class="lab" for="d-key">Key</label><input class="field" id="d-key" data-f="key" value="${esc(t.key)}"></div></div>
+  <div class="three four"><div><label class="lab">Status</label>${picker('tstatus', '', ST, t.status, 'status')}</div><div><label class="lab" for="d-content">Type</label><div class="sel box wide"><select id="d-content">${CONTENT.map(([k, l]) => `<option value="${k}" ${(t.content || 'main') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div><div><label class="lab" for="d-bpm">BPM</label><input class="field" id="d-bpm" data-f="bpm" type="number" min="0" max="300" value="${t.bpm || ''}"></div><div><label class="lab" for="d-key">Key</label><input class="field" id="d-key" data-f="key" value="${esc(t.key)}"></div></div>
   <label class="lab">Versions</label><div class="vers" id="d-vers">${versHTML(t)}</div>
   <div class="crow" style="margin-top:6px"><button class="btn sm" data-act="ver-add">${ico('plus', 14)} Add a version</button></div>
   <label class="lab" for="d-lyr">Lyrics</label><textarea class="field" id="d-lyr" data-f="lyrics" rows="5" style="resize:vertical;min-height:96px" placeholder="One line per row.">${esc(t.lyrics || '')}</textarea>
@@ -4137,6 +4258,19 @@ function makeSequel(id) {
 }
 /* ---------- QR scanner (mock): any code unlocks sxteen ways' Movie for now.
    Later each printed code will point at one Store release and the server will check it. ---------- */
+const QRGEN_URL = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+function loadQrGen() { if (window.qrcode) return Promise.resolve(true); return new Promise(res => { const sc = document.createElement('script'); sc.src = QRGEN_URL; sc.onload = () => res(!!window.qrcode); sc.onerror = () => res(false); document.head.appendChild(sc); }); }
+/* Wholesale code pack: a CSV and a printable sheet of QR cards, every code unique. */
+async function wsPack(c, q) {
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', seen = new Set(), part = () => Array.from(crypto.getRandomValues(new Uint8Array(4)), b => A[b % A.length]).join('');
+  while (seen.size < q) seen.add([part(), part(), part()].join('-'));
+  const codes = [...seen], csvq = v => `"${String(v).replace(/"/g, '""')}"`, artist = projArtist(c) || '';
+  const csv = 'code,album,artist,qr\n' + codes.map(k => [k, csvq(c.name), csvq(artist), 'compass:redeem:' + k].join(',')).join('\n') + '\n';
+  if (!(await loadQrGen()) || !window.JSZip) return { csv, cards: null, codes };
+  const card = k => { const g = qrcode(0, 'M'); g.addData('compass:redeem:' + k); g.make(); return `<div class="c">${g.createImgTag(3, 0)}<div><b>${esc(c.name)}</b><span>${esc(artist)}</span><code>${k}</code><small>Scan in Compass Music Player, or enter the code. Works once.</small></div></div>`; };
+  const cards = `<!doctype html><meta charset="utf-8"><title>${esc(c.name)} codes</title><style>@page{size:A4;margin:10mm}body{font:11px Arial,sans-serif;margin:0}.g{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}.c{display:flex;gap:3mm;align-items:center;border:1px dashed #999;padding:3mm;break-inside:avoid}.c img{width:24mm;height:24mm;image-rendering:pixelated}.c div{display:flex;flex-direction:column;gap:1mm;min-width:0}b{font-size:12px}code{font:bold 11px monospace}small{color:#666;font-size:8px}</style><div class="g">${codes.map(card).join('')}</div>`;
+  return { csv, cards, codes };
+}
 const JSQR_URL = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
 const QR = { stream: null, timer: 0, busy: false, done: false };
 function loadJsQR() { if (window.jsQR) return Promise.resolve(true); return new Promise(res => { const sc = document.createElement('script'); sc.src = JSQR_URL; sc.onload = () => res(!!window.jsQR); sc.onerror = () => res(false); document.head.appendChild(sc); }); }
@@ -4423,7 +4557,7 @@ function act(a, el, e) {
     case 'cd-grid': S.cd.grid = !S.cd.grid; save(); renderPsStatus(); cdDirty(); break;
     case 'cd-snapt': S.cd.snap = S.cd.snap === false; save(); renderPsStatus(); toast(S.cd.snap === false ? 'Snapping off' : 'Snapping on'); break;
     case 'verified-info': toast('Verified: This album is verified by its distributors and is an official release. Your digital token is irreplicable and you retain sole ownership of this copy of this release.'); break;
-    case 'ctx-release': { const c = col(id); if (c) openModal('release', c.id); break; }
+    case 'ctx-release': { const c = col(id); if (!c) break; if (isMine(c)) openModal('publish', c.id); else act('publish', { dataset: { id } }); break; }
     case 'ctx-todigital': { const c = col(id); if (!c || isFolder(c)) break; if (!colTracks(c).length) { toast('Add songs before making it a digital album'); break; } c.mine = true; if (c.parent) { const f = col(c.parent); if (f) f.kids = f.kids.filter(x => x !== c.id); delete c.parent; } if (!c.released) { c.released = true; c.targetDate = c.targetDate || today(); } S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id); if (S.view === 'collection' && S.colId === c.id || S.view === 'cd') { S.view = 'library'; } S.libTab = 'mine'; save(); refresh(); toast(c.name + ' is now a digital album'); break; }
     case 'rel-fmt': $$('[data-act="rel-fmt"]', el.parentElement).forEach(b => { b.classList.toggle('on', b === el); b.setAttribute('aria-pressed', b === el); }); $('#rel-dig').classList.toggle('hide-folder', k === 'cd'); $('#rel-cd').classList.toggle('hide-folder', k === 'digital'); applySlides(); break;
     case 'rel-ok': releaseSave(); break;
@@ -4438,8 +4572,23 @@ function act(a, el, e) {
     case 'disc-rm': { const c = col(S.colId), i = c.discs.findIndex(x => x.id === k); if (i < 0) break; const to = c.discs[i ? i - 1 : 1]; Object.keys(c.discOf || {}).forEach(id => { if (c.discOf[id] === k) c.discOf[id] = to.id; }); c.discs.splice(i, 1); if (c.discs.length < 2) { delete c.discs; delete c.discOf; } save(); renderList(); break; }
     case 'm-logo': $('#logofile').click(); break;
     case 'm-logo-clear': UI.mLogo = false; { const b = $('.mlogo-pv'); if (b) { b.style.backgroundImage = ''; b.innerHTML = ico('image', 20); } } el.remove(); break;
+    case 'publish': { const c = col(id); if (!c) break; const b = publishBlock(c); if (b) { toast(b); break; }
+      duplicateProject(id, true).then(() => { const n = S.cols[S.cols.indexOf(c) + 1]; if (!n || n === c) return; Object.assign(n, { name: c.name, mine: true, fromProject: true, publishedFrom: c.id, released: true, targetDate: c.targetDate || today() }); delete n.release; delete n.parent;
+        save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published as a digital album. Set its price and quantity.'); openModal('publish', n.id); }); break; }
+    case 'pb-save': publishSave(); break;
+    case 'ws-buy': { const c = col(id), q = +k, v = c.release.wholesale[k]; askSure(`Buy ${q.toLocaleString()} codes for ${c.name}?`, `${usd(v)} each, ${usd(v * q)} total. Test purchase, nothing is charged. You get a zip with a CSV of codes and printable QR cards.${c.release.size ? ` Uses ${q.toLocaleString()} of the ${c.release.size - (c.release.sold || 0)} copies left.` : ''}`, 'Get codes').then(async ok => { if (!ok) return;
+      toast(`Making ${q.toLocaleString()} codes…`); const P = await wsPack(c, q), base = `${infoName(c.name)} - ${q} codes`;
+      c.release.codesIssued = (c.release.codesIssued || 0) + q; if (c.release.size) c.release.sold = (c.release.sold || 0) + q; save();
+      if (!P.cards) return saveBlob(base + '.csv', new Blob([P.csv], { type: 'text/csv' }));
+      const z = new JSZip(); z.file(base + '.csv', P.csv); z.file(base + ' - cards.html', P.cards); saveBlob(base + '.zip', await z.generateAsync({ type: 'blob', compression: 'DEFLATE' })); }); break; }
     case 'store-tab': UI.storeTab = k; renderMain(); break;
-    case 'store-buy': toast('Checkout coming soon'); break;
+    case 'store-buy': toast('Checkout opens when payments are connected. Nothing was charged.'); break;
+    case 'sp-open': UI.spId = id; UI.spArtist = null; UI.spEd = k === 'cd' ? 'cd' : 'digital'; UI.spImg = null; S.view = 'store'; refresh(); $('#main').scrollTop = 0; break;
+    case 'sp-back': UI.spId = null; UI.spArtist = null; spLeave(); refresh(); break;
+    case 'sp-img': UI.spImg = k; renderMain(); break;
+    case 'sp-ed': UI.spHeld = false; UI.spT = 0; UI.spEd = k; if (k !== 'cd') spLeave(); renderMain(); break;
+    case 'sp-artist': if (k) { UI.spArtist = k; UI.spId = null; spLeave(); renderMain(); $('#main').scrollTop = 0; } break;
+    case 'sp-prev': { if (S.cur === id && S.playing) { toggle(); renderMain(); break; } storePreview(id); renderMain(); break; }
     case 'store-cd': viewerFor(id, { store: true, list: S.cols.filter(c => c.release && c.release.cd != null && !c.archived).map(c => c.id) }); break;
     case 'daw-rescan': UI.dawScan = null; S.dawHidden = []; save(); renderMain(); break;
     case 'fl-screen': UI.flScreen = true; UI.flRecent = null; UI.flAll = null; UI.flZip = null; UI.flBak = null; UI.flPage = 1; UI.flQ = ''; renderMain(); break;
@@ -4657,6 +4806,11 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.id === 'd-content') { const tr = trk(S.editId); if (tr) { tr.content = t.value; save(); renderList(); } return; }
+  if (t.id === 'pb-unl') { const q = $('#pb-qty'); if (q) q.disabled = t.checked; return; }
+  if (t.id === 'pb-cdon') { $$('#pb-cdbox .field, #pb-upbox .field').forEach(x => { x.disabled = !t.checked; }); return; }
+  if (t.id === 'pb-ws') { const b = $('#pb-wsbox'); if (b) b.classList.toggle('hide-folder', !t.checked); return; }
+  if (t.id === 'pb-rs') { const b = $('#pb-rsbox'); if (b) b.classList.toggle('hide-folder', !t.checked); return; }
   if (t.dataset.libsort !== undefined) { S.libSort = t.value; save(); renderMain(); return; }
   if (t.dataset.modtoggle) { const id = t.dataset.modtoggle; S.mods = { ...(S.mods || {}), [id]: t.checked }; save(); const m = MODS.list.find(x => x.id === id); if (m) { if (t.checked) modStart(m); else modStop(id); } toast(t.checked ? 'Mod on' : 'Mod off'); return; }
   if (t.dataset.flv) { S.flView = { ...(S.flView || {}), [t.dataset.flv]: t.value }; UI.flPage = 1; save(); flAllPaint(); return; }
@@ -5173,10 +5327,23 @@ function splitPreview() {
     o.innerHTML = cents ? (cents < MIN_RESALE ? 'Minimum $1.00.' : (() => { const sp = splitOf(cents); return `${label}: you get <b>${money(sp.seller)}</b> · artist ${money(sp.artist)} (5%) · Compass ${money(sp.compass)} (2.5%)`; })()) : (inp === '#ln-price' ? 'Free loan.' : ''); };
   f('#ln-price', '#ln-split', 'Rental'); f('#sl-price', '#sl-split', 'If it sells');
 }
+function publishSave() {
+  const c = col(UI.modal && UI.modal.id); if (!c) return; const num = id => { const v = ($('#' + id) || {}).value; return v === '' || v == null ? null : Math.round(+v * 100) / 100; }, err = m => { const e = $('#pb-err'); if (e) e.textContent = m; };
+  const price = Math.max(0, num('pb-price') || 0), unl = $('#pb-unl').checked, size = unl ? null : Math.max(1, Math.round(num('pb-qty') || 1)), cdOn = $('#pb-cdon').checked, cd = cdOn ? Math.max(0, num('pb-cd') || 0) : null, up = cdOn ? num('pb-up') : null;
+  if (cdOn && up != null && up >= cd) return err('The CD upgrade price has to be below the CD price.');
+  const rs = $('#pb-rs').checked, share = Math.min(97.5, Math.max(0, num('pb-share') ?? 92.5)), max = num('pb-max');
+  let ws = null; if ($('#pb-ws').checked) { ws = {}; let prev = Infinity;
+    for (const el of $$('#pb-wsbox [data-ws]')) { const q = +el.dataset.ws, v = el.value === '' ? null : Math.round(+el.value * 100) / 100; if (v == null) continue;
+      if (price && v >= price) return err(`${q.toLocaleString()} codes: each code has to cost less than the Store price (${usd(price)}).`);
+      if (v > prev) return err(`${q.toLocaleString()} codes can't cost more per code than a smaller pack.`); ws[q] = v; prev = v; }
+    if (!Object.keys(ws).length) return err('Set a price for at least one wholesale pack, or turn wholesale off.'); }
+  c.release = { ...(c.release || {}), digital: price, cd, cdUpgrade: cdOn ? up : null, size, edition: size ? 'collector' : 'open', desc: ($('#pb-desc').value || '').trim(), resale: rs, tradable: rs, sellerShare: rs ? share : null, maxResale: rs ? max : null, lend: true, wholesale: ws, at: (c.release && c.release.at) || Date.now() };
+  save(); closeModal(); refresh(); toast(`${c.name} is in the Store: ${usd(price)}${cd != null ? ' · CD ' + usd(cd) : ''}${size ? ' · ' + size + ' copies' : ' · unlimited'}`);
+}
 function digitalMenuBase(c) {
   return [{ head: c.name + (projArtist(c) ? ' · ' + projArtist(c) : '') }, { label: 'Make My Version', act: 'ctx-myver', id: c.id, icon: 'copy' },
     ...(isMyArtist(c) ? [{ label: 'Make deluxe', act: 'ctx-deluxe', id: c.id, icon: 'disc' }, { label: 'New sequel…', act: 'ctx-sequel', id: c.id, icon: 'plus' }] : []),
-    ...(STORE_OPEN_TO_ALL || isMyArtist(c) ? [{ label: c.release ? 'Store Settings…' : 'Put in the Store…', act: 'ctx-release', id: c.id, icon: 'upload' }] : []),
+    ...(STORE_OPEN_TO_ALL || isMyArtist(c) ? [{ label: c.release ? 'Store settings…' : 'Put in the Store…', act: 'ctx-release', id: c.id, icon: 'upload' }] : []),
     ...(cdOk(c) ? [{ sep: 1 }, { label: 'View CD', act: 'ctx-viewcd', id: c.id, icon: 'disc' }, { label: 'Edit CD', act: 'ctx-editcd', id: c.id, icon: 'edit' }] : []),
     { sep: 1 }, { label: 'Download', act: 'ctx-dlproj', id: c.id, icon: 'save' }, { label: 'Delete', act: 'ctx-delcol', id: c.id, icon: 'trash', danger: 1 }];
 }
@@ -5196,7 +5363,7 @@ function projectMenuInner(c) {
     ...(isFolder(c) || isMine(c) ? [] : [{ label: 'View CD', act: 'ctx-viewcd', id: c.id, icon: 'disc' }, { label: 'Edit CD', act: 'ctx-editcd', id: c.id, icon: 'edit' }]),
     { label: isFolder(c) ? 'Export folder' : 'Export CD package', act: 'ctx-disc', id: c.id, icon: 'save' }, { label: 'Download', act: 'ctx-dlproj', id: c.id, icon: 'save' }, { sep: 1 },
     ...(isMine(c) ? [{ label: 'Make My Version', act: 'ctx-myver', id: c.id, icon: 'copy' }] : []),
-    ...(isFolder(c) ? [] : [{ label: c.release ? 'Release settings…' : 'Release…', act: 'ctx-release', id: c.id, icon: 'upload' }, { label: 'Convert to Digital Album', act: 'ctx-todigital', id: c.id, icon: 'disc', confirm: 'Click again: it becomes read-only' }]),
+    ...(isFolder(c) ? [] : [{ label: 'Publish…', act: 'publish', id: c.id, icon: 'upload', disabled: !!publishBlock(c), title: publishBlock(c) }]),
     ...(c.parent ? [{ label: 'Remove from folder', act: 'ctx-unfold', id: c.id, icon: 'back' }] : []),
     { label: c.archived ? 'Unarchive' : 'Archive', act: 'ctx-arch', id: c.id, icon: 'archive' },
     ...(fs => fs.length ? [{ head: 'Move to folder' }, ...fs.map(f => ({ label: f.name, act: 'ctx-tofold', id: c.id, k: f.id, icon: 'folder' }))] : [])(S.cols.filter(f => isFolder(f) && f.id !== c.id && f.id !== c.parent && !f.archived).slice(0, 8)), { sep: 1 },

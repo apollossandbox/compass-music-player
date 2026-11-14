@@ -1,11 +1,21 @@
 {
-  "version": "1.12.4",
+  "version": "1.13.0",
   "file": "Compass-Setup.exe",
-  "size": 82237212,
-  "sha256": "3f4e411f8cdff48494c44f8841280fb39a31dcc8a373e42db782fad4e771b4bb",
-  "notes": "Sidebar brand",
+  "size": 82252438,
+  "sha256": "8dc50594e26caee447df79d6d07c36e4f6fe710ba041d26b0568218754ac2849",
+  "notes": "Store pages with CD panels and the 3D case, Publish with pricing, copies, CD upgrade, resale and wholesale, song Type, and wholesale code packs in the Marketplace.",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.13.0",
+      "d": "2026-11-16",
+      "items": [
+        "Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.",
+        "Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.",
+        "Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.",
+        "Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition."
+      ]
+    },
     {
       "v": "1.12.4",
       "d": "2026-11-16",
@@ -164,13 +174,6 @@
         "CD Creator: one Export menu (print files, 3D model, picture). One Viewer button. Opacity, fill and text options each live in one place instead of two or three.",
         "Settings: Desktop app and About are one row. The EQ lives in the player bar only. CD Creator shortcuts are tucked under their own heading.",
         "Menus use the same capitalisation everywhere, and the nav icons are all different."
-      ]
-    },
-    {
-      "v": "1.8.9",
-      "d": "2026-11-14",
-      "items": [
-        "FL Studio screen: a separate Zipped loop projects tab lists FL zipped loop packages (.zip files with a project inside) from your project folders and Downloads. Click one to open it in FL Studio. Open other project… accepts them too."
       ]
     }
   ]

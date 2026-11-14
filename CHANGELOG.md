@@ -2,6 +2,13 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.0 · 2026-11-16
+
+- Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.
+- Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.
+- Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.
+- Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition.
+
 ## 1.12.4 · 2026-11-16
 
 - Sidebar: the Compass logo next to Music Player, in Arial bold.

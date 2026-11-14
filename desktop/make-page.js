@@ -11,6 +11,7 @@ body = swap(body, "'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/expor
 body = swap(body, "'https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js'", "'lib/mp4-muxer.js'");
 body = swap(body, "'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'", "'lib/jsQR.js'");
 body = swap(body, "'https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js'", "'lib/lame.min.js'");
+body = swap(body, "'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'", "'lib/qrcode.js'");
 const bridge = `<script>
 /* Desktop bridge: the web page asks for a "downloads" helper; here it hands files to the Windows save dialog. */
 window.claude = { use: async name => name === 'downloads' ? { save: async ({ filename, data }) => {
