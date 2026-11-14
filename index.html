@@ -1,4 +1,4 @@
-<title>Compass</title>
+<title>Compass Music Player</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Permanent+Marker&display=swap" media="print" onload="this.media='all'">
 <style>
@@ -756,6 +756,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .st-n { color: var(--ink3); font-size: 12px; text-align: right; } .st-m, .st-v { display: flex; flex-direction: column; min-width: 0; } .st-v { text-align: right; }
 .st-m b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-m small, .st-v small { font-size: 11.5px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-v b { font-size: 12.5px; font-variant-numeric: tabular-nums; }
 @media (max-width: 1150px) { .st-cols { grid-template-columns: 1fr 1fr; } } @media (max-width: 760px) { .st-cols { grid-template-columns: 1fr; } }
+.brand-t { display: flex; flex-direction: column; line-height: 1.05; } .brand-t small { font-size: 9.5px; letter-spacing: .14em; opacity: .65; font-weight: 700; margin-top: 2px; }
 /* song panel: three fields on one row */
 .three { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .three .lab { margin-top: 10px; } .three .picker, .three .sel { width: 100%; }
 /* FL Studio projects screen */
@@ -1446,7 +1447,7 @@ function toast(msg) { const e = $('#toast'); e.textContent = msg; e.classList.ad
 function renderSide() {
   const nav = [['library', 'lib', 'Library', projCount()], ['launcher', 'cube', 'Launcher'], ['store', 'music', 'Music Store'], ['market', 'grid', 'Marketplace'], ['cd', 'disc', 'CD Creator'], ['settings', 'gear', 'Settings']];
   $('#side').innerHTML = `
-  <div class="brand">${logo(26)}<span>Compass</span></div>
+  <div class="brand">${logo(26)}<span class="brand-t">Compass<small>Music Player</small></span></div>
   <nav class="snav" data-slide="nav"><i class="thumb"></i>${nav.map(([v, i, l, n]) => `<button class="navbtn ${S.view === v ? 'on' : ''}" data-act="nav" data-view="${v}">${ico(i)}<span>${l}</span>${n !== undefined ? `<em>${n}</em>` : ''}</button>`).join('')}</nav>
   <div class="shead"><span>Projects</span><button class="ico ${S.side.sort !== 'custom' || S.side.type !== 'all' || S.side.rel !== 'all' ? 'on' : ''}" data-act="side-menu" aria-label="Sort and filter projects" title="Sort and filter">${ico('list', 15)}</button><button class="ico" data-act="newcol" aria-label="New project" title="New project">${ico('plus', 16)}</button></div>
   <div class="colswrap"><div class="cols" data-slide="cols"><i class="thumb"></i>${(() => { let last = null; const ps = sideProjects(), one = ps.length > 1 && new Set(ps.map(projArtist)).size < 2; return ps.map(c => { const a = projArtist(c), head = S.side.sort === 'artist' && a !== last ? `<p class="sgrp">${esc(a || 'No artist')}</p>` : ''; last = a; return `${head}
@@ -3481,6 +3482,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.12.3', d: '2026-11-16', items: ['New name: Compass Music Player.'] },
   { v: '1.12.2', d: '2026-11-16', items: ['Stats fit on one screen: totals in a compact strip, your most played songs, artists and projects side by side, and buttons to sort by plays, time listened or average per play. Click a row to play the song or open the project.'] },
   { v: '1.12.1', d: '2026-11-16', items: ['Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover.'] },
   { v: '1.12.0', d: '2026-11-16', items: ['Library has an Archive tab. Archived projects are saved as they were and can\'t be edited; right-click one and choose New version to keep working on a copy.', 'Albums you own: a $ button on the album page sells it (when the artist allows resale). Lending moved into Share.', 'A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.', 'Second-hand albums are now in the Marketplace instead of the Music Store.'] },

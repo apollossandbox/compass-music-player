@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.12.3 · 2026-11-16
+
+- New name: Compass Music Player.
+
 ## 1.12.2 · 2026-11-16
 
 - Stats fit on one screen: totals in a compact strip, your most played songs, artists and projects side by side, and buttons to sort by plays, time listened or average per play. Click a row to play the song or open the project.

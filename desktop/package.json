@@ -1,7 +1,7 @@
 {
   "name": "tamed-player",
   "productName": "Compass",
-  "version": "1.12.2",
+  "version": "1.12.3",
   "description": "Compass: music library, CD creator, audio tools and DAW launcher.",
   "author": "trulytamed",
   "main": "main.js",
@@ -49,7 +49,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Compass",
+      "shortcutName": "Compass Music Player",
       "deleteAppDataOnUninstall": false
     }
   }

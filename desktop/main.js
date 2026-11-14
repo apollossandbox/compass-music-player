@@ -6,7 +6,7 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 
 // Same data folder as before the rename (%APPDATA%\Tamed Player), so updates keep your projects.
-app.setName('Compass');
+app.setName('Compass Music Player');
 app.setPath('userData', path.join(app.getPath('appData'), 'Tamed Player'));
 app.setAppUserModelId('com.trulytamed.tamedplayer');
 if (!app.requestSingleInstanceLock()) app.quit();
@@ -18,7 +18,7 @@ let win = null;
 function createWindow() {
   win = new BrowserWindow({
     width: 1440, height: 900, minWidth: 1000, minHeight: 660,
-    title: 'Compass', backgroundColor: '#0b0b0c', autoHideMenuBar: true, show: false,
+    title: 'Compass Music Player', backgroundColor: '#0b0b0c', autoHideMenuBar: true, show: false,
     icon: path.join(__dirname, 'app', 'icon.png'),
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false,
       preload: path.join(__dirname, 'preload.js') }
@@ -274,7 +274,7 @@ app.whenReady().then(() => {
   ipcMain.on('tp-drag', (e, file) => { if (typeof file === 'string' && file.startsWith(sentDir()) && fs.existsSync(file)) e.sender.startDrag({ file, icon: dragIcon() }); });
   ipcMain.handle('tp-reveal', (e, file) => { if (typeof file === 'string' && file.startsWith(sentDir()) && fs.existsSync(file)) shell.showItemInFolder(file); else shell.openPath(sentDir()); });
   session.defaultSession.on('will-download', (e, item) => {
-    item.setSaveDialogOptions({ title: 'Save from Compass', defaultPath: path.join(app.getPath('documents'), item.getFilename()) });
+    item.setSaveDialogOptions({ title: 'Save from Compass Music Player', defaultPath: path.join(app.getPath('documents'), item.getFilename()) });
   });
   ipcMain.handle('tp-check-updates', () => checkForUpdates(true));
   ipcMain.on('tp-version', e => { e.returnValue = app.getVersion(); });

@@ -21,7 +21,7 @@ npx electron-builder --win dir --x64 --publish never -c.win.signAndEditExecutabl
 RCEDIT="$(ls ~/.cache/electron-builder/winCodeSign/winCodeSign-*/rcedit-x64.exe | head -1)"
 WINE64="$(command -v wine64 || echo /usr/lib/wine/wine64)"
 WINEARCH=win64 WINEPREFIX="$HOME/.wine64" "$WINE64" "$RCEDIT" "dist/win-unpacked/Compass.exe" \
-  --set-version-string FileDescription "Compass" --set-version-string ProductName "Compass" \
+  --set-version-string FileDescription "Compass Music Player" --set-version-string ProductName "Compass Music Player" \
   --set-version-string LegalCopyright "trulytamed and KGB" --set-version-string CompanyName trulytamed \
   --set-version-string InternalName "Compass" --set-version-string OriginalFilename "Compass.exe" \
   --set-file-version "$VERSION" --set-product-version "$VERSION.0" --set-icon build/icon.ico
