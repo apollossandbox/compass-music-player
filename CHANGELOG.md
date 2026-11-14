@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.1 · 2026-11-16
+
+- Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export.
+
 ## 1.13.0 · 2026-11-16
 
 - Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.

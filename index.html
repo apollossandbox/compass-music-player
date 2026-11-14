@@ -916,6 +916,8 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 .ctx-i:disabled { opacity: .5; cursor: default; }
 .ctx-i.danger, .ctx-i.danger .ic { color: #e5484d; } .ctx-i.danger[data-armed] { background: #e5484d; color: #fff; } .ctx-i.danger[data-armed] .ic { color: #fff; }
 .ctx-sep { height: 1px; margin: 4px 6px; background: var(--line); }
+.ctx-i.has-sub > .ic:last-child { width: 12px; color: var(--ink3); } .ctx-i.has-sub.open { background: var(--panel2); } .ctx-i.has-sub kbd { margin-left: auto; }
+.ctx-sub { min-width: 190px; z-index: 201; }
 /* lock + fieldsets */
 .pso-fs, .psp-fs { display: contents; border: 0; margin: 0; padding: 0; min-width: 0; }
 .psp-fs:disabled .psp-sec, .pso-fs:disabled > * { opacity: .45; }
@@ -1528,9 +1530,9 @@ async function dupTracks(ids) {
 const targetsMenu = (ids, act, label) => S.cols.filter(c => !isMine(c) && !c.archived && !(S.view === 'collection' && c.id === S.colId)).slice(0, 14).map(c => ({ label: (label ? label + ' ' : '') + c.name, act, id: c.id, k: ids.join(','), icon: isFolder(c) ? 'folder' : 'disc' }));
 function bulkMenu(ids) {
   const fromMine = S.view === 'collection' && isMine(col(S.colId));
-  return [{ head: ids.length + ' songs selected' }, { label: 'Play', act: 'bulk-play', k: ids.join(','), icon: 'play' }, { label: 'Download ' + ids.length + ' songs', act: 'bulk-export', k: ids.join(','), icon: 'save' }, { label: 'Duplicate', act: 'bulk-dup', k: ids.join(','), icon: 'copy' }, { sep: 1 },
-    ...(S.view === 'collection' && !fromMine ? [{ head: 'Move to' }, ...targetsMenu(ids, 'bulk-move', '')] : []), { head: 'Add to' }, ...targetsMenu(ids, 'bulk-copy', ''), { sep: 1 },
-    ...Object.entries(ST).map(([k, l]) => ({ label: 'Mark as ' + l, act: 'bulk-st', id: k, k: ids.join(','), icon: null })), { sep: 1 },
+  return [{ head: ids.length + ' songs selected' }, { label: 'Play', act: 'bulk-play', k: ids.join(','), icon: 'play' }, { label: 'Export ' + ids.length + ' songs', act: 'bulk-export', k: ids.join(','), icon: 'save' }, { label: 'Duplicate', act: 'bulk-dup', k: ids.join(','), icon: 'copy' }, { sep: 1 },
+    ...(S.view === 'collection' && !fromMine ? [{ label: 'Move', icon: 'move', sub: targetsMenu(ids, 'bulk-move', '') }] : []), { label: 'Add to', icon: 'plus', sub: targetsMenu(ids, 'bulk-copy', '') },
+    { label: 'Status', icon: 'list', sub: Object.entries(ST).map(([k, l]) => ({ label: l, act: 'bulk-st', id: k, k: ids.join(','), icon: null })) }, { sep: 1 },
     ...(S.view === 'collection' && !fromMine ? [{ label: 'Remove from project', act: 'bulk-rm', k: ids.join(','), icon: 'x' }] : []), { label: 'Delete ' + ids.length + ' songs', act: 'bulk-del', k: ids.join(','), icon: 'trash', danger: 1 }];
 }
 function rowHTML(t, i, inCol) {
@@ -3539,6 +3541,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.1', d: '2026-11-16', items: ['Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export.'] },
   { v: '1.13.0', d: '2026-11-16', items: ['Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.', 'Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.', 'Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.', 'Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition.'] },
   { v: '1.12.4', d: '2026-11-16', items: ['Sidebar: the Compass logo next to Music Player, in Arial bold.'] },
   { v: '1.12.3', d: '2026-11-16', items: ['New name: Compass Music Player. The sidebar shows the Compass logo with Music Player.'] },
@@ -4772,7 +4775,7 @@ document.addEventListener('click', e => {
   UI.shiftClick = e.shiftKey;
   if (UI.noClick && Date.now() - UI.noClick < 350) { e.preventDefault(); e.stopPropagation(); return; }
   { const r = e.target.closest && e.target.closest('#list .row'); if (r && !e.target.closest('button, input, a, select, textarea, [data-act]')) selectRow(r.dataset.id, e); else if (!r && !e.target.closest('#ctx') && UI.sel && UI.sel.size && !e.target.closest('.bar, #modal, #drawer')) { UI.sel.clear(); $$('#list .row.picked').forEach(x => x.classList.remove('picked')); } if (false) { const id = r.dataset.id; if (S.cur === id) toggle(); else playTrack(id, curListIds.length ? curListIds : null); return; } }
-  { const m = $('#ctx'); if (m) { const it = e.target.closest('.ctx-i'); if (!it || !(it.dataset.confirm && !it.dataset.armed)) setTimeout(closeCtx, 0); } }
+  { const m = $('#ctx'); if (m) { const it = e.target.closest('.ctx-i'); if (it && it.classList.contains('has-sub')) ctxOpenSub(it); else if (!it || !(it.dataset.confirm && !it.dataset.armed)) setTimeout(closeCtx, 0); } }
   if (UI.fontOpen && !e.target.closest('#psfontdrop, [data-act="cd-fontpick"]')) { UI.fontOpen = false; renderFontDrop(); }
   const el = e.target.closest('[data-act]');
   if (!e.target.closest('.pick')) $$('.pick.open').forEach(p => p.classList.remove('open'));
@@ -5081,13 +5084,36 @@ function cdArrange(L, how) {
 /* one context menu for the whole app */
 function ctxMenu(x, y, items) {
   closeCtx(); const m = document.createElement('div'); m.className = 'ctx'; m.id = 'ctx'; m.setAttribute('role', 'menu');
-  m.innerHTML = items.filter(Boolean).map(it => it.sep ? '<div class="ctx-sep" role="separator"></div>' : it.head ? `<div class="ctx-head">${esc(it.head)}</div>`
-    : `<button role="menuitem" class="ctx-i ${it.danger ? 'danger' : ''}" data-act="${it.act}" ${it.k != null ? `data-k="${esc(it.k)}"` : ''} ${it.id ? `data-id="${esc(it.id)}"` : ''} ${it.confirm ? `data-confirm="${esc(it.confirm)}"` : ''} ${it.disabled ? 'disabled' : ''}>${it.icon ? ico(it.icon, 14) : '<span class="ctx-ic"></span>'}<span>${esc(it.label)}</span>${it.kbd ? `<kbd>${esc(it.kbd)}</kbd>` : ''}</button>`).join('');
+  UI.ctxItems = items = items.filter(Boolean); m.innerHTML = items.map(ctxItemHTML).join('');
+  m.addEventListener('mouseover', e => { const b = e.target.closest('.ctx-i'); if (!b) return; clearTimeout(UI.ctxSubT); if (b.classList.contains('has-sub')) ctxOpenSub(b); else UI.ctxSubT = setTimeout(ctxCloseSub, 180); });
   document.body.appendChild(m);
   const r = { width: m.offsetWidth, height: m.offsetHeight }; m.style.left = Math.max(8, Math.min(x, innerWidth - r.width - 8)) + 'px'; m.style.top = Math.max(8, Math.min(y, innerHeight - r.height - 8)) + 'px'; // real size, not the size mid-animation
   const first = m.querySelector('.ctx-i:not([disabled])'); if (first) first.focus({ preventScroll: true });
 }
-function closeCtx() { const m = $('#ctx'); if (m) m.remove(); }
+function ctxItemHTML(it, i) {
+  if (it.sep) return '<div class="ctx-sep" role="separator"></div>'; if (it.head) return `<div class="ctx-head">${esc(it.head)}</div>`;
+  const icon = it.icon ? ico(it.icon, 14) : '<span class="ctx-ic"></span>', kbd = it.kbd ? `<kbd>${esc(it.kbd)}</kbd>` : '';
+  if (it.sub) return `<button role="menuitem" aria-haspopup="menu" class="ctx-i has-sub" data-sub="${i}" ${it.sub.length ? '' : 'disabled'}>${icon}<span>${esc(it.label)}</span>${kbd}${ico('chevR', 12)}</button>`;
+  return `<button role="menuitem" class="ctx-i ${it.danger ? 'danger' : ''}" data-act="${it.act}" ${it.k != null ? `data-k="${esc(it.k)}"` : ''} ${it.id ? `data-id="${esc(it.id)}"` : ''} ${it.confirm ? `data-confirm="${esc(it.confirm)}"` : ''} ${it.disabled ? 'disabled' : ''}>${icon}<span>${esc(it.label)}</span>${kbd}</button>`;
+}
+function ctxOpenSub(btn, focus) {
+  const it = (UI.ctxItems || [])[+btn.dataset.sub]; if (!it || !it.sub) return; let s = $('#ctxsub');
+  if (!s || s.dataset.of !== btn.dataset.sub) {
+    if (s) s.remove(); s = document.createElement('div'); s.className = 'ctx ctx-sub'; s.id = 'ctxsub'; s.dataset.of = btn.dataset.sub; s.setAttribute('role', 'menu');
+    s.innerHTML = it.sub.filter(Boolean).map(ctxItemHTML).join(''); s.addEventListener('mouseenter', () => clearTimeout(UI.ctxSubT)); document.body.appendChild(s);
+    const r = btn.getBoundingClientRect(), w = s.offsetWidth, h = s.offsetHeight; let x = r.right + 2; if (x + w > innerWidth - 8) x = r.left - w - 2;
+    s.style.left = Math.max(8, x) + 'px'; s.style.top = Math.max(8, Math.min(r.top - 6, innerHeight - h - 8)) + 'px';
+    $$('#ctx .has-sub').forEach(b => b.classList.toggle('open', b === btn));
+  }
+  if (focus) { const f = s.querySelector('.ctx-i:not([disabled])'); if (f) f.focus({ preventScroll: true }); }
+}
+function ctxCloseSub() { const s = $('#ctxsub'); if (s) s.remove(); $$('#ctx .has-sub.open').forEach(b => b.classList.remove('open')); }
+document.addEventListener('keydown', e => {
+  if (!$('#ctx')) return; const a = document.activeElement;
+  if (e.key === 'ArrowRight' && a && a.classList.contains('has-sub')) { e.preventDefault(); ctxOpenSub(a, true); }
+  else if ((e.key === 'ArrowLeft' || e.key === 'Escape') && a && a.closest('#ctxsub')) { e.preventDefault(); e.stopImmediatePropagation(); const b = $(`#ctx [data-sub="${$('#ctxsub').dataset.of}"]`); ctxCloseSub(); if (b) b.focus(); }
+}, true);
+function closeCtx() { ctxCloseSub(); const m = $('#ctx'); if (m) m.remove(); }
 const MOD = /Mac|iPhone|iPad/.test(navigator.platform || '') ? '⌘' : 'Ctrl+';
 function layerMenu(L) {
   const lk = !!L.locked;
@@ -5128,9 +5154,9 @@ function trackMenuBase(t, inCol) {
   const on = S.cur === t.id && S.playing;
   return [{ head: dispTitle(t) }, { label: on ? 'Pause' : 'Play', act: 'play', id: t.id, icon: on ? 'pause' : 'play' }, { sep: 1 },
     { label: 'Edit song', act: 'edit', id: t.id, icon: 'edit' }, { label: 'Details & credits…', act: 'meta-open', id: t.id, icon: 'list' }, { sep: 1 },
-    { label: 'Replace audio…', act: 'ctx-replaudio', id: t.id, icon: 'upload' }, { label: 'Add version…', act: 'ctx-addver', id: t.id, icon: 'plus' }, { label: 'Download', act: 'bulk-export', k: t.id, icon: 'save' }, { label: 'Duplicate', act: 'bulk-dup', k: t.id, icon: 'copy' }, { sep: 1 },
-    ...(inCol && !isMine(col(S.colId)) ? [{ head: 'Move to' }, ...targetsMenu([t.id], 'bulk-move', '')] : []), { head: 'Add to' }, ...targetsMenu([t.id], 'bulk-copy', ''), { sep: 1 },
-    ...Object.entries(ST).map(([k, l]) => ({ label: 'Mark as ' + l, act: 'set-st', id: t.id, k, icon: t.status === k ? 'check' : null })), { sep: 1 },
+    { label: 'Replace audio…', act: 'ctx-replaudio', id: t.id, icon: 'upload' }, { label: 'Add version…', act: 'ctx-addver', id: t.id, icon: 'plus' }, { label: 'Export', act: 'bulk-export', k: t.id, icon: 'save' }, { label: 'Duplicate', act: 'bulk-dup', k: t.id, icon: 'copy' }, { sep: 1 },
+    ...(inCol && !isMine(col(S.colId)) ? [{ label: 'Move', icon: 'move', sub: targetsMenu([t.id], 'bulk-move', '') }] : []), { label: 'Add to', icon: 'plus', sub: targetsMenu([t.id], 'bulk-copy', '') },
+    { label: 'Status', icon: 'list', kbd: ST[t.status] || '', sub: Object.entries(ST).map(([k, l]) => ({ label: l, act: 'set-st', id: t.id, k, icon: t.status === k ? 'check' : null })) }, { sep: 1 },
     ...(inCol ? [{ label: 'Remove from project', act: 'rm', id: t.id, icon: 'x' }] : []),
     { label: 'Delete', act: 'ctx-deltrack', id: t.id, icon: 'trash', danger: 1, confirm: 'Click again to delete' }];
 }
