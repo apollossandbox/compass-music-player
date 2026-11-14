@@ -2,6 +2,13 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.12.0 · 2026-11-16
+
+- Library has an Archive tab. Archived projects are saved as they were and can't be edited; right-click one and choose New version to keep working on a copy.
+- Albums you own: a $ button on the album page sells it (when the artist allows resale). Lending moved into Share.
+- A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.
+- Second-hand albums are now in the Marketplace instead of the Music Store.
+
 ## 1.11.7 · 2026-11-15
 
 - Artist page: pick a colour for the artist's round picture and for the header (image button on the header). Or use one of their project covers as the picture or header.

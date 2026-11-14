@@ -1,11 +1,21 @@
 {
-  "version": "1.11.7",
+  "version": "1.12.0",
   "file": "Compass-Setup.exe",
-  "size": 82235302,
-  "sha256": "9990006626bb6c5cdf702f40cf6ab4efb497d93edf4da00a880bb01b48e1929e",
-  "notes": "Artist colours and project covers",
+  "size": 82236445,
+  "sha256": "1c4e26c401010b47b838c17b306c9d6c90ff4cd1ee3d2fb6432d54b732a1f8eb",
+  "notes": "Archive, $ button, lending in Share, lent overlay, second-hand in Marketplace",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.12.0",
+      "d": "2026-11-16",
+      "items": [
+        "Library has an Archive tab. Archived projects are saved as they were and can't be edited; right-click one and choose New version to keep working on a copy.",
+        "Albums you own: a $ button on the album page sells it (when the artist allows resale). Lending moved into Share.",
+        "A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.",
+        "Second-hand albums are now in the Marketplace instead of the Music Store."
+      ]
+    },
     {
       "v": "1.11.7",
       "d": "2026-11-15",
@@ -165,14 +175,6 @@
       "d": "2026-11-13",
       "items": [
         "CD Creator: Update tracklist rewrites the tracklist text on the tray card and booklet from the project's current songs, with disc headings for multi-disc projects. Fonts, colours and positions stay; credits and © lines are kept. Undo works."
-      ]
-    },
-    {
-      "v": "1.8.3",
-      "d": "2026-11-13",
-      "items": [
-        "Renaming discs works: double-click a disc name, or use Rename Disc in its menu, type, and press Enter. Clear the name to go back to \"Disc 1\".",
-        "Renaming CD designs works in the Windows app too."
       ]
     }
   ]
