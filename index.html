@@ -733,6 +733,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .art-ht h2 { margin: 0; font-size: clamp(34px, 5vw, 64px); font-weight: 900; letter-spacing: -.03em; line-height: 1; } .art-ht p { margin: 8px 0 0; opacity: .85; font-size: 14px; }
 .art-edit { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,.45); color: #fff; border-radius: 50%; width: 34px; height: 34px; }
 .art-sec { margin-top: 14px !important; }
+.artcov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; margin-top: 10px; max-height: 56vh; overflow-y: auto; } .artcov { display: flex; flex-direction: column; gap: 5px; min-width: 0; } .artcov img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; } .artcov b { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .artcov .btn { padding: 4px 8px; font-size: 11.5px; }
 .art-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
 .art-songs .row { grid-template-columns: 36px minmax(0, 1fr) 36px !important; padding-top: 4px; padding-bottom: 4px; }
 .art-songs .row .hov, .art-songs .row .pill, .art-songs .row .c-add, .art-songs .row .c-dur { display: none !important; }
@@ -1556,16 +1557,18 @@ const LIBTABS_EXTRA = [['artists', 'Artists'], ['stats', 'Stats']], LIBVIEWS = {
 /* artists: from the song's artist, else its project's artist, else an "Artist - Title" file name */
 const songArtists = t => { const a = (t.artist || '').trim() || projArtist(projOf(t)) || ((t.title.match(/^(.+?)\s+-\s+.+$/) || [])[1] || '').trim(); return a ? a.split(/\s*(?:,|&|\bx\b|\bfeat\.?|\bft\.?)\s*/i).map(x => x.trim()).filter(Boolean) : ['Unknown artist']; };
 function artistIndex() { const m = new Map(); S.tracks.forEach(t => songArtists(t).forEach(a => { const k = a.toLowerCase(); if (!m.has(k)) m.set(k, { name: a, songs: 0, dur: 0 }); const r = m.get(k); r.songs++; r.dur += t.dur || 0; })); return [...m.values()].sort((x, y) => y.songs - x.songs || x.name.localeCompare(y.name)); }
-const artistPic = name => srcs['artist:pic:' + name] || '';
+const artCover = (name, kind) => { const k = ((S.artists || {})[name] || {})[kind + 'Cover']; return k && srcs[k] || ''; };
+const artistPic = name => srcs['artist:pic:' + name] || artCover(name, 'pic');
 const artHue = n => [...n].reduce((h, c) => h + c.charCodeAt(0), 0) % 360;
-const artAv = (name, cls = 'art-av') => { const p = artistPic(name); return `<span class="${cls}" style="${p ? `background-image:url(${p})` : `--h:${artHue(name)}`}">${p ? '' : esc(name.slice(0, 1).toUpperCase())}</span>`; };
+const artCol = (name, k) => ((S.artists || {})[name] || {})[k] || '';
+const artAv = (name, cls = 'art-av') => { const p = artistPic(name), c = artCol(name, 'picColor'); return `<span class="${cls}" style="${p ? `background-image:url(${p})` : c ? `background:${c}` : `--h:${artHue(name)}`}">${p ? '' : esc(name.slice(0, 1).toUpperCase())}</span>`; };
 const artistSongs = name => S.tracks.filter(t => songArtists(t).some(a => a.toLowerCase() === name.toLowerCase()));
 LIBVIEWS.artists = () => {
   const A = artistIndex(); if (!A.length) return '<p class="faint">No songs yet.</p>';
   if (!UI.libArtist || !A.some(a => a.name === UI.libArtist)) UI.libArtist = A[0].name;
-  const name = UI.libArtist, ts = artistSongs(name), plays = ts.reduce((n, t) => n + (t.plays || 0), 0), bg = srcs['artist:bg:' + name];
+  const name = UI.libArtist, ts = artistSongs(name), plays = ts.reduce((n, t) => n + (t.plays || 0), 0), bg = srcs['artist:bg:' + name] || artCover(name, 'bg');
   return `<div class="art-wrap"><nav class="art-list" aria-label="Artists">${A.map(a => `<button class="art-li ${a.name === name ? 'on' : ''}" data-act="lib-artist" data-k="${esc(a.name)}">${artAv(a.name, 'art-sm')}<span><b>${esc(a.name)}</b><small>${plural(a.songs, 'song')}</small></span></button>`).join('')}</nav>
-    <section class="art-page"><header class="art-hero ${bg ? 'has-bg' : ''}" style="${bg ? `background-image:linear-gradient(180deg, transparent 30%, rgba(0,0,0,.75)), url(${bg})` : `--h:${artHue(name)}`}">
+    <section class="art-page"><header class="art-hero ${bg ? 'has-bg' : ''}" style="${bg ? `background-image:linear-gradient(180deg, transparent 30%, rgba(0,0,0,.75)), url(${bg})` : artCol(name, 'bgColor') ? `background:linear-gradient(160deg, ${artCol(name, 'bgColor')}, color-mix(in srgb, ${artCol(name, 'bgColor')} 35%, #000))` : `--h:${artHue(name)}`}">
         ${artAv(name, 'art-big')}<div class="art-ht"><h2>${esc(name)}</h2><p>${plural(plays, 'play')} by you · ${plural(ts.length, 'song')}</p></div>
         <button class="ico art-edit" data-act="art-menu" data-k="${esc(name)}" title="Change picture or header" aria-label="Change picture or header">${ico('image', 16)}</button></header>
       <div class="art-acts"><button class="playbig" data-act="art-play" data-k="${esc(name)}" aria-label="Play ${esc(name)}">${ico('play', 22)}</button><button class="ico pa" data-act="art-shuffle" data-k="${esc(name)}" title="Shuffle" aria-label="Shuffle">${ico('shuffle', 20)}</button></div>
@@ -1796,6 +1799,11 @@ function openModal(kind, id, x = {}) {
     h = `<h2>Sell ${esc(c.name)}</h2><p class="faint small" style="margin:0">${edLabel(a.tk, a.r)}. Ownership moves to the buyer when they pay.</p>
     <label class="lab" for="sl-price">Price (USD)</label><input class="field" id="sl-price" type="number" min="1" step=".01" value="20">
     <p class="faint small" id="sl-split" style="margin:6px 0 0"></p>`;
+  } else if (kind === 'artcov') {
+    const name = x.name, al = S.cols.filter(c => !isFolder(c) && projArtists(c).some(a => a.toLowerCase() === name.toLowerCase()));
+    const covs = al.flatMap(c => (c.covers || []).map(cv => ({ c, key: 'art:' + cv.id }))).filter(o => srcs[o.key]);
+    h = `<h2>Use a project cover</h2><p class="faint small" style="margin:0">${esc(name)}</p>
+    <div class="artcov-grid">${covs.map(o => `<div class="artcov"><img src="${srcs[o.key]}" alt=""><b>${esc(o.c.name)}</b><div class="crow"><button class="btn sm" data-act="art-usecov" data-k="pic|${o.key}|${esc(name)}">Picture</button><button class="btn sm" data-act="art-usecov" data-k="bg|${o.key}|${esc(name)}">Header</button></div></div>`).join('') || '<p class="faint">None of their projects has a cover yet.</p>'}</div>`;
   } else if (kind === 'conv') {
     const desk = !!(window.tpDesktop && tpDesktop.conv); UI.convFiles = [];
     h = `<h2>Convert & download</h2><p class="faint small" style="margin:0">Turn a link, a video or an audio file into an MP3 or WAV. Only download music you have the rights to.</p>
@@ -1831,7 +1839,7 @@ function openModal(kind, id, x = {}) {
     <div class="dropzone" id="m-drop">${ico('import', 26)}<b>Drop the .zip here</b><span class="faint small">or loose audio and image files</span><button class="btn sm primary" data-act="zip-pick">Choose files</button></div>
     <p class="faint small" id="m-status" role="status"></p>`;
   }
-  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
+  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' || kind === 'artcov' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
   md.classList.toggle('wide', kind === 'meta' || kind === 'lstyle'); md.classList.toggle('clogm', kind === 'changelog' || kind === 'qr');
   if (kind === 'qr') qrStart();
   if (kind === 'addtrack') setTimeout(() => { const i = $('#at-q'); if (i) i.focus(); }, 60);
@@ -3443,6 +3451,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.11.7', d: '2026-11-15', items: ['Artist page: pick a colour for the artist\'s round picture and for the header (image button on the header). Or use one of their project covers as the picture or header.'] },
   { v: '1.11.6', d: '2026-11-15', items: ['Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right.'] },
   { v: '1.11.5', d: '2026-11-15', items: ['Logo: the W is gone. Compass is the disc on its own, in the app and as the Windows icon.'] },
   { v: '1.11.4', d: '2026-11-15', items: ['Every disc icon in the app is now the Compass disc.'] },
@@ -4534,11 +4543,19 @@ function act(a, el, e) {
     case 'at-conv': openModal('conv', null, { colId: id }); break;
     case 'lib-artist': UI.libArtist = k || null; renderMain(); break;
     case 'art-play': case 'art-shuffle': { const a = el.dataset.act; const ids = artistSongs(k).sort((x, y) => (y.plays || 0) - (x.plays || 0)).map(t => t.id); if (ids.length) playQueue(ids, a === 'art-shuffle'); break; }
-    case 'art-menu': { const r = el.getBoundingClientRect(), has = kind => !!srcs['artist:' + kind + ':' + k];
+    case 'art-menu': { const r = el.getBoundingClientRect(), has = kind => !!(srcs['artist:' + kind + ':' + k] || artCover(k, kind));
       ctxMenu(r.left - 160, r.bottom + 4, [{ head: k }, { label: has('pic') ? 'Change picture…' : 'Add a picture…', act: 'art-img', k: 'pic|' + k, icon: 'image' }, { label: has('bg') ? 'Change header…' : 'Add a header image…', act: 'art-img', k: 'bg|' + k, icon: 'image' },
+        { label: 'Use a project cover…', act: 'art-covers', k, icon: 'image' }, { label: 'Picture colour…', act: 'art-color', k: 'picColor|' + k, icon: 'style' }, { label: 'Header colour…', act: 'art-color', k: 'bgColor|' + k, icon: 'style' },
         ...(has('pic') ? [{ label: 'Remove picture', act: 'art-img-rm', k: 'pic|' + k, icon: 'x' }] : []), ...(has('bg') ? [{ label: 'Remove header', act: 'art-img-rm', k: 'bg|' + k, icon: 'x' }] : [])]); break; }
+    case 'art-color': { const [key, ...n] = k.split('|'), name = n.join('|'), inp = document.createElement('input'); inp.type = 'color'; inp.value = artCol(name, key) || '#3b5a8a';
+      inp.style.cssText = 'position:fixed;left:50%;top:40%;opacity:0;pointer-events:none'; document.body.appendChild(inp);
+      inp.addEventListener('input', () => { S.artists = S.artists || {}; S.artists[name] = { ...(S.artists[name] || {}), [key]: inp.value }; renderMain(); });
+      inp.addEventListener('change', () => { save(); inp.remove(); toast(key === 'picColor' ? 'Picture colour updated' : 'Header colour updated'); }); inp.click(); break; }
+    case 'art-covers': openModal('artcov', null, { name: k }); break;
+    case 'art-usecov': { const [kind, ck, ...n] = k.split('|'), name = n.join('|'), up = 'artist:' + kind + ':' + name; DB.del(up); if (srcs[up]) { URL.revokeObjectURL(srcs[up]); delete srcs[up]; }
+      S.artists = S.artists || {}; S.artists[name] = { ...(S.artists[name] || {}), [kind + 'Cover']: ck }; save(); closeModal(); refresh(); toast(kind === 'pic' ? 'Picture set' : 'Header set'); break; }
     case 'art-img': { const [kind, ...n] = k.split('|'); UI.artFor = { name: n.join('|'), kind }; $('#artimg').click(); break; }
-    case 'art-img-rm': { const [kind, ...n] = k.split('|'), name = n.join('|'), key = 'artist:' + kind + ':' + name; DB.del(key); if (srcs[key]) URL.revokeObjectURL(srcs[key]); delete srcs[key]; if (S.artists && S.artists[name]) delete S.artists[name][kind]; save(); refresh(); break; }
+    case 'art-img-rm': { const [kind, ...n] = k.split('|'), name = n.join('|'), key = 'artist:' + kind + ':' + name; DB.del(key); if (srcs[key]) URL.revokeObjectURL(srcs[key]); delete srcs[key]; if (S.artists && S.artists[name]) { delete S.artists[name][kind]; delete S.artists[name][kind + 'Cover']; } save(); refresh(); break; }
     case 'feat-open': openFeatures(id || S.editId); break;
     case 'fx-pick': fxAdd(k); break;
     case 'fx-rm': fxRead(); UI.fx.list.splice(+el.closest('.fx-row').dataset.fx, 1); fxPaint(); break;

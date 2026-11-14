@@ -1,11 +1,18 @@
 {
-  "version": "1.11.6",
+  "version": "1.11.7",
   "file": "Compass-Setup.exe",
-  "size": 82234592,
-  "sha256": "74b932f33510323694e0b9c88c3f23a7cdf9d79e563edd4f9d5e5f66a1f18bf2",
-  "notes": "Compact artist page",
+  "size": 82235302,
+  "sha256": "9990006626bb6c5cdf702f40cf6ab4efb497d93edf4da00a880bb01b48e1929e",
+  "notes": "Artist colours and project covers",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.11.7",
+      "d": "2026-11-15",
+      "items": [
+        "Artist page: pick a colour for the artist's round picture and for the header (image button on the header). Or use one of their project covers as the picture or header."
+      ]
+    },
     {
       "v": "1.11.6",
       "d": "2026-11-15",
@@ -166,13 +173,6 @@
       "items": [
         "Renaming discs works: double-click a disc name, or use Rename Disc in its menu, type, and press Enter. Clear the name to go back to \"Disc 1\".",
         "Renaming CD designs works in the Windows app too."
-      ]
-    },
-    {
-      "v": "1.8.2",
-      "d": "2026-11-13",
-      "items": [
-        "Disc lists are compact (one line per song), so a whole disc fits on screen without scrolling."
       ]
     }
   ]

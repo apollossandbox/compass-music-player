@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.7 · 2026-11-15
+
+- Artist page: pick a colour for the artist's round picture and for the header (image button on the header). Or use one of their project covers as the picture or header.
+
 ## 1.11.6 · 2026-11-15
 
 - Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right.
