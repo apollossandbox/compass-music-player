@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.4 · 2026-11-16
+
+- Sidebar: CD Creator moved under Launcher.
+
 ## 1.13.3 · 2026-11-16
 
 - Song lists: the Title header lines up with the track numbers.

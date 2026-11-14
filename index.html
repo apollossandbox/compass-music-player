@@ -1489,7 +1489,7 @@ function settlePick(el, k) { const p = el.closest('.pick'); if (!p) return; $$('
 function toast(msg) { const e = $('#toast'); e.textContent = msg; e.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('show'), 2600); }
 
 function renderSide() {
-  const nav = [['library', 'lib', 'Library', projCount()], ['launcher', 'cube', 'Launcher'], ['store', 'music', 'Music Store'], ['market', 'grid', 'Marketplace'], ['cd', 'disc', 'CD Creator'], ['settings', 'gear', 'Settings']];
+  const nav = [['library', 'lib', 'Library', projCount()], ['launcher', 'cube', 'Launcher'], ['cd', 'disc', 'CD Creator'], ['store', 'music', 'Music Store'], ['market', 'grid', 'Marketplace'], ['settings', 'gear', 'Settings']];
   $('#side').innerHTML = `
   <div class="brand">${logo(26)}<span class="brand-t" aria-label="Compass Music Player">Music Player</span></div>
   <nav class="snav" data-slide="nav"><i class="thumb"></i>${nav.map(([v, i, l, n]) => `<button class="navbtn ${S.view === v ? 'on' : ''}" data-act="nav" data-view="${v}">${ico(i)}<span>${l}</span>${n !== undefined ? `<em>${n}</em>` : ''}</button>`).join('')}</nav>
@@ -3547,6 +3547,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.4', d: '2026-11-16', items: ['Sidebar: CD Creator moved under Launcher.'] },
   { v: '1.13.3', d: '2026-11-16', items: ['Song lists: the Title header lines up with the track numbers.'] },
   { v: '1.13.2', d: '2026-11-16', items: ['Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final.'] },
   { v: '1.13.1', d: '2026-11-16', items: ['Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export.'] },
