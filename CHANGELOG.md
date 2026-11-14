@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.10.1 · 2026-11-15
+
+- Launcher: the FL Studio tile buttons fit again (Projects is now a folder icon).
+
 ## 1.10.0 · 2026-11-15
 
 - Compass tokens (preview): albums you own show a Verified badge with their edition (open, or numbered like #014/500). Click it for the full ownership history.

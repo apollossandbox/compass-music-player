@@ -1,11 +1,18 @@
 {
-  "version": "1.10.0",
+  "version": "1.10.1",
   "file": "Compass-Setup.exe",
-  "size": 82299680,
-  "sha256": "fc57a19aa1bf289bc7254f132e1957940f020028f9ec9ba4bf03db127c852ba8",
-  "notes": "Compass tokens preview: verified ownership, lending, resale with 5% artist royalty",
+  "size": 82299808,
+  "sha256": "7403c2afb76926aa0e51281f463c86027a740b5ebae9539ee1901df744178ea3",
+  "notes": "Launcher tile fix",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.10.1",
+      "d": "2026-11-15",
+      "items": [
+        "Launcher: the FL Studio tile buttons fit again (Projects is now a folder icon)."
+      ]
+    },
     {
       "v": "1.10.0",
       "d": "2026-11-15",
@@ -172,13 +179,6 @@
       "d": "2026-11-12",
       "items": [
         "New logo: a compass record on a turntable with a red tonearm."
-      ]
-    },
-    {
-      "v": "1.7.3",
-      "d": "2026-11-12",
-      "items": [
-        "Convert to Digital Album is back in the right-click menu. Converted albums move to Library › Digital Albums and are read-only."
       ]
     }
   ]
