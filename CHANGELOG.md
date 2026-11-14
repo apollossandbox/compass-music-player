@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.5 · 2026-11-16
+
+- Notifications now show at the bottom right, above the player.
+
 ## 1.13.4 · 2026-11-16
 
 - Sidebar: CD Creator moved under Launcher.

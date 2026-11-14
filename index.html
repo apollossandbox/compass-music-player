@@ -459,7 +459,8 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .pbtn { box-shadow: none; }
 .rail { background: var(--panel3); box-shadow: none; }
 .eqpop { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); right: max(20px, env(safe-area-inset-right, 0px)); }
-.toast { border-radius: 10px; }
+.toast { border-radius: 10px; left: auto; right: 20px; top: auto; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); transform: translateY(16px); opacity: 0; transition: transform .35s var(--ease2), opacity .2s; max-width: min(440px, calc(100% - var(--side) - 40px)); text-align: left; }
+.toast.show { transform: none; opacity: 1; }
 .cd-stage { border-radius: 14px; background: var(--panel); }
 .cpanel { border-radius: 14px; }
 .panelbtn { border-radius: 8px; background: var(--panel2); }
@@ -3547,6 +3548,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.5', d: '2026-11-16', items: ['Notifications now show at the bottom right, above the player.'] },
   { v: '1.13.4', d: '2026-11-16', items: ['Sidebar: CD Creator moved under Launcher.'] },
   { v: '1.13.3', d: '2026-11-16', items: ['Song lists: the Title header lines up with the track numbers.'] },
   { v: '1.13.2', d: '2026-11-16', items: ['Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final.'] },
