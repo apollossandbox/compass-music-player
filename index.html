@@ -1094,7 +1094,7 @@ const IC = {
   vol: 'M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6', x: 'M6 6l12 12M18 6 6 18', music: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
   phone: 'M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2', list: 'M4 6h16M4 12h16M4 18h10',
   check: 'M5 12l5 5 9-10', quote: 'M4 5h16v11H9l-5 4z', home: 'M4 11l8-7 8 7v9H4z', grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
-  time: 'M3 12h18M7 8v8M12 6v12M17 9v6', disc: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  time: 'M3 12h18M7 8v8M12 6v12M17 9v6', disc: 'M11.75 19.04L10.96 18.63L10.17 18.15L9.41 17.61L8.67 17.02L7.96 16.38L7.30 15.69L6.68 14.97L6.11 14.21L5.60 13.44L5.16 12.65L4.78 11.85L4.48 11.06L4.25 10.27L4.09 9.51L4.02 8.76L4.03 8.05L4.11 7.38L4.27 6.75L4.51 6.18L4.83 5.66L5.21 5.21L5.66 4.83L6.18 4.51L6.75 4.27L7.38 4.11L8.05 4.03L8.76 4.02L9.51 4.09M12.25 4.96L13.04 5.37L13.83 5.85L14.59 6.39L15.33 6.98L16.04 7.62L16.70 8.31L17.32 9.03L17.89 9.79L18.40 10.56L18.84 11.35L19.22 12.15L19.52 12.94L19.75 13.73L19.91 14.49L19.98 15.24L19.97 15.95L19.89 16.62L19.73 17.25L19.49 17.82L19.17 18.34L18.79 18.79L18.34 19.17L17.82 19.49L17.25 19.73L16.62 19.89L15.95 19.97L15.24 19.98L14.49 19.91M13.13 13.13L12.78 13.31L12.30 13.30L11.78 13.08L11.30 12.70L10.92 12.22L10.70 11.70L10.69 11.22L10.87 10.87L11.22 10.69L11.70 10.70L12.22 10.92L12.70 11.30L13.08 11.78L13.30 12.30L13.31 12.78L13.13 13.13',
   eq: 'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6', star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
   mail: 'M3 6h18v12H3zM3 6l9 7 9-7', pen: 'M4 20l4-1 11-11-3-3L5 16zM14 6l3 3', user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0', mic: 'M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM6 11a6 6 0 0 0 12 0M12 17v4',
   import: 'M12 3v12M7 10l5 5 5-5M4 21h16', grip: 'M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01', image: 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4M15 9h.01',
@@ -3436,6 +3436,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.11.4', d: '2026-11-15', items: ['Every disc icon in the app is now the Compass disc.'] },
   { v: '1.11.3', d: '2026-11-15', items: ['New Compass logo: a disc and a compass in one.'] },
   { v: '1.11.2', d: '2026-11-15', items: ['Artists tab redesigned: artists down the side with round pictures; each artist page has a header image, their picture, your play count and their 10 most played songs, and their albums and projects, with Play and Shuffle. Add or change the picture and header with the image button.', 'Removed the automatic Deezer photo lookup for now.'] },
   { v: '1.11.1', d: '2026-11-15', items: ['Library: new Artists tab (between All songs and Stats): artists down the side, and each artist gets a page with their picture, a header image, how often you played them, and their songs, most played first. Add your own pictures with the image button on the header. Songs named "Artist - Title" count for that artist.', 'CD player moved to a button at the top, left of Scan QR.'] },

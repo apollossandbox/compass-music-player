@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.4 · 2026-11-15
+
+- Every disc icon in the app is now the Compass disc.
+
 ## 1.11.3 · 2026-11-15
 
 - New Compass logo: a disc and a compass in one.
