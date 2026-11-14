@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.6 · 2026-11-15
+
+- Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right.
+
 ## 1.11.5 · 2026-11-15
 
 - Logo: the W is gone. Compass is the disc on its own, in the app and as the Windows icon.

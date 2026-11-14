@@ -1,11 +1,18 @@
 {
-  "version": "1.11.5",
+  "version": "1.11.6",
   "file": "Compass-Setup.exe",
-  "size": 82234340,
-  "sha256": "e3bbe6abd136bb918e3c76861732380d1a0b57cabbc1fa72b069d078cdf1fc30",
-  "notes": "Logo without the W",
+  "size": 82234592,
+  "sha256": "74b932f33510323694e0b9c88c3f23a7cdf9d79e563edd4f9d5e5f66a1f18bf2",
+  "notes": "Compact artist page",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.11.6",
+      "d": "2026-11-15",
+      "items": [
+        "Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right."
+      ]
+    },
     {
       "v": "1.11.5",
       "d": "2026-11-15",
@@ -166,13 +173,6 @@
       "d": "2026-11-13",
       "items": [
         "Disc lists are compact (one line per song), so a whole disc fits on screen without scrolling."
-      ]
-    },
-    {
-      "v": "1.8.1",
-      "d": "2026-11-13",
-      "items": [
-        "Scan QR in the Library: scan the code on the back of an album to add it. For now any code unlocks sxteen ways – Movie. Pick which camera to use, or scan from a photo."
       ]
     }
   ]
