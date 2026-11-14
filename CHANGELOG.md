@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.5 · 2026-11-15
+
+- Logo: the W is gone. Compass is the disc on its own, in the app and as the Windows icon.
+
 ## 1.11.4 · 2026-11-15
 
 - Every disc icon in the app is now the Compass disc.

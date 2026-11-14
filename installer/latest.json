@@ -1,11 +1,18 @@
 {
-  "version": "1.11.4",
+  "version": "1.11.5",
   "file": "Compass-Setup.exe",
-  "size": 82242235,
-  "sha256": "0eb5593110254b9cf005078850e345d6d471765dbdac472e8c5acf96eabb0d09",
-  "notes": "Compass disc icons",
+  "size": 82234340,
+  "sha256": "e3bbe6abd136bb918e3c76861732380d1a0b57cabbc1fa72b069d078cdf1fc30",
+  "notes": "Logo without the W",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.11.5",
+      "d": "2026-11-15",
+      "items": [
+        "Logo: the W is gone. Compass is the disc on its own, in the app and as the Windows icon."
+      ]
+    },
     {
       "v": "1.11.4",
       "d": "2026-11-15",
@@ -166,20 +173,6 @@
       "d": "2026-11-13",
       "items": [
         "Scan QR in the Library: scan the code on the back of an album to add it. For now any code unlocks sxteen ways – Movie. Pick which camera to use, or scan from a photo."
-      ]
-    },
-    {
-      "v": "1.8.0",
-      "d": "2026-11-13",
-      "items": [
-        "Make deluxe: copies a project and adds a Deluxe disc. It sits above New sequel.",
-        "Discs now sit side by side. Drag songs between discs, onto a song or anywhere in a disc.",
-        "Selected songs no longer squash their rows.",
-        "Menus fit on screen and scroll when long. Icons line up.",
-        "Removed the Audio Editor. Tempo and key are still read in the background and shown on songs.",
-        "Digital albums can be deleted (they go to Recently deleted).",
-        "Projects you turned into digital albums or put in the Store stay in the CD Creator.",
-        "Faster page switches: smaller cover images in grids and quicker animations."
       ]
     }
   ]
