@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.11.3 · 2026-11-15
+
+- New Compass logo: a disc and a compass in one.
+
 ## 1.11.2 · 2026-11-15
 
 - Artists tab redesigned: artists down the side with round pictures; each artist page has a header image, their picture, your play count and their 10 most played songs, and their albums and projects, with Play and Shuffle. Add or change the picture and header with the image button.
