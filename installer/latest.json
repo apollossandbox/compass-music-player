@@ -1,11 +1,18 @@
 {
-  "version": "1.13.2",
+  "version": "1.13.3",
   "file": "Compass-Setup.exe",
-  "size": 82253134,
-  "sha256": "4d9acd337ddde8ff940df9418d8acb4ae2e807e751e6bf6d53feaa5a38734a3d",
-  "notes": "Publish: hovering when songs aren't Final shows a warning with a Finalize button.",
+  "size": 82253140,
+  "sha256": "6172b458ffdbcfeb4a3a53509155c3962706d4264b5d98eb170dd6da6676654e",
+  "notes": "Song lists: the Title header lines up with the track numbers.",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.13.3",
+      "d": "2026-11-16",
+      "items": [
+        "Song lists: the Title header lines up with the track numbers."
+      ]
+    },
     {
       "v": "1.13.2",
       "d": "2026-11-16",
@@ -152,13 +159,6 @@
       "items": [
         "Export button on every project and digital album, next to Share.",
         "Digital albums: no more Read-only bar, and no Status or Added columns."
-      ]
-    },
-    {
-      "v": "1.9.2",
-      "d": "2026-11-14",
-      "items": [
-        "The update button is back in the bottom-left corner, next to the version number."
       ]
     }
   ]

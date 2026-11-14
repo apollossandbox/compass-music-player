@@ -135,6 +135,7 @@ h1 { font-size: 36px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1
 .row .hov { overflow: hidden; text-overflow: ellipsis; text-align: right; opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .3s var(--ease); white-space: nowrap; }
 .row:hover .hov, .row:focus-within .hov { opacity: 1; transform: none; }
 .row { cursor: pointer; }
+.colhead > span:first-child { display: none; } .colhead > span:nth-child(2) { grid-column: 1 / span 2; }
 .colhead { padding: 6px 12px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); font-weight: 700; }
 .list { position: relative; display: flex; flex-direction: column; gap: 4px; }
 .row { padding: 7px 12px; border-radius: 18px; border: 1px solid transparent; transition: background .25s, border-color .25s, box-shadow .25s; }
@@ -3546,6 +3547,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.3', d: '2026-11-16', items: ['Song lists: the Title header lines up with the track numbers.'] },
   { v: '1.13.2', d: '2026-11-16', items: ['Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final.'] },
   { v: '1.13.1', d: '2026-11-16', items: ['Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export.'] },
   { v: '1.13.0', d: '2026-11-16', items: ['Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.', 'Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.', 'Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.', 'Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition.'] },

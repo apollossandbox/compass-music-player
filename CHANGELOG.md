@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.3 · 2026-11-16
+
+- Song lists: the Title header lines up with the track numbers.
+
 ## 1.13.2 · 2026-11-16
 
 - Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final.
