@@ -780,7 +780,11 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 @media (max-width: 980px) { .sp { grid-template-columns: 1fr; } .sp-media { position: static; } }
 /* Publish */
 .pub-pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: var(--onink); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
-.pub-pill:disabled { background: none; color: var(--ink3); border-color: var(--line); cursor: not-allowed; }
+.pub-pill.off { background: none; color: var(--ink3); border-color: var(--line); }
+.pub-wrap { position: relative; display: inline-flex; }
+.pub-tip { position: absolute; left: 0; top: 100%; z-index: 30; display: none; align-items: center; gap: 8px; margin-top: 8px; padding: 8px 8px 8px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 12px 30px -10px var(--shadow); white-space: nowrap; font-size: 13px; color: var(--ink); }
+.pub-tip::before { content: ''; position: absolute; left: 0; right: 0; top: -10px; height: 10px; } .pub-tip .ic { color: #f5a524; }
+.pub-wrap:hover .pub-tip, .pub-wrap:focus-within .pub-tip, .pub-wrap.show .pub-tip { display: inline-flex; }
 .pb-grid { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 12px; align-items: center; margin-top: 8px; } .pb-grid .lab { margin: 0; }
 .pb-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .pb-row .field { width: 96px; padding-top: 7px; padding-bottom: 7px; } .pb-cur { color: var(--ink2); font-weight: 700; }
 .pb-ws { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin-top: 6px; } .pb-ws label { display: flex; align-items: center; gap: 6px; font-size: 13px; } .pb-ws label > span:first-child { min-width: 84px; } .pb-ws .field { width: 90px; padding-top: 6px; padding-bottom: 6px; }
@@ -1141,6 +1145,7 @@ const EQP = { flat: ['Flat', [0, 0, 0, 0, 0]], bass: ['Bass boost', [6, 3, 0, 0,
 const IC = {
   dollar: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
   update: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+  alert: 'M12 3 2 20h20L12 3zM12 10v4M12 17h.01',
   qr: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 20h.01M20 14h.01',
   play: 'M8 5v14l11-7z', pause: 'M7 5h4v14H7zM13 5h4v14h-4z', next: 'M6 5l9 7-9 7zM17 5h2v14h-2z', prev: 'M18 5l-9 7 9 7zM5 5h2v14H5z',
   shuffle: 'M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5', repeat: 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3',
@@ -1708,7 +1713,7 @@ function renderProject(m) {
       <div class="pact">
         <button class="playbig" data-act="play-col" data-id="${c.id}" aria-label="${playing ? 'Pause' : 'Play'}" title="${playing ? 'Pause' : 'Play'}">${ico(playing ? 'pause' : 'play', 22)}</button>
         ${isFrozen(c) ? '' : `<button class="ico pa" data-act="add" title="Add songs" aria-label="Add songs">${ico('plus', 20)}</button>`}
-        ${!isFrozen(c) && !isFolder(c) ? (b => `<button class="pub-pill" data-act="publish" data-id="${c.id}" ${b ? `disabled title="${esc(b)}"` : 'title="Publish as a digital album"'}>${ico('upload', 14)} Publish</button>`)(publishBlock(c)) : ''}
+        ${!isFrozen(c) && !isFolder(c) ? (b => b ? `<span class="pub-wrap"><button class="pub-pill off" data-act="publish" data-id="${c.id}" aria-describedby="pub-tip">${ico('upload', 14)} Publish</button><span class="pub-tip" id="pub-tip" role="tooltip">${colTracks(c).length ? `${ico('alert', 14)}<span>Finalize all tracks to publish</span><button class="btn sm" data-act="pub-finalize" data-id="${c.id}">Finalize</button>` : `${ico('alert', 14)}<span>Add songs to publish</span>`}</span></span>` : `<button class="pub-pill" data-act="publish" data-id="${c.id}" title="Publish as a digital album">${ico('upload', 14)} Publish</button>`)(publishBlock(c)) : ''}
         ${isMine(c) && S.ledger && (() => { const a = Ledger.access(c); return a.state === 'owned' && a.tk.tradable && a.r.resale; })() ? `<button class="ico pa" data-act="tok-sell" data-id="${c.id}" title="Sell this album" aria-label="Sell this album">${ico('dollar', 20)}</button>` : ''}
         ${isFolder(c) ? '' : `<button class="ico pa" data-act="ctx-dlproj" data-id="${c.id}" title="Export" aria-label="Export">${ico('update', 20)}</button>`}
         <span class="pa-share"><button class="ico pa" data-act="share" aria-label="Share" title="Share">${ico('share', 20)}</button>
@@ -3541,6 +3546,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.2', d: '2026-11-16', items: ['Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final.'] },
   { v: '1.13.1', d: '2026-11-16', items: ['Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export.'] },
   { v: '1.13.0', d: '2026-11-16', items: ['Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.', 'Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.', 'Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.', 'Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition.'] },
   { v: '1.12.4', d: '2026-11-16', items: ['Sidebar: the Compass logo next to Music Player, in Arial bold.'] },
@@ -4575,10 +4581,11 @@ function act(a, el, e) {
     case 'disc-rm': { const c = col(S.colId), i = c.discs.findIndex(x => x.id === k); if (i < 0) break; const to = c.discs[i ? i - 1 : 1]; Object.keys(c.discOf || {}).forEach(id => { if (c.discOf[id] === k) c.discOf[id] = to.id; }); c.discs.splice(i, 1); if (c.discs.length < 2) { delete c.discs; delete c.discOf; } save(); renderList(); break; }
     case 'm-logo': $('#logofile').click(); break;
     case 'm-logo-clear': UI.mLogo = false; { const b = $('.mlogo-pv'); if (b) { b.style.backgroundImage = ''; b.innerHTML = ico('image', 20); } } el.remove(); break;
-    case 'publish': { const c = col(id); if (!c) break; const b = publishBlock(c); if (b) { toast(b); break; }
+    case 'publish': { const c = col(id); if (!c) break; const b = publishBlock(c); if (b) { const w = el && el.closest && el.closest('.pub-wrap'); if (w) w.classList.add('show'); else toast(b); break; }
       duplicateProject(id, true).then(() => { const n = S.cols[S.cols.indexOf(c) + 1]; if (!n || n === c) return; Object.assign(n, { name: c.name, mine: true, fromProject: true, publishedFrom: c.id, released: true, targetDate: c.targetDate || today() }); delete n.release; delete n.parent;
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published as a digital album. Set its price and quantity.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
+    case 'pub-finalize': { const c = col(id); if (!c) break; const ts = colTracks(c).filter(t => t.status !== 'final'); ts.forEach(t => { t.status = 'final'; }); save(); refresh(); toast(`Marked ${plural(ts.length, 'song')} Final. Ready to publish.`); break; }
     case 'ws-buy': { const c = col(id), q = +k, v = c.release.wholesale[k]; askSure(`Buy ${q.toLocaleString()} codes for ${c.name}?`, `${usd(v)} each, ${usd(v * q)} total. Test purchase, nothing is charged. You get a zip with a CSV of codes and printable QR cards.${c.release.size ? ` Uses ${q.toLocaleString()} of the ${c.release.size - (c.release.sold || 0)} copies left.` : ''}`, 'Get codes').then(async ok => { if (!ok) return;
       toast(`Making ${q.toLocaleString()} codes…`); const P = await wsPack(c, q), base = `${infoName(c.name)} - ${q} codes`;
       c.release.codesIssued = (c.release.codesIssued || 0) + q; if (c.release.size) c.release.sold = (c.release.sold || 0) + q; save();

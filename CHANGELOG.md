@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.2 · 2026-11-16
+
+- Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final.
+
 ## 1.13.1 · 2026-11-16
 
 - Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export.

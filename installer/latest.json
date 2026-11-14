@@ -1,11 +1,18 @@
 {
-  "version": "1.13.1",
+  "version": "1.13.2",
   "file": "Compass-Setup.exe",
-  "size": 82253005,
-  "sha256": "9f80f93c3d9bd7942502e5030c5c5c0af245ece59c2ae749a3092d8fe5fe2899",
-  "notes": "Shorter song menu: Move, Add to and Status open to the side on hover. Download is now Export.",
+  "size": 82253134,
+  "sha256": "4d9acd337ddde8ff940df9418d8acb4ae2e807e751e6bf6d53feaa5a38734a3d",
+  "notes": "Publish: hovering when songs aren't Final shows a warning with a Finalize button.",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.13.2",
+      "d": "2026-11-16",
+      "items": [
+        "Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final."
+      ]
+    },
     {
       "v": "1.13.1",
       "d": "2026-11-16",
@@ -152,14 +159,6 @@
       "d": "2026-11-14",
       "items": [
         "The update button is back in the bottom-left corner, next to the version number."
-      ]
-    },
-    {
-      "v": "1.9.1",
-      "d": "2026-11-14",
-      "items": [
-        "Launcher shows your 9 most recent FL Studio projects under the DAWs. Click one to open it; See all opens the FL Studio screen.",
-        "The Projects button is back on the FL Studio tile."
       ]
     }
   ]
