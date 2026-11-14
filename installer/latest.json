@@ -1,11 +1,18 @@
 {
-  "version": "1.12.0",
+  "version": "1.12.1",
   "file": "Compass-Setup.exe",
-  "size": 82236445,
-  "sha256": "1c4e26c401010b47b838c17b306c9d6c90ff4cd1ee3d2fb6432d54b732a1f8eb",
-  "notes": "Archive, $ button, lending in Share, lent overlay, second-hand in Marketplace",
+  "size": 82236501,
+  "sha256": "29b62f2c641c3559be21d6a31828f9706ed14b3485466c04927b417c73ba0b90",
+  "notes": "Fix artist page grey box",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.12.1",
+      "d": "2026-11-16",
+      "items": [
+        "Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover."
+      ]
+    },
     {
       "v": "1.12.0",
       "d": "2026-11-16",
@@ -168,13 +175,6 @@
         "Text no longer highlights when you click or drag around the app. Typing fields still work as normal.",
         "QR scanner finds cameras more reliably: it lists every camera Windows reports, and tries each one if the default fails.",
         "When the camera can't start, it says why (blocked by Windows, busy in another app, or none found), with a button to open Windows camera settings."
-      ]
-    },
-    {
-      "v": "1.8.4",
-      "d": "2026-11-13",
-      "items": [
-        "CD Creator: Update tracklist rewrites the tracklist text on the tray card and booklet from the project's current songs, with disc headings for multi-disc projects. Fonts, colours and positions stay; credits and © lines are kept. Undo works."
       ]
     }
   ]

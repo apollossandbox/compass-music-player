@@ -738,7 +738,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .art-songs .row { grid-template-columns: 36px minmax(0, 1fr) 36px !important; padding-top: 4px; padding-bottom: 4px; }
 .art-songs .row .hov, .art-songs .row .pill, .art-songs .row .c-add, .art-songs .row .c-dur { display: none !important; }
 .art-albums { display: flex; flex-direction: column; gap: 4px; } .art-al { display: flex; align-items: center; gap: 12px; padding: 6px; border: 0; border-radius: 10px; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; min-width: 0; } .art-al:hover { background: var(--hover); }
-.art-alc { width: 52px; height: 52px; flex: none; border-radius: 6px; overflow: hidden; display: block; } .art-alc img, .art-alc span { width: 100%; height: 100%; object-fit: cover; display: block; }
+.art-alc { position: relative; width: 52px; height: 52px; flex: none; border-radius: 6px; overflow: hidden; display: block; } .art-alc .ic { width: 22px; height: 22px; } .art-alc img, .art-alc span { width: 100%; height: 100%; object-fit: cover; display: block; }
 .art-al > span:last-child { display: flex; flex-direction: column; min-width: 0; } .art-al b { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .art-al small { color: var(--ink2); font-size: 12px; }
 @media (max-width: 1100px) { .art-body { grid-template-columns: minmax(0, 1fr); } }
 .art-acts { display: flex; align-items: center; gap: 14px; margin: 16px 0 6px; } .art-sec { font-size: 17px; margin: 8px 0 6px; }
@@ -3466,6 +3466,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.12.1', d: '2026-11-16', items: ['Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover.'] },
   { v: '1.12.0', d: '2026-11-16', items: ['Library has an Archive tab. Archived projects are saved as they were and can\'t be edited; right-click one and choose New version to keep working on a copy.', 'Albums you own: a $ button on the album page sells it (when the artist allows resale). Lending moved into Share.', 'A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.', 'Second-hand albums are now in the Marketplace instead of the Music Store.'] },
   { v: '1.11.7', d: '2026-11-15', items: ['Artist page: pick a colour for the artist\'s round picture and for the header (image button on the header). Or use one of their project covers as the picture or header.'] },
   { v: '1.11.6', d: '2026-11-15', items: ['Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right.'] },

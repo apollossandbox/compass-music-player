@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.12.1 · 2026-11-16
+
+- Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover.
+
 ## 1.12.0 · 2026-11-16
 
 - Library has an Archive tab. Archived projects are saved as they were and can't be edited; right-click one and choose New version to keep working on a copy.
