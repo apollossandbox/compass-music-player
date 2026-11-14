@@ -1,16 +1,23 @@
 {
-  "version": "1.12.3",
+  "version": "1.12.4",
   "file": "Compass-Setup.exe",
-  "size": 82237039,
-  "sha256": "54b85d89c4de028d5d825a181fb440cff247af2e80aaee26a4570e6422c46d20",
-  "notes": "Compass Music Player",
+  "size": 82237212,
+  "sha256": "3f4e411f8cdff48494c44f8841280fb39a31dcc8a373e42db782fad4e771b4bb",
+  "notes": "Sidebar brand",
   "date": "2026-11-14",
   "changelog": [
+    {
+      "v": "1.12.4",
+      "d": "2026-11-16",
+      "items": [
+        "Sidebar: the Compass logo next to Music Player, in Arial bold."
+      ]
+    },
     {
       "v": "1.12.3",
       "d": "2026-11-16",
       "items": [
-        "New name: Compass Music Player."
+        "New name: Compass Music Player. The sidebar shows the Compass logo with Music Player."
       ]
     },
     {
@@ -164,13 +171,6 @@
       "d": "2026-11-14",
       "items": [
         "FL Studio screen: a separate Zipped loop projects tab lists FL zipped loop packages (.zip files with a project inside) from your project folders and Downloads. Click one to open it in FL Studio. Open other project… accepts them too."
-      ]
-    },
-    {
-      "v": "1.8.8",
-      "d": "2026-11-13",
-      "items": [
-        "More space between songs in disc lists. Each song is still one line."
       ]
     }
   ]

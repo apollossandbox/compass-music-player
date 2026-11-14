@@ -2,9 +2,13 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.12.4 · 2026-11-16
+
+- Sidebar: the Compass logo next to Music Player, in Arial bold.
+
 ## 1.12.3 · 2026-11-16
 
-- New name: Compass Music Player.
+- New name: Compass Music Player. The sidebar shows the Compass logo with Music Player.
 
 ## 1.12.2 · 2026-11-16
 
