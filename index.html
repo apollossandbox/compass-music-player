@@ -3548,6 +3548,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.6', d: '2026-11-16', items: ['Publish moves the project out of Projects: you get the digital album in Digital albums and the project in Archive. New version in Archive brings it back to work on.'] },
   { v: '1.13.5', d: '2026-11-16', items: ['Notifications now show at the bottom right, above the player.'] },
   { v: '1.13.4', d: '2026-11-16', items: ['Sidebar: CD Creator moved under Launcher.'] },
   { v: '1.13.3', d: '2026-11-16', items: ['Song lists: the Title header lines up with the track numbers.'] },
@@ -4587,8 +4588,9 @@ function act(a, el, e) {
     case 'm-logo': $('#logofile').click(); break;
     case 'm-logo-clear': UI.mLogo = false; { const b = $('.mlogo-pv'); if (b) { b.style.backgroundImage = ''; b.innerHTML = ico('image', 20); } } el.remove(); break;
     case 'publish': { const c = col(id); if (!c) break; const b = publishBlock(c); if (b) { const w = el && el.closest && el.closest('.pub-wrap'); if (w) w.classList.add('show'); else toast(b); break; }
-      duplicateProject(id, true).then(() => { const n = S.cols[S.cols.indexOf(c) + 1]; if (!n || n === c) return; Object.assign(n, { name: c.name, mine: true, fromProject: true, publishedFrom: c.id, released: true, targetDate: c.targetDate || today() }); delete n.release; delete n.parent;
-        save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published as a digital album. Set its price and quantity.'); openModal('publish', n.id); }); break; }
+      duplicateProject(id, true).then(() => { const n = S.cols[S.cols.indexOf(c) + 1]; if (!n || n === c) return; Object.assign(n, { name: c.name, mine: true, fromProject: true, publishedFrom: c.id, released: true, targetDate: c.targetDate || today() }); delete n.release; delete n.parent; delete n.archived;
+        c.archived = true; c.publishedTo = n.id; S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id);
+        save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
     case 'pub-finalize': { const c = col(id); if (!c) break; const ts = colTracks(c).filter(t => t.status !== 'final'); ts.forEach(t => { t.status = 'final'; }); save(); refresh(); toast(`Marked ${plural(ts.length, 'song')} Final. Ready to publish.`); break; }
     case 'ws-buy': { const c = col(id), q = +k, v = c.release.wholesale[k]; askSure(`Buy ${q.toLocaleString()} codes for ${c.name}?`, `${usd(v)} each, ${usd(v * q)} total. Test purchase, nothing is charged. You get a zip with a CSV of codes and printable QR cards.${c.release.size ? ` Uses ${q.toLocaleString()} of the ${c.release.size - (c.release.sold || 0)} copies left.` : ''}`, 'Get codes').then(async ok => { if (!ok) return;
