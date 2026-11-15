@@ -1,11 +1,18 @@
 {
-  "version": "1.15.3",
+  "version": "1.16.0",
   "file": "Compass-Setup.exe",
-  "size": 84914444,
-  "sha256": "d7823af77b67c4462efb503dc823f291d52ded432194c385adb2827cd4599799",
-  "notes": "CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column. CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer. Library search also finds projects and albums inside folders. Settings: Recently deleted shows five items, with Show all.",
+  "size": 84914695,
+  "sha256": "5da3e5bf6e22e345e85af7aaefd1a7d1c4c2ff2f79003a80a537398ee01efc05",
+  "notes": "Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.0",
+      "d": "2026-11-16",
+      "items": [
+        "Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows."
+      ]
+    },
     {
       "v": "1.15.3",
       "d": "2026-11-16",
@@ -156,17 +163,10 @@
       "items": [
         "Stats fit on one screen: totals in a compact strip, your most played songs, artists and projects side by side, and buttons to sort by plays, time listened or average per play. Click a row to play the song or open the project."
       ]
-    },
-    {
-      "v": "1.12.1",
-      "d": "2026-11-16",
-      "items": [
-        "Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover."
-      ]
     }
   ],
   "live": {
-    "shell": "cbbf8c9165efa86c",
+    "shell": "0c13869e2c637232",
     "files": [
       {
         "p": "icon.png",
@@ -175,8 +175,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "915222f47ccfeeabe9f4fed9cc25000998fef0c8d59b7301bedee1a3537de9be",
-        "size": 682383
+        "sha256": "a6caed254f9d3361f774f74aae58fd88ad745b8d53aa11633ea550b8e3b0bdc2",
+        "size": 682601
       },
       {
         "p": "lib/GLTFExporter.js",

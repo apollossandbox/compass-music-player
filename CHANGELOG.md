@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.0 · 2026-11-16
+
+- Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.
+
 ## 1.15.3 · 2026-11-16
 
 - CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column.
