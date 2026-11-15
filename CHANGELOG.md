@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.7 · 2026-11-16
+
+- Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.
+
 ## 1.16.6 · 2026-11-16
 
 - CD Creator 3D view: Open/Close case, Remove/Put back disc and Reset view buttons are back in the top bar.

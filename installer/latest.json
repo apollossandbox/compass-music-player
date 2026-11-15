@@ -1,11 +1,18 @@
 {
-  "version": "1.16.6",
+  "version": "1.16.7",
   "file": "Compass-Setup.exe",
-  "size": 84917916,
-  "sha256": "8247e6dd7b5229e936790724acb8471677fdc4dfe49050fb4212689524888946",
-  "notes": "CD Creator 3D view: Open/Close case, Remove/Put back disc and Reset view buttons are back in the top bar.",
+  "size": 84918996,
+  "sha256": "772469bea8289e5fb98f4137a2fae87ab84558b925da010fe6fc4ad759b385cb",
+  "notes": "Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.7",
+      "d": "2026-11-16",
+      "items": [
+        "Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later."
+      ]
+    },
     {
       "v": "1.16.6",
       "d": "2026-11-16",
@@ -154,13 +161,6 @@
       "items": [
         "Sidebar: CD Creator moved under Launcher."
       ]
-    },
-    {
-      "v": "1.13.3",
-      "d": "2026-11-16",
-      "items": [
-        "Song lists: the Title header lines up with the track numbers."
-      ]
     }
   ],
   "live": {
@@ -173,8 +173,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "487f9ddfabb22cb57e3168c7c9cbf7091bb51dd637565577c2a55276b588355c",
-        "size": 692502
+        "sha256": "cf073c8000ad05929ab8c4fbc66e8d9d526f1f08799408da0ec9acb757e57270",
+        "size": 697007
       },
       {
         "p": "lib/GLTFExporter.js",
