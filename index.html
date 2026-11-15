@@ -2513,9 +2513,9 @@ function buildCase() {
     inner(0, sp, -W / 2 + .12, Math.PI / 2); inner(tiw - sp, tiw, W / 2 - .12, -Math.PI / 2);
     back.userData.sheet = 'tray'; ls.userData.sheet = 'spineL'; rs.userData.sheet = 'spineR'; ls.userData.strip = 'L'; rs.userData.strip = 'R'; C3.print.push(back, ls, rs);
     const thick = new T3.MeshPhysicalMaterial({ color: lightUI ? 0xbfc8d2 : 0xe8eef6, metalness: 0, roughness: .12, transparent: true, opacity: lightUI ? .22 : .16, clearcoat: 1, clearcoatRoughness: .05, side: T3.DoubleSide, depthWrite: false });
-    box(.09, H - .34, T * .88, thick, -W / 2 + .66, 0, T * .46); // inner spine wall
+    box(.06, H - .34, T * .88, thick, -W / 2 + .27, 0, T * .46); // inner spine wall: at the tray card fold, so the spine window shows in full
     [1, -1].forEach(sy => box(.66, .82, T * .97, thick, -W / 2 + .33, sy * (H / 2 - .41), T * .49)); // hinge blocks
-    const tp = box(W - 1.02, H - .5, .06, trayM, .26, 0, .66, root, !black); if (black) C3.occ.push(tp);
+    const tp = box(W - .58, H - .5, .06, trayM, .02, 0, .66, root, !black); if (black) C3.occ.push(tp);
     const hub = add(new T3.CylinderGeometry(.72, .82, .16, 48), trayM, cdFmt(cdCol()) === 'cd100' ? T100.discOff / 10 : 0, 0, .74, root, !black); hub.rotation.x = Math.PI / 2;
   } else {
     const tp = box(W - .3, H - .3, .05, trayM, 0, 0, .13, root, !black); if (black) C3.occ.push(tp);
@@ -3675,6 +3675,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.8', d: '2026-11-16', items: ['CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.'] },
   { v: '1.16.7', d: '2026-11-16', items: ['Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.'] },
   { v: '1.16.6', d: '2026-11-16', items: ['CD Creator 3D view: Open/Close case, Remove/Put back disc and Reset view buttons are back in the top bar.'] },
   { v: '1.16.5', d: '2026-11-16', items: ['CD viewer and Store pages: the case always starts closed and slowly turning.'] },

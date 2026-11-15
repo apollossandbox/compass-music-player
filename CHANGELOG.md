@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.8 · 2026-11-16
+
+- CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.
+
 ## 1.16.7 · 2026-11-16
 
 - Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.

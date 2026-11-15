@@ -1,11 +1,18 @@
 {
-  "version": "1.16.7",
+  "version": "1.16.8",
   "file": "Compass-Setup.exe",
-  "size": 84918996,
-  "sha256": "772469bea8289e5fb98f4137a2fae87ab84558b925da010fe6fc4ad759b385cb",
-  "notes": "Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.",
+  "size": 84919205,
+  "sha256": "719a838cb7fad8dd3af6c767f4a9936e58f6a4db3f91e6e3632ea0b5c6f0f129",
+  "notes": "CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.8",
+      "d": "2026-11-16",
+      "items": [
+        "CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full."
+      ]
+    },
     {
       "v": "1.16.7",
       "d": "2026-11-16",
@@ -154,13 +161,6 @@
       "items": [
         "Notifications now show at the bottom right, above the player."
       ]
-    },
-    {
-      "v": "1.13.4",
-      "d": "2026-11-16",
-      "items": [
-        "Sidebar: CD Creator moved under Launcher."
-      ]
     }
   ],
   "live": {
@@ -173,8 +173,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "cf073c8000ad05929ab8c4fbc66e8d9d526f1f08799408da0ec9acb757e57270",
-        "size": 697007
+        "sha256": "a52edc79fb101ccd93f274822a36814bdcf61e04f5a24f05d71604e71a0163dd",
+        "size": 697233
       },
       {
         "p": "lib/GLTFExporter.js",
