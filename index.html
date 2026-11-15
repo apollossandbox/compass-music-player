@@ -2060,9 +2060,17 @@ function stripXform(x, side, p) { const ex = stripEdge(side); if (side === 'R') 
 const toHex = c => { if (!c) return '#111111'; if (c[0] === '#') return c.length === 7 ? c : '#111111'; const m = c.match(/\d+(\.\d+)?/g); return m ? '#' + m.slice(0, 3).map(n => Math.round(+n).toString(16).padStart(2, '0')).join('') : '#111111'; };
 const shade = (hex, k) => '#' + [1, 3, 5].map(i => Math.min(255, Math.round(parseInt(hex.slice(i, i + 2), 16) * k)).toString(16).padStart(2, '0')).join('');
 function cdCol() { const ok = x => cdOk(x) ? x : null; const c = ok(UI.cdForce && col(UI.cdForce)) || ok(UI.vw && UI.vwCol && col(UI.vwCol)) || ok(S.view === 'collection' && col(S.colId)) || ok(col(S.cd.colId)) || S.cols.find(x => !isFolder(x)); if (c) S.cd.colId = c.id; return c; }
+const cdFmt = c => c && (S.cd.fmts || {})[c.id] || '';
+const isCD100 = D => !!D && D._fmt === 'cd100';
+const T100 = { bleed: 3.175, safe: 3.175, traySafeX: 9.13, spineSafe: 1.3, spineWin: 9.52, discOff: 4.77 }; // measured from the CD100 / CDT100 / UD100 PDFs (mm)
+const FMT_NOTE = { front: 'Keep text inside the green safety line.', inside: 'Back of the booklet. Keep text inside the green safety line.',
+  tray: 'Spines fold at the dashed lines. Keep text inside the green lines, the small ones for the spines.', trayIn: 'The grey strip shows through the hinge on the front. The disc sits over the circle.',
+  spineL: 'Keep text inside the green line.', spineR: 'Keep text inside the green line.', disc: 'Prints from 24 to 116 mm on a 119 mm disc; keep text inside the dashed rings. Print files fill the whole square, center included.' };
 function design(c) {
   if (!S.cd.designs) S.cd.designs = {};
+  if (!S.cd.designs[c.id]) { (S.cd.fmts = S.cd.fmts || {})[c.id] = 'cd100'; } // new CDs use the CD100 set; existing ones stay Classic
   const D = S.cd.designs[c.id] || (S.cd.designs[c.id] = autoDesign(c));
+  Object.defineProperty(D, '_fmt', { value: cdFmt(c), configurable: true, writable: true, enumerable: false });
   if (!D.trayIn) D.trayIn = { bg: '#f4f4f2', layers: [] };
   if (projArtist(c) !== 'Artist Name') cdRenameArtist(c.id, 'Artist Name', projArtist(c));
   if (D.tray && !D.spineL) {
@@ -2221,10 +2229,10 @@ function paintBg(x, bg, W, H, o = 0) {
     if (x.createConicGradient) { const k = x.createConicGradient(.4, W / 2, H / 2); ['#ff9a9a30', '#ffe08030', '#9dffb230', '#8fd2ff30', '#d2a0ff30', '#ff9a9a30'].forEach((s, i, a) => k.addColorStop(i / (a.length - 1), s)); x.fillStyle = k; x.fillRect(0, 0, W, H); }
   } else { x.fillStyle = bg || '#ffffff'; x.fillRect(0, 0, W, H); }
 }
-function paintSheet(x, key, sd, p, D) {
-  const sh = SHEETS[key], W = (sh.w + 2 * BLEED) * p, H = (sh.h + 2 * BLEED) * p;
+function paintSheet(x, key, sd, p, D, mode) { // mode: 'edit' | 'print' | undefined (as it looks on the real thing)
+  const sh = SHEETS[key], W = (sh.w + 2 * BLEED) * p, H = (sh.h + 2 * BLEED) * p, c100 = isCD100(D), full = c100 && (mode === 'edit' || mode === 'print');
   x.clearRect(0, 0, W, H); x.save();
-  if (sh.disc) { x.beginPath(); x.arc(W / 2, H / 2, sh.w / 2 * p, 0, Math.PI * 2); x.clip(); }
+  if (sh.disc && !full) { x.beginPath(); x.arc(W / 2, H / 2, (c100 ? 58 : sh.w / 2) * p, 0, Math.PI * 2); x.clip(); }
   paintBg(x, sd.bg === 'none' && sh.strip && D ? D.tray.bg : sd.bg, W, H); x.translate(BLEED * p, BLEED * p);
   const busy = key === 'tray' && D ? ['L', 'R'].filter(sd2 => { const ss = D['spine' + sd2]; return ss && (ss.bg !== 'none' || ss.layers.some(l => !l.hidden)); }) : [];
   if (busy.length) { x.save(); x.beginPath(); const sp = SHEETS.tray.spine, l0 = busy.includes('L') ? sp : -BLEED, r0 = busy.includes('R') ? sh.w - sp : sh.w + BLEED; x.rect(l0 * p, -BLEED * p, (r0 - l0) * p, (sh.h + 2 * BLEED) * p); x.clip(); }
@@ -2234,7 +2242,37 @@ function paintSheet(x, key, sd, p, D) {
     const st = SHEETS['spine' + side]; if (ss.bg !== 'none') paintBg(x, ss.bg, (st.w + 2 * BLEED) * p, (st.h + 2 * BLEED) * p, -BLEED * p); else if (busy.includes(side)) paintBg(x, sd.bg, (st.w + 2 * BLEED) * p, (st.h + 2 * BLEED) * p, -BLEED * p);
     ss.layers.forEach(L => drawLayer(x, L.type === 'text' && L.fit == null ? { ...L, fit: true } : L, p)); x.restore(); });
   x.restore();
-  if (sh.disc) { x.save(); x.globalCompositeOperation = 'destination-out'; x.beginPath(); x.arc(W / 2, H / 2, 11.5 * p, 0, Math.PI * 2); x.fill(); x.restore(); }
+  if (sh.disc && !full) { x.save(); x.globalCompositeOperation = 'destination-out'; x.beginPath(); x.arc(W / 2, H / 2, (c100 ? 12 : 11.5) * p, 0, Math.PI * 2); x.fill(); x.restore(); }
+}
+/* CD100 / CDT100 / UD100 guides, in the templates' own colours: blue bleed, pink trim, green safety, pink dashed folds */
+function paintGuides100(x, key, p) {
+  const sh = SHEETS[key], B = BLEED * p, W = (sh.w + 2 * BLEED) * p, H = (sh.h + 2 * BLEED) * p, BL = '#5aa9e6', PK = '#ff5fa8', GR = '#5fd394', s = T100.safe;
+  x.save(); x.lineWidth = 1;
+  const ring = (d, col, dash, cx = W / 2, cy = H / 2) => { x.strokeStyle = col; x.setLineDash(dash ? [5, 4] : []); x.beginPath(); x.arc(cx, cy, d / 2 * p, 0, Math.PI * 2); x.stroke(); };
+  const box = (x0, y0, w, h, col, dash) => { x.strokeStyle = col; x.setLineDash(dash ? [5, 4] : []); x.strokeRect(B + x0 * p, B + y0 * p, w * p, h * p); };
+  if (sh.disc) {
+    x.fillStyle = 'rgba(12,12,14,.3)'; x.beginPath(); x.rect(0, 0, W, H); x.arc(W / 2, H / 2, 59.5 * p, 0, Math.PI * 2, true); x.fill();
+    box(-1, -1, 122, 122, BL); ring(119, BL); ring(116, PK); ring(112, GR, 1); ring(46, GR); ring(30, GR, 1); ring(24, PK); ring(15, BL);
+  } else {
+    x.fillStyle = 'rgba(12,12,14,.45)'; x.beginPath(); x.rect(0, 0, W, H); x.rect(B, B, sh.w * p, sh.h * p); x.fill('evenodd');
+    box(0, 0, sh.w, sh.h, PK);
+    if (key === 'tray') { const sp = sh.spine, ss = T100.spineSafe; box(T100.traySafeX, s, sh.w - 2 * T100.traySafeX, sh.h - 2 * s, GR); box(ss, s, sp - 2 * ss, sh.h - 2 * s, GR); box(sh.w - sp + ss, s, sp - 2 * ss, sh.h - 2 * s, GR);
+      x.strokeStyle = PK; x.setLineDash([5, 4]); [sp, sh.w - sp].forEach(fx => { x.beginPath(); x.moveTo(B + fx * p, 0); x.lineTo(B + fx * p, H); x.stroke(); }); }
+    else if (key === 'trayIn') { x.fillStyle = 'rgba(200,200,205,.28)'; x.fillRect(B, B, T100.spineWin * p, sh.h * p);
+      x.save(); x.fillStyle = 'rgba(255,255,255,.75)'; x.font = `700 ${Math.max(9, 2.6 * p)}px Arial`; x.textAlign = 'center'; x.translate(B + T100.spineWin / 2 * p, B + sh.h / 2 * p); x.rotate(-Math.PI / 2); x.fillText('Spine window', 0, 3.2 * p / 3); x.restore();
+      box(T100.traySafeX - SHEETS.tray.spine, s, sh.w - 2 * (T100.traySafeX - SHEETS.tray.spine), sh.h - 2 * s, GR);
+      const cx = B + (sh.w / 2 + T100.discOff) * p, cy = B + sh.h / 2 * p; ring(120.65, GR, 0, cx, cy); ring(31.75, GR, 0, cx, cy); ring(10.44, GR, 0, cx, cy); }
+    else if (sh.strip) box(s, T100.spineSafe, sh.w - 2 * s, sh.h - 2 * T100.spineSafe, GR);
+    else box(s, s, sh.w - 2 * s, sh.h - 2 * s, GR);
+  }
+  x.restore();
+}
+/* print-ready canvas for one sheet: Classic keeps 3 mm bleed; CD100 uses the templates' 1/8 in bleed and a 122 mm disc square */
+function printSheetCanvas(k, d) {
+  const sh = SHEETS[k], P = PRINTMM, cv = document.createElement('canvas'), x = cv.getContext('2d');
+  if (!isCD100(d)) { cv.width = Math.round((sh.w + 2 * BLEED) * P); cv.height = Math.round((sh.h + 2 * BLEED) * P); paintSheet(x, k, d[k], P, d); return cv; }
+  const bl = sh.disc ? 1 : T100.bleed, off = (bl - BLEED) * P; cv.width = Math.round((sh.w + 2 * bl) * P); cv.height = Math.round((sh.h + 2 * bl) * P);
+  if (d[k].bg && d[k].bg !== 'none') paintBg(x, d[k].bg, cv.width, cv.height); x.translate(off, off); paintSheet(x, k, d[k], P, d, 'print'); return cv;
 }
 function paintGuides(x, key, p) {
   const sh = SHEETS[key], B = BLEED * p, W = (sh.w + 2 * BLEED) * p, H = (sh.h + 2 * BLEED) * p;
@@ -2278,7 +2316,7 @@ function draw2D() {
   const dpr = Math.min(2, devicePixelRatio || 1);
   cv.style.width = TW * p + 'px'; cv.style.height = TH * p + 'px'; cv.width = Math.round(TW * p * dpr); cv.height = Math.round(TH * p * dpr);
   const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
-  paintSheet(x, key, design(c)[key], p, design(c)); paintGuides(x, key, p);
+  paintSheet(x, key, design(c)[key], p, design(c), 'edit'); if (isCD100(design(c))) paintGuides100(x, key, p); else paintGuides(x, key, p);
   if (S.cd.grid) { x.save(); x.strokeStyle = 'rgba(79,179,255,.22)'; x.lineWidth = 1; for (let g = 0; g <= sh.w; g += 5) { x.beginPath(); x.moveTo((g + BLEED) * p, BLEED * p); x.lineTo((g + BLEED) * p, (sh.h + BLEED) * p); x.stroke(); } for (let g = 0; g <= sh.h; g += 5) { x.beginPath(); x.moveTo(BLEED * p, (g + BLEED) * p); x.lineTo((sh.w + BLEED) * p, (g + BLEED) * p); x.stroke(); } x.strokeStyle = 'rgba(79,179,255,.5)'; x.beginPath(); x.moveTo((sh.w / 2 + BLEED) * p, 0); x.lineTo((sh.w / 2 + BLEED) * p, TH * p); x.moveTo(0, (sh.h / 2 + BLEED) * p); x.lineTo(TW * p, (sh.h / 2 + BLEED) * p); x.stroke(); x.restore(); }
   if (!S.cd.lock && UI.cdSel && UI.cdSel.sheet === key) selLayers().slice(1).forEach(l => { const w = l.w * p, h = layerH(l) * p; x.save(); x.translate((l.x + BLEED) * p, (l.y + BLEED) * p); x.rotate(l.rot * Math.PI / 180); x.strokeStyle = '#4fb3ff'; x.setLineDash([4, 3]); x.lineWidth = 1.5; x.strokeRect(-w / 2, -h / 2, w, h); x.restore(); });
   (UI.guides || []).forEach(g => { x.save(); x.strokeStyle = '#ff2fa8'; x.lineWidth = 1; x.beginPath(); if (g.x != null) { x.moveTo((g.x + BLEED) * p, 0); x.lineTo((g.x + BLEED) * p, TH * p); } else { x.moveTo(0, (g.y + BLEED) * p); x.lineTo(TW * p, (g.y + BLEED) * p); } x.stroke(); x.restore(); });
@@ -2411,15 +2449,15 @@ function buildCase() {
   const T3 = THREE, root = C3.root; while (root.children.length) root.remove(root.children[0]);
   const slim = S.cd.caseType === 'slim', T = slim ? .52 : 1.04, W = 14.2, H = 12.5;
   const lightUI = !UI.vw && (() => { const m = getComputedStyle(document.body).backgroundColor.match(/\d+/g); return m && (+m[0] + +m[1] + +m[2]) > 450; })();
-  const clear = new T3.MeshPhysicalMaterial({ color: lightUI ? 0xc9d2dc : 0xf2f7ff, metalness: 0, roughness: .08, transparent: true, opacity: lightUI ? .14 : .1, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1.1, side: T3.DoubleSide, depthWrite: false });
-  const edgeM = new T3.LineBasicMaterial({ color: lightUI ? 0x2a2a2e : 0xffffff, transparent: true, opacity: lightUI ? .22 : .16 });
+  const clear = new T3.MeshPhysicalMaterial({ color: lightUI ? 0xc9d2dc : 0xf2f7ff, metalness: 0, roughness: .04, transparent: true, opacity: lightUI ? .1 : .06, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1.1, side: T3.DoubleSide, depthWrite: false });
+  const edgeM = new T3.LineBasicMaterial({ color: lightUI ? 0x2a2a2e : 0xffffff, transparent: true, opacity: lightUI ? .4 : .5 });
   const black = S.cd.tray === 'black';
   const trayM = black ? new T3.MeshStandardMaterial({ color: 0x0d0d0e, roughness: .38, metalness: .1 }) : new T3.MeshPhysicalMaterial({ color: 0xffffff, roughness: .06, transparent: true, opacity: .2, clearcoat: 1, side: T3.DoubleSide, depthWrite: false, envMapIntensity: 1.6 });
   const add = (geo, m, x, y, z, parent, edges) => { const me = new T3.Mesh(geo, m); me.position.set(x, y, z); parent.add(me); if (edges) { const e = new T3.LineSegments(new T3.EdgesGeometry(geo, 25), edgeM); me.add(e); } return me; };
   const box = (w, h, d, m, x, y, z, parent = root, edges = true) => add(new T3.BoxGeometry(w, h, d), m, x, y, z, parent, edges);
   const printM = (k, extra = {}) => new T3.MeshBasicMaterial({ map: C3.tex[k].tex, toneMapped: false, transparent: !!extra.transparent, side: extra.side || T3.FrontSide });
   const sub = (k, a, b) => { const sh = SHEETS[k], TW = sh.w + 2 * BLEED, TH = sh.h + 2 * BLEED; return [(BLEED + a) / TW, (BLEED + b) / TW, BLEED / TH, (BLEED + sh.h) / TH]; };
-  C3.print = []; C3.occ = []; C3.discX = .45; // the tray centres the disc under the booklet, right of the hinge
+  C3.print = []; C3.occ = [];
   // base shell
   box(W, H, .1, clear, 0, 0, .05);
   box(W, .12, T * .72, clear, 0, H / 2 - .06, T * .36); box(W, .12, T * .72, clear, 0, -H / 2 + .06, T * .36);
@@ -2430,26 +2468,25 @@ function buildCase() {
     const tin = add(uvRemap(new T3.PlaneGeometry(bw, th), ...sub('trayIn', 0, SHEETS.trayIn.w)), printM('trayIn'), 0, 0, .108, root); tin.userData.sheet = 'trayIn'; C3.print.push(tin);
     const ls = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', 0, sp)), printM('tray'), W / 2 - .11, 0, .104 + sd / 2, root); ls.rotation.y = Math.PI / 2;
     const rs = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', sh.w - sp, sh.w)), printM('tray'), -W / 2 + .11, 0, .104 + sd / 2, root); rs.rotation.y = -Math.PI / 2;
-    const paper = new T3.MeshStandardMaterial({ color: 0xeeeeea, roughness: .9 }); [[W / 2 - .118, -Math.PI / 2], [-W / 2 + .118, Math.PI / 2]].forEach(([px, ry]) => { const bk = add(new T3.PlaneGeometry(sd, th), paper, px, 0, .104 + sd / 2, root); bk.rotation.y = ry; }); // inside of each spine fold is plain paper
-    const sw = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', sh.w - sp, sh.w)), printM('tray'), -W / 2 + .55 + sd / 2, 0, .74, root); sw.userData.sheet = 'spineR'; sw.userData.strip = 'R';
     back.userData.sheet = 'tray'; ls.userData.sheet = 'spineL'; rs.userData.sheet = 'spineR'; ls.userData.strip = 'L'; rs.userData.strip = 'R'; C3.print.push(back, ls, rs);
     const tp = box(W - .5, H - .5, .06, trayM, 0, 0, .66, root, !black); if (black) C3.occ.push(tp);
-    const hub = add(new T3.CylinderGeometry(.72, .82, .16, 48), trayM, C3.discX, 0, .74, root, !black); hub.rotation.x = Math.PI / 2;
+    const hub = add(new T3.CylinderGeometry(.72, .82, .16, 48), trayM, cdFmt(cdCol()) === 'cd100' ? T100.discOff / 10 : 0, 0, .74, root, !black); hub.rotation.x = Math.PI / 2;
   } else {
     const tp = box(W - .3, H - .3, .05, trayM, 0, 0, .13, root, !black); if (black) C3.occ.push(tp);
-    const hub = add(new T3.CylinderGeometry(.72, .82, .12, 48), trayM, C3.discX, 0, .2, root, !black); hub.rotation.x = Math.PI / 2;
+    const hub = add(new T3.CylinderGeometry(.72, .82, .12, 48), trayM, cdFmt(cdCol()) === 'cd100' ? T100.discOff / 10 : 0, 0, .2, root, !black); hub.rotation.x = Math.PI / 2;
   }
   // disc
+  const u100 = cdFmt(cdCol()) === 'cd100', Ro = u100 ? 5.95 : 6, Po = u100 ? 5.8 : 6, Pi = u100 ? 1.2 : 1.15; C3.discX = u100 ? T100.discOff / 10 : 0;
   const dz = slim ? .27 : .76, disc = new T3.Group(); disc.position.set(C3.discX, 0, dz); root.add(disc); C3.disc = disc; C3.discZ = dz;
   const silver = new T3.MeshStandardMaterial({ color: 0xdcdce2, metalness: 1, roughness: .16, side: T3.DoubleSide });
-  const top = new T3.Mesh(uvRemap(new T3.RingGeometry(1.15, 6, 128, 2), BLEED / 126, (BLEED + 120) / 126, BLEED / 126, (BLEED + 120) / 126), printM('disc', { transparent: true, roughness: .42, metalness: .12 }));
+  const top = new T3.Mesh(uvRemap(new T3.RingGeometry(Pi, Po, 128, 2), (BLEED + 60 - Po * 10) / 126, (BLEED + 60 + Po * 10) / 126, (BLEED + 60 - Po * 10) / 126, (BLEED + 60 + Po * 10) / 126), printM('disc', { transparent: true, roughness: .42, metalness: .12 }));
   top.position.z = .062; top.userData.sheet = 'disc'; disc.add(top); C3.print.push(top);
-  const under = new T3.Mesh(new T3.RingGeometry(1.15, 6, 128), silver); under.position.z = .056; disc.add(under);
+  const under = new T3.Mesh(new T3.RingGeometry(1.15, Ro, 128), silver); under.position.z = .056; disc.add(under);
   const irCv = document.createElement('canvas'); irCv.width = irCv.height = 512; { const x = irCv.getContext('2d'); x.fillStyle = '#d8d8de'; x.fillRect(0, 0, 512, 512); if (x.createConicGradient) { const g = x.createConicGradient(0, 256, 256); ['#ffb3b3', '#ffe6a0', '#b7ffc8', '#a8dcff', '#d8b8ff', '#ffb3b3', '#ffe6a0', '#b7ffc8', '#a8dcff', '#d8b8ff', '#ffb3b3'].forEach((k, i, a) => g.addColorStop(i / (a.length - 1), k)); x.globalAlpha = .55; x.fillStyle = g; x.fillRect(0, 0, 512, 512); } }
   const irTex = new T3.CanvasTexture(irCv); irTex.encoding = T3.sRGBEncoding;
-  const bot = new T3.Mesh(new T3.RingGeometry(1.15, 6, 128), new T3.MeshStandardMaterial({ map: irTex, metalness: .85, roughness: .12, side: T3.DoubleSide })); bot.position.z = -.061; bot.rotation.y = Math.PI; disc.add(bot);
-  const edge = new T3.Mesh(new T3.CylinderGeometry(6, 6, .12, 128, 1, true), silver); edge.rotation.x = Math.PI / 2; disc.add(edge);
-  const hubR = new T3.Mesh(new T3.RingGeometry(.75, 1.15, 64), clear); hubR.position.z = .06; disc.add(hubR);
+  const bot = new T3.Mesh(new T3.RingGeometry(1.15, Ro, 128), new T3.MeshStandardMaterial({ map: irTex, metalness: .85, roughness: .12, side: T3.DoubleSide })); bot.position.z = -.061; bot.rotation.y = Math.PI; disc.add(bot);
+  const edge = new T3.Mesh(new T3.CylinderGeometry(Ro, Ro, .12, 128, 1, true), silver); edge.rotation.x = Math.PI / 2; disc.add(edge);
+  const hubR = new T3.Mesh(new T3.RingGeometry(.75, Pi, 64), clear); hubR.position.z = .06; disc.add(hubR);
   // lid, hinged on the left edge
   const lid = new T3.Group(); lid.position.set(-W / 2, 0, T); root.add(lid); C3.lid = lid;
   box(W, H, .1, clear, W / 2, 0, -.05, lid);
@@ -2460,13 +2497,6 @@ function buildCase() {
   const bf = add(uvRemap(new T3.PlaneGeometry(bs, bs), ...sub('front', 0, SHEETS.front.w)), printM('front'), W / 2 + .45, 0, -.115, lid); bf.userData.sheet = 'front';
   const bi = add(uvRemap(new T3.PlaneGeometry(bs, bs), ...sub('inside', 0, SHEETS.inside.w)), printM('inside'), W / 2 + .45, 0, -.122, lid); bi.rotation.y = Math.PI; bi.userData.sheet = 'inside';
   C3.print.push(bf, bi);
-  if (!C3.sheen) { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 450; const x = cv.getContext('2d');
-    const band = (a, w, o) => { const g = x.createLinearGradient(0, 0, 512, 450); g.addColorStop(Math.max(0, a - w), 'rgba(255,255,255,0)'); g.addColorStop(a, `rgba(255,255,255,${o})`); g.addColorStop(Math.min(1, a + w), 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 512, 450); };
-    band(.2, .16, .07); band(.42, .05, .1); band(.5, .03, .06); band(.82, .12, .05);
-    let r = 7; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647; x.lineCap = 'round';
-    for (let i = 0; i < 46; i++) { const px = rnd() * 512, py = rnd() * 450, a = rnd() * Math.PI, l = 6 + rnd() * 34; x.strokeStyle = `rgba(255,255,255,${.03 + rnd() * .06})`; x.lineWidth = .6 + rnd() * .8; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
-    C3.sheen = new T3.CanvasTexture(cv); C3.sheen.encoding = T3.sRGBEncoding; }
-  const sheen = add(new T3.PlaneGeometry(W - .1, H - .1), new T3.MeshBasicMaterial({ map: C3.sheen, transparent: true, depthWrite: false, blending: T3.AdditiveBlending, toneMapped: false }), W / 2, 0, .004, lid); sheen.renderOrder = 5;
   cdPaintTex();
 }
 function cdPaintTex() { const c = cdCol(); if (!C3 || !c) return; const d = design(c); Object.keys(SHEETS).forEach(k => { if (!d[k] || SHEETS[k].strip) return; const t = C3.tex[k]; paintSheet(t.cv.getContext('2d'), k, d[k], TEXMM, d); t.tex.needsUpdate = true; }); }
@@ -2687,7 +2717,8 @@ function renderPsProps() {
   if (!L) {
     const ts = colTracks(c), sec = totalSec(ts) + Math.max(0, ts.length - 1) * 2, cap = 4800, over = sec > cap;
     const bgs = [...(sh.strip ? ['none'] : []), '#ffffff', '#111111', ...pcolors(c).map(toHex), ...(sh.disc ? ['silver'] : [])];
-    P.innerHTML = `<div class="psp-sec"><h4>${ico('folder', 13)} ${sh.name}</h4><p class="psp-note">${sh.size} trim, 3 mm bleed. ${sh.note}</p>
+    P.innerHTML = `<div class="psp-sec"><h4>${ico('folder', 13)} ${sh.name}</h4><p class="psp-note">${sh.size} trim, ${isCD100(design(c)) ? '⅛ in' : '3 mm'} bleed. ${isCD100(design(c)) ? FMT_NOTE[S.cd.sheet] || sh.note : sh.note}</p>
+        <span class="psp-lab">Template</span>${seg('cdfmt', [['', 'Classic'], ['cd100', 'CD100 set']], cdFmt(c), 'cd-fmt')}
         <span class="psp-lab">Background</span>
         <div class="swatches">${[...new Set(bgs)].map(b => `<button class="sw ${sd.bg === b ? 'on' : ''}" style="--c:${bgCss(b)}" data-act="cd-bg" data-k="${b}" aria-label="${b === 'silver' ? 'Unprinted silver' : b === 'none' ? 'None (tray card shows through)' : 'Color ' + b}" title="${b === 'none' ? 'None (tray card shows through)' : b === 'silver' ? 'Unprinted silver' : b}"></button>`).join('')}<label class="sw" style="--c:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);overflow:hidden" title="Custom color"><input type="color" id="cd-bg" value="${sd.bg === 'silver' || sd.bg === 'none' ? '#cccccc' : toHex(sd.bg)}" style="opacity:0;width:100%;height:100%;cursor:pointer" aria-label="Custom background color"></label></div></div>
       ${(() => { const { D, all } = designSet(c), ci = c.covers.findIndex(x => x.id === c.cover); return `<div class="psp-sec"><h4>Designs</h4>
@@ -2859,6 +2890,7 @@ function cdAct(a, el) {
     case 'cd-down': if (L) { const i = sd.layers.indexOf(L); if (i > 0) { [sd.layers[i], sd.layers[i - 1]] = [sd.layers[i - 1], sd.layers[i]]; renderCdPanel(); cdDirty(); save(); } } break;
     case 'cd-open': S.cd.open = !S.cd.open; if (!S.cd.open) S.cd.discOut = false; renderPsOpts(); save(); break;
     case 'cd-disc': S.cd.discOut = !S.cd.discOut; renderPsOpts(); save(); break;
+    case 'cd-fmt': { const c = cdCol(); if (!c) break; (S.cd.fmts = S.cd.fmts || {})[c.id] = k || ''; if (!k) delete S.cd.fmts[c.id]; design(c); save(); if (C3) buildCase(); renderCD($('#main')); toast(k ? 'Template: CD100 booklet, CDT100 tray card, UD100 disc' : 'Template: Classic'); break; }
     case 'cd-sheet': UI.fontOpen = false; S.cd.sheet = k; UI.cdSel = { sheet: k, id: null }; if (S.cd.view === '3d') { if (k === 'inside') S.cd.open = true; if (k === 'trayIn') { S.cd.open = true; S.cd.discOut = true; } const face = { trayIn: [-.3, .35], spineL: [-.15, -1.45], spineR: [-.15, 1.45], front: [0, 0], inside: [-.25, -.4], tray: [-.25, 2.75], disc: [-.5, .2] }[k]; if (C3 && face) { C3.tx = face[0]; C3.ty = face[1] + Math.round((C3.ry - face[1]) / (Math.PI * 2)) * Math.PI * 2; } if (k === 'disc') S.cd.discOut = true; } refresh(); break;
     case 'cd-case': S.cd.caseType = k; if (C3) buildCase(); refresh(); break;
     case 'cd-tray': S.cd.tray = k; if (C3) buildCase(); refresh(); break;
@@ -2895,14 +2927,13 @@ async function cdPrint() {
   let dl = null; try { dl = await claude.use('downloads'); } catch (e) { } if (!dl) return toast('Saving files is not available in this view');
   toast('Rendering print files…');
   const d = design(c), z = new JSZip();
-  await Promise.all(Object.values(d).flatMap(sd => sd.layers).filter(l => l.type === 'img' && srcs[l.src]).map(l => { const im = getImg(l.src) || imgCache[l.src]; return im && im.decode ? im.decode().catch(() => { }) : null; }));
-  await waitFonts(Object.values(d).flatMap(sd => sd.layers));
+  await Promise.all(Object.values(d).flatMap(sd => (sd && sd.layers) || []).filter(l => l.type === 'img' && srcs[l.src]).map(l => { const im = getImg(l.src) || imgCache[l.src]; return im && im.decode ? im.decode().catch(() => { }) : null; }));
+  await waitFonts(Object.values(d).flatMap(sd => (sd && sd.layers) || []));
   for (const [i, k] of printKeys().entries()) {
-    const sh = SHEETS[k], cv = document.createElement('canvas'); cv.width = Math.round((sh.w + 2 * BLEED) * PRINTMM); cv.height = Math.round((sh.h + 2 * BLEED) * PRINTMM);
-    paintSheet(cv.getContext('2d'), k, d[k], PRINTMM, d);
+    const sh = SHEETS[k], cv = printSheetCanvas(k, d);
     z.file(`${i + 1} ${sh.name}.png`, await new Promise(r => cv.toBlob(r, 'image/png')));
   }
-  z.file('specs.txt', `${c.name} by ${projArtist(c)}\n${S.cd.caseType === 'slim' ? 'Slim jewel case' : 'Jewel case'}, ${S.cd.tray} tray\n\nEvery file is 300 dpi with 3 mm (0.125 in) bleed on each edge.\nBooklet front and inside: 4.75 x 4.75 in trim.\n${S.cd.caseType === 'jewel' ? 'Tray card: 5.906 x 4.625 in trim, 0.25 in spines at each end. Under the tray (inside of the tray card): 5.406 x 4.625 in.\n' : ''}Disc: 120 mm, printable from 23 mm to 118 mm, 15 mm hole.\nKeep text 3 mm inside the trim. Check your printer's template before ordering.\n`);
+  z.file('specs.txt', `${c.name} by ${projArtist(c)}\n${S.cd.caseType === 'slim' ? 'Slim jewel case' : 'Jewel case'}, ${S.cd.tray} tray\n${isCD100(d) ? 'Template: CD100 booklet, CDT100 tray card, UD100 disc.\n' : ''}\nEvery file is 300 dpi with ${isCD100(d) ? '0.125 in (3.175 mm)' : '3 mm (0.125 in)'} bleed on each edge.${isCD100(d) ? ' The disc file is the full 122 mm square, art to the edges and through the center.' : ''}\nBooklet front and inside: 4.75 x 4.75 in trim.\n${S.cd.caseType === 'jewel' ? 'Tray card: 5.906 x 4.625 in trim, 0.25 in spines at each end. Under the tray (inside of the tray card): 5.406 x 4.625 in.\n' : ''}Disc: 120 mm, printable from 23 mm to 118 mm, 15 mm hole.\nKeep text 3 mm inside the trim. Check your printer's template before ordering.\n`);
   const blob = await z.generateAsync({ type: 'blob' });
   try { await dl.save({ filename: slug(c.name) + '-cd-print-files.zip', data: blob }); toast('Print files saved'); } catch (e) { if (e && e.code !== 'declined') toast("Couldn't save print files"); }
 }
@@ -2994,8 +3025,7 @@ async function addCD3Dx(c, root) {
   const base = safeName(c.name);
   root.file(`${base} CD.glb`, glb);
   for (const [i, k] of printKeys().entries()) {
-    const sh = SHEETS[k], cv = document.createElement('canvas'); cv.width = Math.round((sh.w + 2 * BLEED) * PRINTMM); cv.height = Math.round((sh.h + 2 * BLEED) * PRINTMM);
-    paintSheet(cv.getContext('2d'), k, d[k], PRINTMM, d); root.file(`print/${i + 1} ${sh.name}.png`, await new Promise(r => cv.toBlob(r, 'image/png')));
+    const sh = SHEETS[k], cv = printSheetCanvas(k, d); root.file(`print/${i + 1} ${sh.name}.png`, await new Promise(r => cv.toBlob(r, 'image/png')));
   }
   if (C3.w && C3.r.domElement.isConnected) { C3.r.render(C3.scene, C3.cam); const pv = await new Promise(r => C3.r.domElement.toBlob(r, 'image/png')); if (pv) root.file('preview.png', pv); }
   root.file('README.txt', `${c.name} by ${projArtist(c)} - 3D CD from Compass
@@ -3564,7 +3594,8 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
-  { v: '1.14.0', d: '2026-11-16', items: ['CD case looks like the real thing: the disc sits under the cover instead of peeking out beside it, the back insert’s spine shows through the hinge, and the plastic has a soft sheen, slight haze and faint scuffs instead of bright outlines.'] },
+  { v: '1.14.1', d: '2026-11-16', items: ['CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.', 'New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.', 'Rolled back the 1.14.0 case look.'] },
+  { v: '1.14.0', d: '2026-11-16', items: ['CD case look updated (rolled back in 1.14.1).'] },
   { v: '1.13.9', d: '2026-11-16', items: ['Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.', 'Convert: YouTube links work again. Compass gives the link tool its own built-in JavaScript runtime (YouTube now requires one), keeps the tool up to date weekly, and shows the real error instead of a warning.'] },
   { v: '1.13.8', d: '2026-11-16', items: ['Project pages are tighter so a full album fits on one screen without scrolling.', 'Artists: a song counts for the artist in its own Artist field, then the one in an "Artist - Song" title, and only then the project’s artist (folders don’t count). A song titled "Travis Scott - …" no longer counts as Latto just because it sits in a Latto project.', 'Artist page: All N songs shows every song counted for that artist, so you can check and fix them.'] },
   { v: '1.13.7', d: '2026-11-16', items: ['Reordering songs only animates the disc you’re moving them on; the other discs stay still.'] },
@@ -4272,6 +4303,7 @@ async function duplicateProject(id, quiet) {
   const c = { ...JSON.parse(JSON.stringify(src)), id: uid(), name: src.name + ' (copy)', created: Date.now(), covers: [], cover: null, sequelOf: src.sequelOf };
   const remap = {};
   for (const cv of src.covers) { const b = await DB.get('art:' + cv.id); if (!b) continue; const nid = uid(); await DB.put('art:' + nid, b); srcs['art:' + nid] = URL.createObjectURL(b); await makeThumb(nid, b); c.covers.push({ ...cv, id: nid }); remap['art:' + cv.id] = 'art:' + nid; if (cv.id === src.cover) c.cover = nid; }
+  if (cdFmt(src)) (S.cd.fmts = S.cd.fmts || {})[c.id] = cdFmt(src);
   if (S.cd.designs && S.cd.designs[src.id]) { const d = JSON.parse(JSON.stringify(S.cd.designs[src.id])); Object.values(d).forEach(sd => (sd.layers || []).forEach(l => { l.id = uid(); if (remap[l.src]) l.src = remap[l.src]; })); S.cd.designs[c.id] = d; }
   S.cols.splice(S.cols.indexOf(src) + 1, 0, c);
   if (quiet) return; toast('Duplicated ' + src.name + ' (same songs)'); refresh();

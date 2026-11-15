@@ -1,16 +1,25 @@
 {
-  "version": "1.14.0",
+  "version": "1.14.1",
   "file": "Compass-Setup.exe",
-  "size": 82254939,
-  "sha256": "b60c8ee638f572a5cc0e086613c074ec3e5f23d8b80ced413f9c6a71dcbf3fb2",
-  "notes": "CD case looks like the real thing: disc under the cover, spine through the hinge, soft sheen and scuffs.",
+  "size": 82255996,
+  "sha256": "10b7e663c2a0d1332879420587f92acf33e432aae0cf73261ba1c25a576bff83",
+  "notes": "CD100 template set (booklet, tray card, disc) with the printer's guides and print sizes. New CDs use it; existing CDs keep Classic and can switch. 1.14.0 case look rolled back.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.14.1",
+      "d": "2026-11-16",
+      "items": [
+        "CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.",
+        "New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.",
+        "Rolled back the 1.14.0 case look."
+      ]
+    },
     {
       "v": "1.14.0",
       "d": "2026-11-16",
       "items": [
-        "CD case looks like the real thing: the disc sits under the cover instead of peeking out beside it, the back insert’s spine shows through the hinge, and the plastic has a soft sheen, slight haze and faint scuffs instead of bright outlines."
+        "CD case look updated (rolled back in 1.14.1)."
       ]
     },
     {
@@ -146,13 +155,6 @@
       "d": "2026-11-15",
       "items": [
         "Logo: the W is gone. Compass is the disc on its own, in the app and as the Windows icon."
-      ]
-    },
-    {
-      "v": "1.11.4",
-      "d": "2026-11-15",
-      "items": [
-        "Every disc icon in the app is now the Compass disc."
       ]
     }
   ]

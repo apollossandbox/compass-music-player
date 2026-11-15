@@ -2,9 +2,15 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.14.1 · 2026-11-16
+
+- CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.
+- New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.
+- Rolled back the 1.14.0 case look.
+
 ## 1.14.0 · 2026-11-16
 
-- CD case looks like the real thing: the disc sits under the cover instead of peeking out beside it, the back insert’s spine shows through the hinge, and the plastic has a soft sheen, slight haze and faint scuffs instead of bright outlines.
+- CD case look updated (rolled back in 1.14.1).
 
 ## 1.13.9 · 2026-11-16
 
