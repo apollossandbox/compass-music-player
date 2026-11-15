@@ -1,11 +1,18 @@
 {
-  "version": "1.17.0",
+  "version": "1.17.1",
   "file": "Compass-Setup.exe",
-  "size": 84919616,
-  "sha256": "eca41dfbb96845ba7f97e984fca779f6b6a3e885d4d51dcc0146553f364c193e",
-  "notes": "Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open. Sidebar: Digital albums starts halfway down, Projects has the top half.",
+  "size": 84919523,
+  "sha256": "2f37ffeb64c9461c9dc3204d0a4753cb6d8c1f5da634333e6d07467d45701c79",
+  "notes": "Sidebar: nine most recently played digital albums.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.17.1",
+      "d": "2026-11-16",
+      "items": [
+        "Sidebar: nine most recently played digital albums."
+      ]
+    },
     {
       "v": "1.17.0",
       "d": "2026-11-16",
@@ -155,13 +162,6 @@
         "Artists: a song counts for the artist in its own Artist field, then the one in an \"Artist - Song\" title, and only then the project’s artist (folders don’t count). A song titled \"Travis Scott - …\" no longer counts as Latto just because it sits in a Latto project.",
         "Artist page: All N songs shows every song counted for that artist, so you can check and fix them."
       ]
-    },
-    {
-      "v": "1.13.7",
-      "d": "2026-11-16",
-      "items": [
-        "Reordering songs only animates the disc you’re moving them on; the other discs stay still."
-      ]
     }
   ],
   "live": {
@@ -174,8 +174,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "34ad87c6c5cebdb6ac1b7ecbf570110f5557db6b891425aea5791cc8218c4346",
-        "size": 699578
+        "sha256": "c90e3a524a34f3d2acd2143107866e68a10a1885776bfc5b87919cec2820ad95",
+        "size": 699677
       },
       {
         "p": "lib/GLTFExporter.js",

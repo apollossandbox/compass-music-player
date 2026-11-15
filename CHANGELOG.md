@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.17.1 · 2026-11-16
+
+- Sidebar: nine most recently played digital albums.
+
 ## 1.17.0 · 2026-11-16
 
 - Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open.

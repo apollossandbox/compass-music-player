@@ -1531,7 +1531,7 @@ function renderSide() {
     <button class="colitem ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" data-drop="${c.id}">
       <span class="mini" style="${pcov(c)}"></span><span class="cn"><span class="cn-t">${esc(c.name)}</span><span class="cn-k">${esc([KINDS[c.type], S.side.sort === 'artist' || one ? '' : a].filter(Boolean).join(' · '))}</span></span>
     </button>`; }).join(''); })() || `<p class="faint pad small">${S.cols.some(c => !isFolder(c) && !isMine(c)) ? 'No matching projects.' : 'No projects yet.'}</p>`}</div></div>
-  ${(() => { const lp = c => Math.max(0, ...colTracks(c).map(t => t.lastPlayed || 0)), da = S.cols.filter(c => isMine(c) && !isFolder(c) && !c.archived).sort((a, b) => lp(b) - lp(a)).slice(0, 6);
+  ${(() => { const lp = c => Math.max(0, ...colTracks(c).map(t => t.lastPlayed || 0)), da = S.cols.filter(c => isMine(c) && !isFolder(c) && !c.archived).sort((a, b) => lp(b) - lp(a)).slice(0, 9);
     return da.length ? `<div class="side-da"><div class="shead"><button class="shead-l" data-act="side-mine" title="All digital albums">Digital albums</button><button class="ico" data-act="side-mine" aria-label="All digital albums" title="All digital albums">${ico('grid', 15)}</button></div><div class="side-tiles">${da.map(c => `<button class="stile ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" title="${esc(c.name)}" style="${pcov(c)}"></button>`).join('')}</div></div>` : ''; })()}
   <div class="sfoot"><button class="credbtn" data-act="credits" aria-label="Credits" title="Credits">${ico('star', 14)}</button>${window.tpDesktop ? `<button class="credbtn upd" data-act="desk-update" aria-label="Check for updates" title="Check for updates">${ico('update', 15)}</button><button class="sver" data-act="desk-update" title="Version ${esc(tpDesktop.version)}. Check for updates">v${esc(tpDesktop.version)}</button>` : ''}</div>`;
 }
@@ -3679,6 +3679,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.17.1', d: '2026-11-16', items: ['Sidebar: nine most recently played digital albums.'] },
   { v: '1.17.0', d: '2026-11-16', items: ['Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open.', 'Sidebar: Digital albums starts halfway down, Projects has the top half.'] },
   { v: '1.16.9', d: '2026-11-16', items: ['Sidebar: Projects shows up to six; below it, your six most recently played digital albums as cover tiles. Click either heading to open it in the Library.'] },
   { v: '1.16.8', d: '2026-11-16', items: ['CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.'] },
