@@ -3555,6 +3555,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.9', d: '2026-11-16', items: ['Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.', 'Convert: YouTube links work again. Compass gives the link tool its own built-in JavaScript runtime (YouTube now requires one), keeps the tool up to date weekly, and shows the real error instead of a warning.'] },
   { v: '1.13.8', d: '2026-11-16', items: ['Project pages are tighter so a full album fits on one screen without scrolling.', 'Artists: a song counts for the artist in its own Artist field, then the one in an "Artist - Song" title, and only then the project’s artist (folders don’t count). A song titled "Travis Scott - …" no longer counts as Latto just because it sits in a Latto project.', 'Artist page: All N songs shows every song counted for that artist, so you can check and fix them.'] },
   { v: '1.13.7', d: '2026-11-16', items: ['Reordering songs only animates the disc you’re moving them on; the other discs stay still.'] },
   { v: '1.13.6', d: '2026-11-16', items: ['Publish moves the project out of Projects: you get the digital album in Digital albums and the project in Archive. New version in Archive brings it back to work on.'] },
@@ -5434,10 +5435,11 @@ function onContext(e) {
       ctxMenu(e.clientX, e.clientY, [{ head: vers.length > 1 ? 'Open which version?' : name }, ...vers.map(v => ({ label: v.label, act: 'daw-open-ver', k: id, id: v.path, icon: v.path === cur ? 'check' : null })),
         ...(id === 'fl' && tpDesktop.flp ? [{ sep: 1 }, { label: 'FL Studio projects', act: 'fl-screen', icon: 'folder' }] : []), { sep: 1 }, { label: 'Remove from Launcher', act: 'daw-forget', k: id, icon: 'x' }]); return; } }
   { const r = t.closest('.flr'); if (r) { e.preventDefault(); const f = r.dataset.k; ctxMenu(e.clientX, e.clientY, [{ head: f.split(/[\\/]/).pop() }, { label: 'Open in FL Studio', act: 'fl-proj', k: f, icon: 'play' }, { label: 'Show in folder', act: 'fl-reveal', k: f, icon: 'folder' }]); return; } }
+  if (t.closest && t.closest('#sp-3d')) { e.preventDefault(); return; } // Store page: the case only turns, no CD Creator menus
   if (t.id === 'cd2d') {
     const r = t.getBoundingClientRect(), p = UI.p2d, key = S.cd.sheet, mx = (e.clientX - r.left) / p - BLEED, my = (e.clientY - r.top) / p - BLEED;
     if (S.cd.lock) menu = viewOnlyMenu(); else { const L = hitLayer(design(cdCol())[key], mx, my); if (L) { UI.cdSel = { sheet: key, id: L.id }; renderCdPanel(); draw2D(); menu = layerMenu(L); } else menu = panelMenu(key, { x: mx, y: my }); }
-  } else if (t.classList && t.classList.contains('cd3d') && !UI.vw) {
+  } else if (t.classList && t.classList.contains('cd3d') && !UI.vw && S.view === 'cd') {
     if (S.cd.lock) menu = viewOnlyMenu(); else { const h = pick(e); if (h) { const L = hitLayer(design(cdCol())[h.sheet], h.x, h.y); S.cd.sheet = h.sheet; UI.cdSel = { sheet: h.sheet, id: L ? L.id : null }; renderCdPanel(); menu = L ? layerMenu(L) : panelMenu(h.sheet, h); } else menu = panelMenu(S.cd.sheet); }
   } else if (t.closest('[data-psl]')) {
     const f = findLayer(t.closest('[data-psl]').dataset.psl); if (f) { S.cd.sheet = f.sheet; UI.cdSel = { sheet: f.sheet, id: f.L.id }; renderCdPanel(); cdDirty(); menu = layerMenu(f.L); }

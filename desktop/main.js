@@ -203,7 +203,11 @@ function modsList() {
 /* ---------- converter: links (YouTube and other video sites) through yt-dlp, fetched on first use ---------- */
 const ytBin = () => process.env.COMPASS_YTDLP || path.join(app.getPath('userData'), 'bin', process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
 async function ensureYt() {
-  const f = ytBin(); if (fs.existsSync(f)) return f;
+  const f = ytBin(); if (fs.existsSync(f) && (process.env.COMPASS_YTDLP || Date.now() - fs.statSync(f).mtimeMs < 7 * 864e5)) return f;
+  if (fs.existsSync(f)) { try { return await fetchYt(f); } catch (e) { return f; } }
+  return fetchYt(f);
+}
+async function fetchYt(f) {
   const name = process.platform === 'win32' ? 'yt-dlp.exe' : process.platform === 'darwin' ? 'yt-dlp_macos' : 'yt-dlp';
   const r = await fetch('https://github.com/yt-dlp/yt-dlp/releases/latest/download/' + name); if (!r.ok) throw new Error('Could not download the link tool (yt-dlp): HTTP ' + r.status);
   fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f + '.part', Buffer.from(await r.arrayBuffer())); fs.renameSync(f + '.part', f); try { fs.chmodSync(f, 0o755); } catch (e) {}
@@ -213,13 +217,14 @@ function ytGet(url) {
   return new Promise(async (resolve, reject) => {
     let bin; try { bin = await ensureYt(); } catch (e) { return reject(e); }
     const tmp = fs.mkdtempSync(path.join(app.getPath('temp'), 'compass-'));
-    const p = spawn(bin, ['--no-playlist', '--no-progress', '-f', 'bestaudio/best', '-o', path.join(tmp, '%(title).120B.%(ext)s'), '--print', 'after_move:filepath', url], { windowsHide: true });
+    const p = spawn(bin, ['--no-playlist', '--no-progress', '--js-runtimes', 'node:' + process.execPath, '-f', 'bestaudio/best', '-o', path.join(tmp, '%(title).120B.%(ext)s'), '--print', 'after_move:filepath', url], { windowsHide: true, env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } });
     let out = '', err = ''; p.stdout.on('data', d => out += d); p.stderr.on('data', d => err += d);
     const timer = setTimeout(() => { p.kill(); reject(new Error('The download took too long')); }, 15 * 60 * 1000);
     p.on('error', e => { clearTimeout(timer); reject(e); });
     p.on('close', code => { clearTimeout(timer);
       const file = out.trim().split(/\r?\n/).filter(Boolean).pop();
-      if (code !== 0 || !file || !fs.existsSync(file)) return reject(new Error((err.trim().split(/\r?\n/).pop() || 'The link could not be downloaded').replace(/^ERROR:\s*/, '')));
+      if (code !== 0 || !file || !fs.existsSync(file)) { const L = err.trim().split(/\r?\n/).filter(Boolean), msg = L.filter(l => /^ERROR:/.test(l)).pop() || L.filter(l => !/^WARNING:/.test(l)).pop() || 'The link could not be downloaded';
+        return reject(new Error(msg.replace(/^ERROR:\s*(\[[^\]]+\]\s*)?/, ''))); }
       try { const data = fs.readFileSync(file); resolve({ name: path.basename(file), data }); } catch (e) { reject(e); } finally { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {} } });
   });
 }

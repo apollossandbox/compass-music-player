@@ -1,11 +1,19 @@
 {
-  "version": "1.13.8",
+  "version": "1.13.9",
   "file": "Compass-Setup.exe",
-  "size": 82254283,
-  "sha256": "b8c50fb9d98209e3d03b850dd05302f5da2e44fb5d6f08862104135ed1de3163",
-  "notes": "Project pages fit one screen. Artist counts use the song's own artist, then its title, then the project. Artist page: All N songs.",
+  "size": 82254489,
+  "sha256": "fe425d83d3f5e7612be6ddd74987e1d06e45db620b73a41d40b6702583276f1a",
+  "notes": "Store: no CD editing menu on the case. Convert: YouTube links work again (built-in JS runtime for yt-dlp, weekly updates, real error messages).",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.13.9",
+      "d": "2026-11-16",
+      "items": [
+        "Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.",
+        "Convert: YouTube links work again. Compass gives the link tool its own built-in JavaScript runtime (YouTube now requires one), keeps the tool up to date weekly, and shows the real error instead of a warning."
+      ]
+    },
     {
       "v": "1.13.8",
       "d": "2026-11-16",
@@ -145,14 +153,6 @@
       "d": "2026-11-15",
       "items": [
         "New Compass logo: a disc and a compass in one."
-      ]
-    },
-    {
-      "v": "1.11.2",
-      "d": "2026-11-15",
-      "items": [
-        "Artists tab redesigned: artists down the side with round pictures; each artist page has a header image, their picture, your play count and their 10 most played songs, and their albums and projects, with Play and Shuffle. Add or change the picture and header with the image button.",
-        "Removed the automatic Deezer photo lookup for now."
       ]
     }
   ]

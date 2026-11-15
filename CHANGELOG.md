@@ -2,6 +2,11 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.9 · 2026-11-16
+
+- Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.
+- Convert: YouTube links work again. Compass gives the link tool its own built-in JavaScript runtime (YouTube now requires one), keeps the tool up to date weekly, and shows the real error instead of a warning.
+
 ## 1.13.8 · 2026-11-16
 
 - Project pages are tighter so a full album fits on one screen without scrolling.
