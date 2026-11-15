@@ -2,6 +2,12 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.13.8 · 2026-11-16
+
+- Project pages are tighter so a full album fits on one screen without scrolling.
+- Artists: a song counts for the artist in its own Artist field, then the one in an "Artist - Song" title, and only then the project’s artist (folders don’t count). A song titled "Travis Scott - …" no longer counts as Latto just because it sits in a Latto project.
+- Artist page: All N songs shows every song counted for that artist, so you can check and fix them.
+
 ## 1.13.7 · 2026-11-16
 
 - Reordering songs only animates the disc you’re moving them on; the other discs stay still.

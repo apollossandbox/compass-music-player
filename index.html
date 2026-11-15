@@ -415,7 +415,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .snav .thumb, .cols .thumb { border-radius: 8px; }
 .shead { padding: 22px 10px 8px; }
 .credbtn { border-color: var(--line); }
-.main { padding: 30px max(32px, env(safe-area-inset-right, 0px)) 130px 32px; }
+.main { padding: 30px max(32px, env(safe-area-inset-right, 0px)) 100px 32px; }
 .head { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
 .btn { border-radius: 10px; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--panel2); border: 1px solid var(--line); padding: 9px 16px; transition: background .2s, transform .3s var(--ease), opacity .2s; }
 .btn:hover { transform: none; filter: none; background: var(--panel3); }
@@ -482,6 +482,9 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 }
 /* project page layout */
 .covcol { display: flex; flex-direction: column; gap: 12px; width: min(240px, 100%); flex: none; }
+#main:has(> .chero) .covcol { width: min(200px, 100%); } #main > .chero { margin-bottom: 14px; }
+#main:has(> .chero) .list .row { padding-top: 3px; padding-bottom: 3px; } #main:has(> .chero) .list .rowplay { width: 30px; height: 30px; }
+#main:has(> .chero) .dischead { padding-top: 8px; margin-top: 0; } #main:has(> .chero) .disc-add { margin-top: 6px; padding: 5px 12px; }
 .covcol .covwrap { width: 100%; } .covbtn { justify-content: center; width: 100%; }
 .hrow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; } .hrow .grow { flex: 1; } .hrow .pick { margin-right: 8px; }
 .hrow { position: relative; } .hrow .share-pop { top: calc(100% + 8px); right: 0; }
@@ -734,7 +737,10 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .art-page { min-width: 0; } .art-hero { position: relative; display: flex; align-items: flex-end; gap: 22px; min-height: 230px; padding: 24px; border-radius: 16px; background: linear-gradient(160deg, hsl(var(--h, 200) 40% 26%), hsl(var(--h, 200) 30% 10%)); background-size: cover; background-position: center; color: #fff; overflow: hidden; }
 .art-ht h2 { margin: 0; font-size: clamp(34px, 5vw, 64px); font-weight: 900; letter-spacing: -.03em; line-height: 1; } .art-ht p { margin: 8px 0 0; opacity: .85; font-size: 14px; }
 .art-edit { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,.45); color: #fff; border-radius: 50%; width: 34px; height: 34px; }
-.art-sec { margin-top: 14px !important; }
+.art-sec { margin-top: 14px !important; display: flex; align-items: center; gap: 10px; }
+.art-all { margin-left: auto; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); font-size: 12px; font-weight: 700; color: var(--ink2); }
+.art-all:hover { color: var(--ink); border-color: var(--ink3); }
+.art-songs.all { max-height: calc(100vh - 420px); min-height: 220px; overflow-y: auto; }
 .artcov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; margin-top: 10px; max-height: 56vh; overflow-y: auto; } .artcov { display: flex; flex-direction: column; gap: 5px; min-width: 0; } .artcov img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; } .artcov b { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .artcov .btn { padding: 4px 8px; font-size: 11.5px; }
 .art-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
 .art-songs .row { grid-template-columns: 36px minmax(0, 1fr) 36px !important; padding-top: 4px; padding-bottom: 4px; }
@@ -1368,7 +1374,7 @@ let curListIds = [];
 const listIds = () => curListIds.length ? curListIds : S.tracks.map(t => t.id);
 function visibleTracks() {
   const q = S.q.toLowerCase();
-  if (S.view === 'library' && S.libTab === 'artists' && UI.libArtist) return artistSongs(UI.libArtist).sort((x, y) => (y.plays || 0) - (x.plays || 0) || (y.added || 0) - (x.added || 0)).slice(0, 10);
+  if (S.view === 'library' && S.libTab === 'artists' && UI.libArtist) return artistSongs(UI.libArtist).sort((x, y) => (y.plays || 0) - (x.plays || 0) || (y.added || 0) - (x.added || 0)).slice(0, UI.artAll ? Infinity : 10);
   let a = S.tracks.filter(t => (S.filter === 'all' || t.status === S.filter) && (!q || (dispTitle(t) + ' ' + dispArtist(t) + ' ' + t.tags + ' ' + t.key).toLowerCase().includes(q)));
   const by = { added: (x, y) => y.added - x.added, title: (x, y) => x.title.localeCompare(y.title), artist: (x, y) => dispArtist(x).localeCompare(dispArtist(y), undefined, { sensitivity: 'base' }) || x.title.localeCompare(y.title), status: (x, y) => Object.keys(ST).indexOf(x.status) - Object.keys(ST).indexOf(y.status), bpm: (x, y) => (x.bpm || 0) - (y.bpm || 0) };
   return a.sort(by[S.sort] || by.added);
@@ -1619,7 +1625,8 @@ function renderMain() {
 const meVerified = n => !!(S.concept && S.concept.verified) && !!n && (!S.concept.artist || S.concept.artist === 'Artist Name' || n.trim().toLowerCase() === S.concept.artist.trim().toLowerCase());
 const LIBTABS_EXTRA = [['artists', 'Artists'], ['archived', 'Archive'], ['stats', 'Stats']], LIBVIEWS = {};
 /* artists: from the song's artist, else its project's artist, else an "Artist - Title" file name */
-const songArtists = t => { const a = (t.artist || '').trim() || projArtist(projOf(t)) || ((t.title.match(/^(.+?)\s+-\s+.+$/) || [])[1] || '').trim(); return a ? a.split(/\s*(?:,|&|\bx\b|\bfeat\.?|\bft\.?)\s*/i).map(x => x.trim()).filter(Boolean) : ['Unknown artist']; };
+const titleArtist = title => { const m = String(title || '').match(/^(.+?)\s+-\s+(.+)$/); return m && !/^(?:\(?\d{4}\)?\s*)?(?:remaster|remix|live|version|edit|mix|demo|instrumental|acoustic|radio|extended|clean|explicit|sped|slowed|interlude|intro|outro|skit|bonus|prod)/i.test(m[2]) ? m[1].trim() : ''; };
+const songArtists = t => { const a = (t.artist || '').trim() || titleArtist(t.title) || projArtist(S.cols.find(c => !isFolder(c) && c.tracks.includes(t.id) && projArtists(c).length)); return a ? a.split(/\s*(?:,|&|\bx\b|\bfeat\.?|\bft\.?)\s*/i).map(x => x.trim()).filter(Boolean) : ['Unknown artist']; };
 function artistIndex() { const m = new Map(); S.tracks.forEach(t => songArtists(t).forEach(a => { const k = a.toLowerCase(); if (!m.has(k)) m.set(k, { name: a, songs: 0, dur: 0 }); const r = m.get(k); r.songs++; r.dur += t.dur || 0; })); return [...m.values()].sort((x, y) => y.songs - x.songs || x.name.localeCompare(y.name)); }
 const artCover = (name, kind) => { const k = ((S.artists || {})[name] || {})[kind + 'Cover']; return k && srcs[k] || ''; };
 const artistPic = name => srcs['artist:pic:' + name] || artCover(name, 'pic');
@@ -1636,7 +1643,7 @@ LIBVIEWS.artists = () => {
         ${artAv(name, 'art-big')}<div class="art-ht"><h2>${esc(name)}</h2><p>${plural(plays, 'play')} by you · ${plural(ts.length, 'song')}</p></div>
         <button class="ico art-edit" data-act="art-menu" data-k="${esc(name)}" title="Change picture or header" aria-label="Change picture or header">${ico('image', 16)}</button></header>
       <div class="art-acts"><button class="playbig" data-act="art-play" data-k="${esc(name)}" aria-label="Play ${esc(name)}">${ico('play', 22)}</button><button class="ico pa" data-act="art-shuffle" data-k="${esc(name)}" title="Shuffle" aria-label="Shuffle">${ico('shuffle', 20)}</button></div>
-      <div class="art-body"><div><h3 class="art-sec">Most played</h3><div id="list" class="list art-songs"></div></div>
+      <div class="art-body"><div><h3 class="art-sec">${UI.artAll ? 'All songs' : 'Most played'}${ts.length > 10 ? `<button class="art-all" data-act="art-all">${UI.artAll ? 'Top 10' : `All ${ts.length}`}</button>` : ''}</h3><div id="list" class="list art-songs ${UI.artAll ? 'all' : ''}"></div></div>
       ${(() => { const al = S.cols.filter(c => !isFolder(c) && !c.archived && projArtists(c).some(a => a.toLowerCase() === name.toLowerCase())).sort((x, y) => (y.created || 0) - (x.created || 0));
         return al.length ? `<aside class="art-albums"><h3 class="art-sec">Projects & albums</h3>${al.map(c => `<button class="art-al" data-act="col" data-id="${c.id}"><span class="art-alc">${albumArt(c)}</span><span><b>${esc(c.name)}</b><small>${isMine(c) ? 'Digital album' : KINDS[c.type] || ''} · ${plural(colTracks(c).length, 'song')}</small></span></button>`).join('')}</aside>` : ''; })()}</div></section></div>`;
 };
@@ -3548,6 +3555,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.13.8', d: '2026-11-16', items: ['Project pages are tighter so a full album fits on one screen without scrolling.', 'Artists: a song counts for the artist in its own Artist field, then the one in an "Artist - Song" title, and only then the project’s artist (folders don’t count). A song titled "Travis Scott - …" no longer counts as Latto just because it sits in a Latto project.', 'Artist page: All N songs shows every song counted for that artist, so you can check and fix them.'] },
   { v: '1.13.7', d: '2026-11-16', items: ['Reordering songs only animates the disc you’re moving them on; the other discs stay still.'] },
   { v: '1.13.6', d: '2026-11-16', items: ['Publish moves the project out of Projects: you get the digital album in Digital albums and the project in Archive. New version in Archive brings it back to work on.'] },
   { v: '1.13.5', d: '2026-11-16', items: ['Notifications now show at the bottom right, above the player.'] },
@@ -4752,7 +4760,8 @@ function act(a, el, e) {
     case 'at-conv': openModal('conv', null, { colId: id }); break;
     case 'stat-artist': S.libTab = 'artists'; UI.libArtist = k; refresh(); break;
     case 'stat-sort': S.statSort = k; save(); renderMain(); break;
-    case 'lib-artist': UI.libArtist = k || null; renderMain(); break;
+    case 'lib-artist': UI.libArtist = k || null; UI.artAll = false; renderMain(); break;
+    case 'art-all': UI.artAll = !UI.artAll; renderMain(); break;
     case 'art-play': case 'art-shuffle': { const a = el.dataset.act; const ids = artistSongs(k).sort((x, y) => (y.plays || 0) - (x.plays || 0)).map(t => t.id); if (ids.length) playQueue(ids, a === 'art-shuffle'); break; }
     case 'art-menu': { const r = el.getBoundingClientRect(), has = kind => !!(srcs['artist:' + kind + ':' + k] || artCover(k, kind));
       ctxMenu(r.left - 160, r.bottom + 4, [{ head: k }, { label: has('pic') ? 'Change picture…' : 'Add a picture…', act: 'art-img', k: 'pic|' + k, icon: 'image' }, { label: has('bg') ? 'Change header…' : 'Add a header image…', act: 'art-img', k: 'bg|' + k, icon: 'image' },

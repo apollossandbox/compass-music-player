@@ -1,11 +1,20 @@
 {
-  "version": "1.13.7",
+  "version": "1.13.8",
   "file": "Compass-Setup.exe",
-  "size": 82253697,
-  "sha256": "b32c82afa188d2e3c43a2446a9966428f94ec99b6112c3be2058b4c8c39cdcd9",
-  "notes": "Reordering songs only animates the disc you're moving them on.",
-  "date": "2026-11-14",
+  "size": 82254283,
+  "sha256": "b8c50fb9d98209e3d03b850dd05302f5da2e44fb5d6f08862104135ed1de3163",
+  "notes": "Project pages fit one screen. Artist counts use the song's own artist, then its title, then the project. Artist page: All N songs.",
+  "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.13.8",
+      "d": "2026-11-16",
+      "items": [
+        "Project pages are tighter so a full album fits on one screen without scrolling.",
+        "Artists: a song counts for the artist in its own Artist field, then the one in an \"Artist - Song\" title, and only then the project’s artist (folders don’t count). A song titled \"Travis Scott - …\" no longer counts as Latto just because it sits in a Latto project.",
+        "Artist page: All N songs shows every song counted for that artist, so you can check and fix them."
+      ]
+    },
     {
       "v": "1.13.7",
       "d": "2026-11-16",
@@ -144,14 +153,6 @@
       "items": [
         "Artists tab redesigned: artists down the side with round pictures; each artist page has a header image, their picture, your play count and their 10 most played songs, and their albums and projects, with Play and Shuffle. Add or change the picture and header with the image button.",
         "Removed the automatic Deezer photo lookup for now."
-      ]
-    },
-    {
-      "v": "1.11.1",
-      "d": "2026-11-15",
-      "items": [
-        "Library: new Artists tab (between All songs and Stats): artists down the side, and each artist gets a page with their picture, a header image, how often you played them, and their songs, most played first. Add your own pictures with the image button on the header. Songs named \"Artist - Title\" count for that artist.",
-        "CD player moved to a button at the top, left of Scan QR."
       ]
     }
   ]
