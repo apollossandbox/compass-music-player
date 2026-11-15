@@ -579,6 +579,8 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .ap-av { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--panel3) center/cover; display: grid; place-items: center; font-weight: 800; }
 .ap-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0 8px; } .ap-stats div { display: flex; flex-direction: column; padding: 8px; border-radius: 10px; background: var(--panel2); } .ap-stats b { font-size: 16px; } .ap-stats small { font-size: 11px; color: var(--ink2); }
 .ap-line { margin: 4px 0; font-size: 12.5px; } .acct-pop .crow { margin-top: 10px; }
+.shead-l { all: unset; flex: 1; cursor: pointer; } .shead-l:hover { color: var(--ink); text-decoration: underline; }
+.side-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px 10px 10px; } .stile { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; background-size: cover; background-position: center; cursor: pointer; } .stile:hover { border-color: var(--ink3); } .stile.on { border-color: var(--ink); }
 .lib-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; } .lib-tools .search { width: 240px; } .lib-none { margin: 4px 0 16px; } .mine-filter select { padding-right: 22px; }
 
 .mk-hero { text-align: center; padding: 36px 16px 26px; } .mk-hero h1 { font-size: clamp(28px, 4vw, 42px); margin: 0 0 6px; } .mk-hero p { color: var(--ink2); margin: 0 0 18px; }
@@ -1533,11 +1535,13 @@ function renderSide() {
   $('#side').innerHTML = `
   <div class="brand">${logo(26)}<span class="brand-t" aria-label="Compass Music Player">Music Player</span></div>
   <nav class="snav" data-slide="nav"><i class="thumb"></i>${nav.map(([v, i, l, n]) => `<button class="navbtn ${S.view === v ? 'on' : ''}" data-act="nav" data-view="${v}">${ico(i)}<span>${l}</span>${n !== undefined ? `<em>${n}</em>` : ''}</button>`).join('')}</nav>
-  <div class="shead"><span>Projects</span><button class="ico ${S.side.sort !== 'custom' || S.side.type !== 'all' || S.side.rel !== 'all' ? 'on' : ''}" data-act="side-menu" aria-label="Sort and filter projects" title="Sort and filter">${ico('list', 15)}</button><button class="ico" data-act="newcol" aria-label="New project" title="New project">${ico('plus', 16)}</button></div>
-  <div class="colswrap"><div class="cols" data-slide="cols"><i class="thumb"></i>${(() => { let last = null; const ps = sideProjects(), one = ps.length > 1 && new Set(ps.map(projArtist)).size < 2; return ps.map(c => { const a = projArtist(c), head = S.side.sort === 'artist' && a !== last ? `<p class="sgrp">${esc(a || 'No artist')}</p>` : ''; last = a; return `${head}
+  <div class="shead"><button class="shead-l" data-act="side-projects" title="All projects">Projects</button><button class="ico ${S.side.sort !== 'custom' || S.side.type !== 'all' || S.side.rel !== 'all' ? 'on' : ''}" data-act="side-menu" aria-label="Sort and filter projects" title="Sort and filter">${ico('list', 15)}</button><button class="ico" data-act="newcol" aria-label="New project" title="New project">${ico('plus', 16)}</button></div>
+  <div class="colswrap"><div class="cols" data-slide="cols"><i class="thumb"></i>${(() => { let last = null; const ps = sideProjects().slice(0, 6), one = ps.length > 1 && new Set(ps.map(projArtist)).size < 2; return ps.map(c => { const a = projArtist(c), head = S.side.sort === 'artist' && a !== last ? `<p class="sgrp">${esc(a || 'No artist')}</p>` : ''; last = a; return `${head}
     <button class="colitem ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" data-drop="${c.id}">
       <span class="mini" style="${pcov(c)}"></span><span class="cn"><span class="cn-t">${esc(c.name)}</span><span class="cn-k">${esc([KINDS[c.type], S.side.sort === 'artist' || one ? '' : a].filter(Boolean).join(' · '))}</span></span>
     </button>`; }).join(''); })() || `<p class="faint pad small">${S.cols.some(c => !isFolder(c) && !isMine(c)) ? 'No matching projects.' : 'No projects yet.'}</p>`}</div></div>
+  ${(() => { const lp = c => Math.max(0, ...colTracks(c).map(t => t.lastPlayed || 0)), da = S.cols.filter(c => isMine(c) && !isFolder(c) && !c.archived).sort((a, b) => lp(b) - lp(a)).slice(0, 6);
+    return da.length ? `<div class="shead"><button class="shead-l" data-act="side-mine" title="All digital albums">Digital albums</button><button class="ico" data-act="side-mine" aria-label="All digital albums" title="All digital albums">${ico('grid', 15)}</button></div><div class="side-tiles">${da.map(c => `<button class="stile ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" title="${esc(c.name)}" style="${pcov(c)}"></button>`).join('')}</div>` : ''; })()}
   <div class="sfoot"><button class="credbtn" data-act="credits" aria-label="Credits" title="Credits">${ico('star', 14)}</button>${window.tpDesktop ? `<button class="credbtn upd" data-act="desk-update" aria-label="Check for updates" title="Check for updates">${ico('update', 15)}</button><button class="sver" data-act="desk-update" title="Version ${esc(tpDesktop.version)}. Check for updates">v${esc(tpDesktop.version)}</button>` : ''}</div>`;
 }
 
@@ -3684,6 +3688,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.9', d: '2026-11-16', items: ['Sidebar: Projects shows up to six; below it, your six most recently played digital albums as cover tiles. Click either heading to open it in the Library.'] },
   { v: '1.16.8', d: '2026-11-16', items: ['CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.'] },
   { v: '1.16.7', d: '2026-11-16', items: ['Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.'] },
   { v: '1.16.6', d: '2026-11-16', items: ['CD Creator 3D view: Open/Close case, Remove/Put back disc and Reset view buttons are back in the top bar.'] },
@@ -4841,6 +4846,8 @@ function act(a, el, e) {
         mintOwn(n, 'publish'); c.archived = true; c.publishedTo = n.id; S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id);
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
+    case 'side-projects': S.view = 'library'; S.libTab = 'projects'; refresh(); break;
+    case 'side-mine': S.view = 'library'; S.libTab = 'mine'; refresh(); break;
     case 'acct-lib': acctLibSync(true); break;
     case 'acct-pop': acctPop(); break;
     case 'ap-stats': { const p = $('#acctpop'); if (p) p.remove(); S.view = 'library'; S.libTab = 'stats'; refresh(); break; }

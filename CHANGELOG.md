@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.9 · 2026-11-16
+
+- Sidebar: Projects shows up to six; below it, your six most recently played digital albums as cover tiles. Click either heading to open it in the Library.
+
 ## 1.16.8 · 2026-11-16
 
 - CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.
