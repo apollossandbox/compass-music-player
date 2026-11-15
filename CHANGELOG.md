@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.15.1 · 2026-11-16
+
+- Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time.
+
 ## 1.15.0 · 2026-11-16
 
 - Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.

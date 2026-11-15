@@ -1233,11 +1233,12 @@ const dispArtist = t => [t.artist || projArtist(projOf(t)), ...featsIn(t, 'artis
 const ROLES = ['Producer', 'Co-producer', 'Executive producer', 'Songwriter', 'Composer', 'Lyricist', 'Vocals', 'Background vocals', 'Mixing engineer', 'Mastering engineer', 'Recording engineer', 'Guitar', 'Bass', 'Keys', 'Drums', 'Programming', 'Arranger', 'Artwork', 'Label', 'Publisher'];
 const creditLine = t => { const g = {}; (t.credits || []).forEach(c => { if (c.role && c.name) (g[c.role] = g[c.role] || []).push(c.name); }); return Object.entries(g).map(([r, n]) => `${r}: ${n.join(', ')}`).join(' · '); };
 function stampAdds() { const now = Date.now(); for (const c of S.cols) { c.addedAt = c.addedAt || {}; for (const id of c.tracks) if (!c.addedAt[id]) { const t = trk(id); c.addedAt[id] = (t && t.added) || now; } } }
-const save = () => { stampAdds(); if (typeof cdTrack === 'function') cdTrack(); try { localStorage.setItem(KEY, JSON.stringify({ ...S, playing: false, q: '', editId: null, cx: { ...S.cx, open: false } })); } catch (e) { } };
+let LOADED = false;
+const save = () => { if (!LOADED) return; stampAdds(); if (typeof cdTrack === 'function') cdTrack(); try { localStorage.setItem(KEY, JSON.stringify({ ...S, playing: false, q: '', editId: null, cx: { ...S.cx, open: false } })); } catch (e) { } };
 
 function load() {
   try { const r = JSON.parse(localStorage.getItem(KEY)); if (r && r.tracks) S = { ...S, ...r, playing: false, concept: { ...S.concept, ...r.concept } }; } catch (e) { }
-  normalize();
+  normalize(); LOADED = true;
 }
 function normalize() {
   const now = Date.now();
@@ -3598,6 +3599,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.15.1', d: '2026-11-16', items: ['Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time.'] },
   { v: '1.15.0', d: '2026-11-16', items: ['Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.', 'Digital albums: filter All, Verified or Local.', 'Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album.'] },
   { v: '1.14.1', d: '2026-11-16', items: ['CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.', 'New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.', 'Rolled back the 1.14.0 case look.'] },
   { v: '1.14.0', d: '2026-11-16', items: ['CD case look updated (rolled back in 1.14.1).'] },
@@ -4031,6 +4033,7 @@ function renderSettings(m) {
       ${setRow('Storage used', '<span id="set-usage">Checking…</span>', '')}
       ${setRow('Back up everything', 'Every project, song, cover, CD design and font in one zip.', `<button class="btn sm" data-act="backup">${ico('save', 14)} Back up</button>`)}
       ${setRow('Restore from a backup', 'Replaces everything in Compass.', `<button class="btn sm" data-act="restore">${ico('upload', 14)} Restore…</button>`)}
+      ${window.tpDesktop && tpDesktop.recover ? setRow('Find an older copy', 'Looks for an earlier version of your library list on this computer, if songs or projects went missing.', `<button class="btn sm" data-act="recover">Find…</button>`) : ''}
     </section>
     <section class="set-card box"><h2>Keyboard shortcuts</h2>
       <dl class="keys"><dt>Space</dt><dd>Play or pause</dd><dt>Esc</dt><dd>Close panels and menus</dd></dl>
@@ -4054,6 +4057,18 @@ function renderSettings(m) {
   </div>`;
   if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => { const u = $('#set-usage'); if (u) u.textContent = `${(e.usage / 1048576).toFixed(1)} MB used · ${S.cols.length} projects · ${S.tracks.length} songs`; }).catch(() => { const u = $('#set-usage'); if (u) u.textContent = `${S.cols.length} projects · ${S.tracks.length} songs`; });
   else { const u = $('#set-usage'); if (u) u.textContent = `${S.cols.length} projects · ${S.tracks.length} songs`; }
+}
+/* Find an older copy of the library list in this computer's storage files and offer to restore it.
+   Audio, covers and fonts are stored separately and are not affected. */
+async function recoverOffer(auto) {
+  if (!(window.tpDesktop && tpDesktop.recover)) { if (!auto) toast('Recovery works in the desktop app'); return; }
+  if (!auto) toast('Looking for older copies…'); let list = []; try { list = await tpDesktop.recover(); } catch (e) {}
+  const cur = S.tracks.length, best = (list || []).find(x => x.tracks > cur || (x.tracks === cur && x.cols > S.cols.length));
+  if (!best) { if (!auto) toast('No older copy with more in it was found'); return; }
+  const ok = await askSure('Restore your library?', `${auto ? 'Your library list is empty. ' : ''}An older copy was found on this computer: ${plural(best.cols, 'project')} and ${plural(best.tracks, 'song')}. Your audio and covers are still here. Restoring replaces the current list${cur || S.cols.length ? ` (${plural(S.cols.length, 'project')}, ${plural(cur, 'song')})` : ''}.`, 'Restore');
+  if (!ok) return;
+  try { localStorage.setItem(KEY + '.before-restore', localStorage.getItem(KEY) || ''); localStorage.setItem(KEY, best.json); } catch (e) { return toast("Couldn't restore: " + e.message); }
+  LOADED = false; location.reload();
 }
 async function backupAll() {
   if (!window.JSZip) return toast('Zip support did not load, so backups are unavailable');
@@ -4665,6 +4680,7 @@ function act(a, el, e) {
         mintOwn(n, 'publish'); c.archived = true; c.publishedTo = n.id; S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id);
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
+    case 'recover': recoverOffer(false); break;
     case 'mine-f': S.mineF = k; save(); renderMain(); break;
     case 'pub-finalize': { const c = col(id); if (!c) break; const ts = colTracks(c).filter(t => t.status !== 'final'); ts.forEach(t => { t.status = 'final'; }); save(); refresh(); toast(`Marked ${plural(ts.length, 'song')} Final. Ready to publish.`); break; }
     case 'ws-buy': { const c = col(id), q = +k, v = c.release.wholesale[k]; askSure(`Buy ${q.toLocaleString()} codes for ${c.name}?`, `${usd(v)} each, ${usd(v * q)} total. Test purchase, nothing is charged. You get a zip with a CSV of codes and printable QR cards.${c.release.size ? ` Uses ${q.toLocaleString()} of the ${c.release.size - (c.release.sold || 0)} copies left.` : ''}`, 'Get codes').then(async ok => { if (!ok) return;
@@ -5382,7 +5398,6 @@ function ownBadge(c, small) {
 }
 const lockMsg = c => { const a = Ledger.access(c); return a.state === 'onloan' ? `On loan to ${handleOf(a.loan.to)}. It comes back in ${leftTxt(a.loan.until)}.` : a.state === 'ended' ? 'That loan has ended.' : "You can't do that with a borrowed album."; };
 /* every 20 s: hand back loans that ran out, and keep the countdowns current */
-verifyMigrate();
 function tokenTick() {
   if (!S.ledger) return; const n = Ledger.sweep();
   $$('[data-until]').forEach(el => { el.textContent = leftTxt(+el.dataset.until); });
@@ -5547,7 +5562,9 @@ addEventListener('blur', closeCtx); addEventListener('resize', closeCtx);
   if (S.cur && !trk(S.cur)) S.cur = null;
   if (S.cur) Engine.load(trk(S.cur));
   if (S.view === 'collection' && !col(S.colId)) S.view = 'library';
+  verifyMigrate();
   applyPrefs(); refresh(); renderEq();
+  if (!S.tracks.length && !S.cols.length) setTimeout(() => recoverOffer(true), 900);
   setInterval(tick, 250); setInterval(modTick, 500); setInterval(tokenTick, 20000); setTimeout(tokenTick, 1500);
   modsLoad(); acctLoad();
   setTimeout(checkWhatsNew, 1200);

@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('tpDesktop', {
   daw: { scan: () => ipcRenderer.invoke('tp-daw-scan'), icon: f => ipcRenderer.invoke('tp-daw-icon', f), open: f => ipcRenderer.invoke('tp-daw-open', f), locate: n => ipcRenderer.invoke('tp-daw-locate', n) },
   saveToDownloads: (name, data) => ipcRenderer.invoke('tp-save-downloads', name, data),
   conv: { link: url => ipcRenderer.invoke('tp-conv-link', url), save: (name, data, dir, pick) => ipcRenderer.invoke('tp-conv-save', name, data, dir, pick), reveal: f => ipcRenderer.invoke('tp-conv-reveal', f) },
+  recover: () => ipcRenderer.invoke('tp-recover'),
   mods: { list: () => ipcRenderer.invoke('tp-mods-list'), folder: () => ipcRenderer.invoke('tp-mods-folder') },
   account: { status: () => ipcRenderer.invoke('tp-acct-status'), signIn: () => ipcRenderer.invoke('tp-acct-signin'), signOut: () => ipcRenderer.invoke('tp-acct-signout'), profile: () => ipcRenderer.invoke('tp-acct-profile'), save: p => ipcRenderer.invoke('tp-acct-save', p) },
   openCameraSettings: () => ipcRenderer.invoke('tp-camera-settings'),

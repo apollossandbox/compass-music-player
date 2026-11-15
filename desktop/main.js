@@ -237,6 +237,7 @@ app.whenReady().then(() => {
     fs.writeFileSync(f, Buffer.from(data)); return { dir, file: f };
   });
   ipcMain.handle('tp-conv-reveal', (e, f) => { if (typeof f === 'string' && fs.existsSync(f)) shell.showItemInFolder(f); });
+  ipcMain.handle('tp-recover', () => { try { return require('./recover').findLibraries(app.getPath('userData'), 'glassroom.v2').slice(0, 8).map(x => ({ tracks: x.tracks, cols: x.cols, json: x.json })); } catch (e) { return []; } });
   require('./online').register(ipcMain); // Google sign-in + online profile (hidden until online.json exists)
   ipcMain.handle('tp-mods-list', () => modsList());
   ipcMain.handle('tp-mods-folder', async () => { const dir = modsDir(); fs.mkdirSync(dir, { recursive: true });

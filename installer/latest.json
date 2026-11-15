@@ -1,11 +1,18 @@
 {
-  "version": "1.15.0",
+  "version": "1.15.1",
   "file": "Compass-Setup.exe",
-  "size": 84905262,
-  "sha256": "aee278509247f61139118b8c20e8a267bc2c4393bb7ed73892d01ab49e8aa088",
-  "notes": "Verified albums with a green seal, Verified/Local filters, and sxteen ways – Movie free in the Store.",
+  "size": 84907408,
+  "sha256": "609b532c400755069a6ec550ebadbef07fa90a135d43bf104ecfb71e5ab90c01",
+  "notes": "Fix: 1.15.0 could empty your library list on first start. Compass now offers to restore the copy from before the update; your audio and covers were never touched.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.15.1",
+      "d": "2026-11-16",
+      "items": [
+        "Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time."
+      ]
+    },
     {
       "v": "1.15.0",
       "d": "2026-11-16",
@@ -150,13 +157,6 @@
       "d": "2026-11-15",
       "items": [
         "Artist page: pick a colour for the artist's round picture and for the header (image button on the header). Or use one of their project covers as the picture or header."
-      ]
-    },
-    {
-      "v": "1.11.6",
-      "d": "2026-11-15",
-      "items": [
-        "Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right."
       ]
     }
   ]
