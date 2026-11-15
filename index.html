@@ -2411,15 +2411,15 @@ function buildCase() {
   const T3 = THREE, root = C3.root; while (root.children.length) root.remove(root.children[0]);
   const slim = S.cd.caseType === 'slim', T = slim ? .52 : 1.04, W = 14.2, H = 12.5;
   const lightUI = !UI.vw && (() => { const m = getComputedStyle(document.body).backgroundColor.match(/\d+/g); return m && (+m[0] + +m[1] + +m[2]) > 450; })();
-  const clear = new T3.MeshPhysicalMaterial({ color: lightUI ? 0xc9d2dc : 0xf2f7ff, metalness: 0, roughness: .04, transparent: true, opacity: lightUI ? .1 : .06, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1.1, side: T3.DoubleSide, depthWrite: false });
-  const edgeM = new T3.LineBasicMaterial({ color: lightUI ? 0x2a2a2e : 0xffffff, transparent: true, opacity: lightUI ? .4 : .5 });
+  const clear = new T3.MeshPhysicalMaterial({ color: lightUI ? 0xc9d2dc : 0xf2f7ff, metalness: 0, roughness: .08, transparent: true, opacity: lightUI ? .14 : .1, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1.1, side: T3.DoubleSide, depthWrite: false });
+  const edgeM = new T3.LineBasicMaterial({ color: lightUI ? 0x2a2a2e : 0xffffff, transparent: true, opacity: lightUI ? .22 : .16 });
   const black = S.cd.tray === 'black';
   const trayM = black ? new T3.MeshStandardMaterial({ color: 0x0d0d0e, roughness: .38, metalness: .1 }) : new T3.MeshPhysicalMaterial({ color: 0xffffff, roughness: .06, transparent: true, opacity: .2, clearcoat: 1, side: T3.DoubleSide, depthWrite: false, envMapIntensity: 1.6 });
   const add = (geo, m, x, y, z, parent, edges) => { const me = new T3.Mesh(geo, m); me.position.set(x, y, z); parent.add(me); if (edges) { const e = new T3.LineSegments(new T3.EdgesGeometry(geo, 25), edgeM); me.add(e); } return me; };
   const box = (w, h, d, m, x, y, z, parent = root, edges = true) => add(new T3.BoxGeometry(w, h, d), m, x, y, z, parent, edges);
   const printM = (k, extra = {}) => new T3.MeshBasicMaterial({ map: C3.tex[k].tex, toneMapped: false, transparent: !!extra.transparent, side: extra.side || T3.FrontSide });
   const sub = (k, a, b) => { const sh = SHEETS[k], TW = sh.w + 2 * BLEED, TH = sh.h + 2 * BLEED; return [(BLEED + a) / TW, (BLEED + b) / TW, BLEED / TH, (BLEED + sh.h) / TH]; };
-  C3.print = []; C3.occ = [];
+  C3.print = []; C3.occ = []; C3.discX = .45; // the tray centres the disc under the booklet, right of the hinge
   // base shell
   box(W, H, .1, clear, 0, 0, .05);
   box(W, .12, T * .72, clear, 0, H / 2 - .06, T * .36); box(W, .12, T * .72, clear, 0, -H / 2 + .06, T * .36);
@@ -2430,15 +2430,17 @@ function buildCase() {
     const tin = add(uvRemap(new T3.PlaneGeometry(bw, th), ...sub('trayIn', 0, SHEETS.trayIn.w)), printM('trayIn'), 0, 0, .108, root); tin.userData.sheet = 'trayIn'; C3.print.push(tin);
     const ls = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', 0, sp)), printM('tray'), W / 2 - .11, 0, .104 + sd / 2, root); ls.rotation.y = Math.PI / 2;
     const rs = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', sh.w - sp, sh.w)), printM('tray'), -W / 2 + .11, 0, .104 + sd / 2, root); rs.rotation.y = -Math.PI / 2;
+    const paper = new T3.MeshStandardMaterial({ color: 0xeeeeea, roughness: .9 }); [[W / 2 - .118, -Math.PI / 2], [-W / 2 + .118, Math.PI / 2]].forEach(([px, ry]) => { const bk = add(new T3.PlaneGeometry(sd, th), paper, px, 0, .104 + sd / 2, root); bk.rotation.y = ry; }); // inside of each spine fold is plain paper
+    const sw = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', sh.w - sp, sh.w)), printM('tray'), -W / 2 + .55 + sd / 2, 0, .74, root); sw.userData.sheet = 'spineR'; sw.userData.strip = 'R';
     back.userData.sheet = 'tray'; ls.userData.sheet = 'spineL'; rs.userData.sheet = 'spineR'; ls.userData.strip = 'L'; rs.userData.strip = 'R'; C3.print.push(back, ls, rs);
     const tp = box(W - .5, H - .5, .06, trayM, 0, 0, .66, root, !black); if (black) C3.occ.push(tp);
-    const hub = add(new T3.CylinderGeometry(.72, .82, .16, 48), trayM, 0, 0, .74, root, !black); hub.rotation.x = Math.PI / 2;
+    const hub = add(new T3.CylinderGeometry(.72, .82, .16, 48), trayM, C3.discX, 0, .74, root, !black); hub.rotation.x = Math.PI / 2;
   } else {
     const tp = box(W - .3, H - .3, .05, trayM, 0, 0, .13, root, !black); if (black) C3.occ.push(tp);
-    const hub = add(new T3.CylinderGeometry(.72, .82, .12, 48), trayM, 0, 0, .2, root, !black); hub.rotation.x = Math.PI / 2;
+    const hub = add(new T3.CylinderGeometry(.72, .82, .12, 48), trayM, C3.discX, 0, .2, root, !black); hub.rotation.x = Math.PI / 2;
   }
   // disc
-  const dz = slim ? .27 : .76, disc = new T3.Group(); disc.position.set(0, 0, dz); root.add(disc); C3.disc = disc; C3.discZ = dz;
+  const dz = slim ? .27 : .76, disc = new T3.Group(); disc.position.set(C3.discX, 0, dz); root.add(disc); C3.disc = disc; C3.discZ = dz;
   const silver = new T3.MeshStandardMaterial({ color: 0xdcdce2, metalness: 1, roughness: .16, side: T3.DoubleSide });
   const top = new T3.Mesh(uvRemap(new T3.RingGeometry(1.15, 6, 128, 2), BLEED / 126, (BLEED + 120) / 126, BLEED / 126, (BLEED + 120) / 126), printM('disc', { transparent: true, roughness: .42, metalness: .12 }));
   top.position.z = .062; top.userData.sheet = 'disc'; disc.add(top); C3.print.push(top);
@@ -2458,6 +2460,13 @@ function buildCase() {
   const bf = add(uvRemap(new T3.PlaneGeometry(bs, bs), ...sub('front', 0, SHEETS.front.w)), printM('front'), W / 2 + .45, 0, -.115, lid); bf.userData.sheet = 'front';
   const bi = add(uvRemap(new T3.PlaneGeometry(bs, bs), ...sub('inside', 0, SHEETS.inside.w)), printM('inside'), W / 2 + .45, 0, -.122, lid); bi.rotation.y = Math.PI; bi.userData.sheet = 'inside';
   C3.print.push(bf, bi);
+  if (!C3.sheen) { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 450; const x = cv.getContext('2d');
+    const band = (a, w, o) => { const g = x.createLinearGradient(0, 0, 512, 450); g.addColorStop(Math.max(0, a - w), 'rgba(255,255,255,0)'); g.addColorStop(a, `rgba(255,255,255,${o})`); g.addColorStop(Math.min(1, a + w), 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 512, 450); };
+    band(.2, .16, .07); band(.42, .05, .1); band(.5, .03, .06); band(.82, .12, .05);
+    let r = 7; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647; x.lineCap = 'round';
+    for (let i = 0; i < 46; i++) { const px = rnd() * 512, py = rnd() * 450, a = rnd() * Math.PI, l = 6 + rnd() * 34; x.strokeStyle = `rgba(255,255,255,${.03 + rnd() * .06})`; x.lineWidth = .6 + rnd() * .8; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+    C3.sheen = new T3.CanvasTexture(cv); C3.sheen.encoding = T3.sRGBEncoding; }
+  const sheen = add(new T3.PlaneGeometry(W - .1, H - .1), new T3.MeshBasicMaterial({ map: C3.sheen, transparent: true, depthWrite: false, blending: T3.AdditiveBlending, toneMapped: false }), W / 2, 0, .004, lid); sheen.renderOrder = 5;
   cdPaintTex();
 }
 function cdPaintTex() { const c = cdCol(); if (!C3 || !c) return; const d = design(c); Object.keys(SHEETS).forEach(k => { if (!d[k] || SHEETS[k].strip) return; const t = C3.tex[k]; paintSheet(t.cv.getContext('2d'), k, d[k], TEXMM, d); t.tex.needsUpdate = true; }); }
@@ -2478,7 +2487,7 @@ function loop3D() {
   C3.root.children.forEach(o => { o.visible = !discOnly || o === C3.disc; });
   C3.lidA += ((S.cd.open || S.cd.discOut ? 1 : 0) - C3.lidA) * .09; C3.lid.rotation.y = -1.95 * ease(Math.min(1, Math.max(0, C3.lidA)));
   C3.discA += ((S.cd.discOut && C3.lidA > .6 ? 1 : 0) - C3.discA) * .08; const da = ease(Math.min(1, Math.max(0, C3.discA)));
-  if (discOnly) C3.disc.position.set(0, 0, 0); else C3.disc.position.set(da * 15, 0, C3.discZ + Math.sin(da * Math.PI) * 2.6 + da * .4);
+  if (discOnly) C3.disc.position.set(0, 0, 0); else C3.disc.position.set((C3.discX || 0) + da * 15, 0, C3.discZ + Math.sin(da * Math.PI) * 2.6 + da * .4);
   C3.shadow.scale.set(discOnly ? .55 : S.cd.discOut && !discOnly ? 1.9 : 1, 1, discOnly ? .6 : 1); C3.shadow.position.x = discOnly ? 0 : da * 6;
   const c = col(S.cd.colId), syncing = V && V.spin !== false && S.playing && c && c.tracks.includes(S.cur);
   if (syncing || (V && V.playing && S.playing)) C3.disc.rotation.z -= .04 * (S.cd.spinDisc ?? 1); else if (!V) C3.disc.rotation.z = 0;
@@ -2924,7 +2933,7 @@ function showcasePose(t) {
   const ease = x => { x = Math.max(0, Math.min(1, x)); return x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; }, seg = (a, b) => ease((t - a) / (b - a));
   const lid = seg(1.8, 3), disc = seg(3.1, 4.6), ry = -.7 + 1 * seg(0, 1.8) - .3 * seg(1.8, 3) - .2 * seg(4.6, 8), rx = -.12 + .12 * seg(0, 2);
   C3.root.rotation.set(rx, ry, 0); C3.lid.rotation.y = -1.95 * lid;
-  C3.disc.position.set(disc * 15, 0, C3.discZ + Math.sin(disc * Math.PI) * 2.6 + disc * .4); C3.disc.rotation.z = -Math.max(0, t - 3.6) * 2.2;
+  C3.disc.position.set((C3.discX || 0) + disc * 15, 0, C3.discZ + Math.sin(disc * Math.PI) * 2.6 + disc * .4); C3.disc.rotation.z = -Math.max(0, t - 3.6) * 2.2;
   const pan = disc * 6.5 - lid * 2.5, back = disc * 16 + lid * 8; C3.cam.position.set(pan, 0, 40 + back); C3.cam.lookAt(pan, 0, 0);
   C3.shadow.scale.set(disc > .5 ? 1.9 : 1, 1, 1); C3.shadow.position.x = disc * 6; C3.studio.visible = true; C3.scene.background = C3.bgTex; C3.root.children.forEach(o => { o.visible = true; });
 }
@@ -2970,7 +2979,7 @@ async function addCD3Dx(c, root) {
   await Promise.all(layers.filter(l => l.type === 'img' && srcs[l.src]).map(l => { getImg(l.src); const im = imgCache[l.src]; return im && im.decode ? im.decode().catch(() => { }) : null; }));
   buildCase();
   const R = C3.root, keep = { rot: R.rotation.clone(), lid: C3.lid.rotation.y, dpos: C3.disc.position.clone(), drot: C3.disc.rotation.z, vis: R.children.map(o => o.visible) };
-  R.rotation.set(0, 0, 0); C3.lid.rotation.y = 0; C3.disc.position.set(0, 0, C3.discZ); C3.disc.rotation.z = 0; R.children.forEach(o => o.visible = true);
+  R.rotation.set(0, 0, 0); C3.lid.rotation.y = 0; C3.disc.position.set(C3.discX || 0, 0, C3.discZ); C3.disc.rotation.z = 0; R.children.forEach(o => o.visible = true);
   R.name = `${c.name} CD`; C3.lid.name = 'Lid'; C3.disc.name = 'Disc';
   const q = y => new THREE.Quaternion().setFromEuler(new THREE.Euler(0, y, 0)).toArray(), dz = C3.discZ;
   const clips = [
@@ -3555,6 +3564,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.14.0', d: '2026-11-16', items: ['CD case looks like the real thing: the disc sits under the cover instead of peeking out beside it, the back insert’s spine shows through the hinge, and the plastic has a soft sheen, slight haze and faint scuffs instead of bright outlines.'] },
   { v: '1.13.9', d: '2026-11-16', items: ['Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.', 'Convert: YouTube links work again. Compass gives the link tool its own built-in JavaScript runtime (YouTube now requires one), keeps the tool up to date weekly, and shows the real error instead of a warning.'] },
   { v: '1.13.8', d: '2026-11-16', items: ['Project pages are tighter so a full album fits on one screen without scrolling.', 'Artists: a song counts for the artist in its own Artist field, then the one in an "Artist - Song" title, and only then the project’s artist (folders don’t count). A song titled "Travis Scott - …" no longer counts as Latto just because it sits in a Latto project.', 'Artist page: All N songs shows every song counted for that artist, so you can check and fix them.'] },
   { v: '1.13.7', d: '2026-11-16', items: ['Reordering songs only animates the disc you’re moving them on; the other discs stay still.'] },

@@ -1,11 +1,18 @@
 {
-  "version": "1.13.9",
+  "version": "1.14.0",
   "file": "Compass-Setup.exe",
-  "size": 82254489,
-  "sha256": "fe425d83d3f5e7612be6ddd74987e1d06e45db620b73a41d40b6702583276f1a",
-  "notes": "Store: no CD editing menu on the case. Convert: YouTube links work again (built-in JS runtime for yt-dlp, weekly updates, real error messages).",
+  "size": 82254939,
+  "sha256": "b60c8ee638f572a5cc0e086613c074ec3e5f23d8b80ced413f9c6a71dcbf3fb2",
+  "notes": "CD case looks like the real thing: disc under the cover, spine through the hinge, soft sheen and scuffs.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.14.0",
+      "d": "2026-11-16",
+      "items": [
+        "CD case looks like the real thing: the disc sits under the cover instead of peeking out beside it, the back insert’s spine shows through the hinge, and the plastic has a soft sheen, slight haze and faint scuffs instead of bright outlines."
+      ]
+    },
     {
       "v": "1.13.9",
       "d": "2026-11-16",
@@ -146,13 +153,6 @@
       "d": "2026-11-15",
       "items": [
         "Every disc icon in the app is now the Compass disc."
-      ]
-    },
-    {
-      "v": "1.11.3",
-      "d": "2026-11-15",
-      "items": [
-        "New Compass logo: a disc and a compass in one."
       ]
     }
   ]

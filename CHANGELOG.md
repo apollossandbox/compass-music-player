@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.14.0 · 2026-11-16
+
+- CD case looks like the real thing: the disc sits under the cover instead of peeking out beside it, the back insert’s spine shows through the hinge, and the plastic has a soft sheen, slight haze and faint scuffs instead of bright outlines.
+
 ## 1.13.9 · 2026-11-16
 
 - Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.
