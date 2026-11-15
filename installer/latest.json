@@ -1,11 +1,18 @@
 {
-  "version": "1.16.4",
+  "version": "1.16.5",
   "file": "Compass-Setup.exe",
-  "size": 84917953,
-  "sha256": "3c9b0f70b2ee1ca4ca510f8b23fe3e090c65ecf79362637b6aedf470a54e7a10",
-  "notes": "Fix: the developer account can claim reserved usernames for itself.",
+  "size": 84917977,
+  "sha256": "45dbdf77fc562bc22a873c14953021b73378bde06b2eb3306baf38d0b64da975",
+  "notes": "CD viewer and Store pages: the case always starts closed and slowly turning.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.5",
+      "d": "2026-11-16",
+      "items": [
+        "CD viewer and Store pages: the case always starts closed and slowly turning."
+      ]
+    },
     {
       "v": "1.16.4",
       "d": "2026-11-16",
@@ -154,13 +161,6 @@
       "items": [
         "Publish: when songs aren’t Final yet, hovering Publish says so and offers a Finalize button that marks them all Final."
       ]
-    },
-    {
-      "v": "1.13.1",
-      "d": "2026-11-16",
-      "items": [
-        "Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export."
-      ]
     }
   ],
   "live": {
@@ -173,8 +173,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "2ea114f24097257906de12cabfc543a94f535fd10e8a177dc16ccbde4c5b0466",
-        "size": 691896
+        "sha256": "158487d731f87dc80e4c81debdbb9d2cbd8dd01562f4a0dd0b45a92456bd7f9b",
+        "size": 692081
       },
       {
         "p": "lib/GLTFExporter.js",

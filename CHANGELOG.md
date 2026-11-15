@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.5 · 2026-11-16
+
+- CD viewer and Store pages: the case always starts closed and slowly turning.
+
 ## 1.16.4 · 2026-11-16
 
 - Fix: the developer account can claim reserved usernames for itself.

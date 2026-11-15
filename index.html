@@ -2564,7 +2564,7 @@ function loop3D() {
 function openViewer(mode = 'case') {
   const c = cdCol(); if (!c) return toast('Make a project first');
   design(c); const g = init3D(); if (!g) return toast("3D isn't available in this browser");
-  UI.vw = { mode, auto: !!S.cd.vwAuto, spin: true, saved: { tx: C3.tx, ty: C3.ty, tz: C3.tz, open: S.cd.open, disc: S.cd.discOut } };
+  UI.vw = { mode, auto: true, spin: true, saved: { tx: C3.tx, ty: C3.ty, tz: C3.tz, open: S.cd.open, disc: S.cd.discOut } }; S.cd.open = false; S.cd.discOut = false; // always starts closed and slowly turning
   C3.tx = 0; C3.ty = 0; C3.tz = mode === 'disc' ? 34 : 42; C3.rx = 0; C3.ry = 0;
   const v = $('#viewer'); $('#vwstage').appendChild(g.r.domElement); C3.w = 0; buildCase();
   v.inert = false; v.classList.add('open'); renderViewerBar(); vwBg();
@@ -3666,6 +3666,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.5', d: '2026-11-16', items: ['CD viewer and Store pages: the case always starts closed and slowly turning.'] },
   { v: '1.16.4', d: '2026-11-16', items: ['Fix: the developer account can claim reserved usernames for itself.'] },
   { v: '1.16.3', d: '2026-11-16', items: ['Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).', 'Settings › Profile: change your picture and roles.'] },
   { v: '1.16.2', d: '2026-11-16', items: ['Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.'] },
@@ -3832,7 +3833,7 @@ function spMount3D(c) {
   const fresh = UI.spSaved.at !== c.id; UI.spSaved.at = c.id; S.cd.colId = c.id; S.cd.open = false; S.cd.discOut = false;
   box.appendChild(g.r.domElement); C3.w = 0; if (fresh) { C3.tx = -.12; C3.ty = -.45; C3.tz = 36; } buildCase(); cdPaintTex();
   if (!g.running) { g.running = true; requestAnimationFrame(loop3D); }
-  clearInterval(UI.spSpin); UI.spSpin = setInterval(() => { if (!document.getElementById('sp-3d') || !C3) return clearInterval(UI.spSpin); if (!C3.orbit && !UI.spHeld) { UI.spT = (UI.spT || 0) + .016; C3.ty = -.45 + Math.sin(UI.spT * .7) * .38; } }, 16);
+  clearInterval(UI.spSpin); UI.spSpin = setInterval(() => { if (!document.getElementById('sp-3d') || !C3) return clearInterval(UI.spSpin); if (!C3.orbit && !UI.spHeld) { UI.spT = (UI.spT || 0) + .016; C3.ty = -.45 + UI.spT * .35; } }, 16);
 }
 function spLeave() {
   clearInterval(UI.spSpin); const v = UI.spSaved; UI.spSaved = null; if (!v) return;
