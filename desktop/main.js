@@ -12,7 +12,44 @@ app.setAppUserModelId('com.trulytamed.tamedplayer');
 if (!app.requestSingleInstanceLock()) app.quit();
 
 // Every new installer pushed to GitHub updates this file; the app compares versions against it.
-const FEED = 'https://raw.githubusercontent.com/apollossandbox/tamed-player/main/installer/latest.json';
+const FEED = process.env.COMPASS_FEED || 'https://raw.githubusercontent.com/apollossandbox/tamed-player/main/installer/latest.json';
+
+/* ---------- instant updates: most releases only change app/ (the page). Those download in the background,
+   are checked file by file against latest.json, and load on Reload. A release that changes the native part
+   (different shell fingerprint) still goes through the installer. A newer installer always wins. ---------- */
+const SHELL = require('./shell-hash')(__dirname, process.versions.electron);
+const sha = b => require('crypto').createHash('sha256').update(b).digest('hex');
+const liveRoot = () => path.join(app.getPath('userData'), 'live');
+function liveCurrent() {
+  try { const c = JSON.parse(fs.readFileSync(path.join(liveRoot(), 'current.json'), 'utf8'));
+    if (c && c.shell === SHELL && /^v[\d.]+$/.test(c.dir) && newer(c.version, app.getVersion()) && fs.existsSync(path.join(liveRoot(), c.dir, 'index.html'))) return c; } catch (e) {}
+  return null;
+}
+const appVersion = () => (liveCurrent() || {}).version || app.getVersion();
+const indexPath = () => { const c = liveCurrent(); return c ? path.join(liveRoot(), c.dir, 'index.html') : path.join(__dirname, 'app', 'index.html'); };
+function liveCleanup() { if (!liveCurrent()) { try { fs.rmSync(liveRoot(), { recursive: true, force: true }); } catch (e) {} } } // stale after an installer update
+async function liveUpdate(info) {
+  const L = info.live, dirName = 'v' + info.version, root = liveRoot(), tmp = path.join(root, dirName + '.part'), dest = path.join(root, dirName), base = new URL('app/', FEED).toString();
+  if (!/^[\d.]+$/.test(info.version) || !Array.isArray(L.files) || !L.files.some(f => f.p === 'index.html')) throw new Error('The update file is incomplete.');
+  fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true });
+  const cur = liveCurrent(), have = [path.join(__dirname, 'app'), ...(cur ? [path.join(root, cur.dir)] : [])], total = L.files.reduce((n, f) => n + (f.size || 0), 0); let got = 0;
+  try {
+    for (const f of L.files) {
+      if (typeof f.p !== 'string' || !/^[\w .()\-]+(\/[\w .()\-]+)*$/.test(f.p) || f.p.split('/').includes('..') || !/^[0-9a-f]{64}$/.test(f.sha256)) throw new Error('The update file lists a bad path.');
+      let buf = null; for (const d of have) { try { const b = fs.readFileSync(path.join(d, f.p)); if (sha(b) === f.sha256) { buf = b; break; } } catch (e) {} } // unchanged files are copied, not downloaded
+      if (!buf) { const r = await net.fetch(base + f.p.split('/').map(encodeURIComponent).join('/') + '?v=' + info.version, { cache: 'no-store' }); if (!r.ok) throw new Error('Download failed for ' + f.p + ' (' + r.status + ').');
+        buf = Buffer.from(await r.arrayBuffer()); if (sha(buf) !== f.sha256) throw new Error('A downloaded file did not match (' + f.p + '). Try again in a few minutes.'); }
+      const out = path.join(tmp, ...f.p.split('/')); fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, buf);
+      got += f.size || 0; if (win && total) win.setProgressBar(got / total);
+    }
+  } catch (e) { fs.rmSync(tmp, { recursive: true, force: true }); throw e; } finally { if (win) win.setProgressBar(-1); }
+  fs.rmSync(dest, { recursive: true, force: true }); fs.renameSync(tmp, dest);
+  fs.writeFileSync(path.join(root, 'current.json'), JSON.stringify({ version: info.version, shell: SHELL, dir: dirName }));
+  for (const n of fs.readdirSync(root)) if (n !== dirName && n !== 'current.json') fs.rmSync(path.join(root, n), { recursive: true, force: true });
+  const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Reload now', 'Later'], defaultId: 0, cancelId: 1, message: `Compass ${info.version} is ready`,
+    detail: 'It downloaded in the background. Reloading takes a second and keeps everything you have open saved.' });
+  if (response === 0 && win) win.loadFile(indexPath());
+}
 
 let win = null;
 function createWindow() {
@@ -23,7 +60,8 @@ function createWindow() {
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false,
       preload: path.join(__dirname, 'preload.js') }
   });
-  win.loadFile(path.join(__dirname, 'app', 'index.html'));
+  liveCleanup(); win.loadFile(indexPath());
+  win.webContents.on('did-fail-load', (e, code, desc, url, main) => { if (main && liveCurrent() && /[\\/]live[\\/]/.test(decodeURIComponent(url))) { try { fs.rmSync(path.join(liveRoot(), 'current.json'), { force: true }); } catch (x) {} win.loadFile(path.join(__dirname, 'app', 'index.html')); } });
   win.once('ready-to-show', () => win.show());
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:/i.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('file:')) { e.preventDefault(); if (/^https?:/i.test(url)) shell.openExternal(url); } });
@@ -38,14 +76,15 @@ async function checkForUpdates(manual) {
     if (!r.ok) throw new Error(r.status === 404 ? 'Update file not found. The tamed-player repository on GitHub must be public.' : 'GitHub returned error ' + r.status + '.');
     const info = await r.json();
     const showLog = () => { if (win) win.webContents.send('tp-changelog', { changelog: Array.isArray(info.changelog) ? info.changelog : [], since: app.getVersion() }); };
-    if (!info.version || !newer(info.version, app.getVersion())) {
-      if (manual) { const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['OK', "What's new"], defaultId: 0, cancelId: 0, message: 'Compass is up to date', detail: 'You have version ' + app.getVersion() + '.' }); if (response === 1) showLog(); }
+    if (!info.version || !newer(info.version, appVersion())) {
+      if (manual) { const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['OK', "What's new"], defaultId: 0, cancelId: 0, message: 'Compass is up to date', detail: 'You have version ' + appVersion() + '.' }); if (response === 1) showLog(); }
       return;
     }
+    if (info.live && info.live.shell === SHELL) return await liveUpdate(info); // page-only update: no installer
     const { response } = await dialog.showMessageBox(win, {
       type: 'info', buttons: ['Download and install', "What's new", 'Later'], defaultId: 0, cancelId: 2,
       message: `Compass ${info.version} is available`,
-      detail: `You have ${app.getVersion()}.${info.notes ? '\n\n' + info.notes : ''}\n\nYour projects are kept.`
+      detail: `You have ${appVersion()}.${info.notes ? '\n\n' + info.notes : ''}\n\nYour projects are kept.`
     });
     if (response === 1) { showLog(); return; }
     if (response !== 0) return;
@@ -152,15 +191,34 @@ function flAll(extraDirs, kind, backupDir) {
   for (const root of roots) { const found = []; flpWalk(root, zip && root === app.getPath('downloads') ? 1 : 5, found, zip ? /\.zip$/i : /\.flp$/i);
     for (const x of found) { const k = x.path.toLowerCase(); if (seen.has(k) || out.length >= 5000) continue; seen.add(k); if (zip && !zipHasFlp(x.path)) continue;
       let size = 0; try { size = fs.statSync(x.path).size; } catch (e) {}
-      const rel = path.relative(root, path.dirname(x.path)); out.push({ path: x.path, name: path.basename(x.path, path.extname(x.path)), folder: [path.basename(root), ...(rel ? rel.split(/[\\/]+/) : [])].join(' › '), time: x.time, size }); } }
+      const rel = path.relative(root, path.dirname(x.path)); out.push(withVer({ path: x.path, name: path.basename(x.path, path.extname(x.path)), folder: [path.basename(root), ...(rel ? rel.split(/[\\/]+/) : [])].join(' › '), time: x.time, size })); } }
   return out;
 }
-/* FL Studio's own autosaves live in Projects\Backup; a different backup folder can be chosen in Compass */
+/* The FL Studio version an .flp was saved with: event 199 (FLP_Version) in its FLdt chunk, e.g. "21.2.3.4004".
+   Events: id < 64 one byte, < 128 two, < 192 four, otherwise a varint length and that many bytes. */
+function flpVersion(file) {
+  try { const fd = fs.openSync(file, 'r'), b = Buffer.alloc(4096), n = fs.readSync(fd, b, 0, b.length, 0); fs.closeSync(fd);
+    if (n < 22 || b.toString('latin1', 0, 4) !== 'FLhd') return '';
+    let i = 8 + b.readUInt32LE(4); if (b.toString('latin1', i, i + 4) !== 'FLdt') return ''; i += 8;
+    while (i < n) { const id = b[i++]; if (id < 64) i += 1; else if (id < 128) i += 2; else if (id < 192) i += 4;
+      else { let len = 0, sh = 0, c; do { c = b[i++]; len |= (c & 127) << sh; sh += 7; } while (c & 128 && i < n && sh < 28);
+        if (id === 199) { const v = b.toString('latin1', i, Math.min(n, i + len)).replace(/\0[\s\S]*$/, ''); return /^\d+(\.\d+)*$/.test(v) ? v : ''; } i += len; } }
+  } catch (e) {} return '';
+}
+const flMajor = v => { const m = /^(\d+)\./.exec(v || ''); return m ? +m[1] : 0; };
+// "FL Studio 20" → 20, "FL Studio 21" → 21, "FL Studio 2024" → 24 (2024 is version 24)
+const installMajor = label => { const m = /(\d{2,4})/.exec(label || ''); if (!m) return 0; const n = +m[1]; return n >= 2000 ? n - 2000 : n; };
+function flExeFor(file, fallback) {
+  const want = flMajor(flpVersion(file)); if (!want) return fallback;
+  const hit = ((dawScan().versions || {}).fl || []).find(x => installMajor(x.label) === want); return hit ? hit.path : fallback;
+}
+const withVer = x => ({ ...x, ver: /\.flp$/i.test(x.path) ? flMajor(flpVersion(x.path)) || 0 : 0 });
+/* FL Studio's own autosaves live in Projects\\Backup; a different backup folder can be chosen in Compass */
 function flBackups(dir) {
   const root = typeof dir === 'string' && dir && fs.existsSync(dir) ? dir : path.join(flUserDir(), 'Projects', 'Backup'), found = [];
   flpWalk(root, 2, found);
   return found.slice(0, 5000).map(x => { let size = 0; try { size = fs.statSync(x.path).size; } catch (e) {} const rel = path.relative(root, path.dirname(x.path));
-    return { path: x.path, name: path.basename(x.path, path.extname(x.path)), folder: [path.basename(root), ...(rel ? rel.split(/[\\/]+/) : [])].join(' › '), time: x.time, size }; });
+    return withVer({ path: x.path, name: path.basename(x.path, path.extname(x.path)), folder: [path.basename(root), ...(rel ? rel.split(/[\\/]+/) : [])].join(' › '), time: x.time, size }); });
 }
 function flRecent(extraDirs, opened, n) {
   const seen = new Map(), add = x => { const k = x.path.toLowerCase(); const o = seen.get(k); if (!o || x.time > o.time) seen.set(k, o && o.how === 'opened' && x.how !== 'opened' ? { ...x, how: 'opened', time: Math.max(x.time, o.time) } : x); };
@@ -169,7 +227,7 @@ function flRecent(extraDirs, opened, n) {
   for (const o of (Array.isArray(opened) ? opened : [])) if (o && typeof o.path === 'string' && /\.flp$/i.test(o.path) && fs.existsSync(o.path)) add({ path: o.path, time: +o.time || 0, how: 'opened' });
   const found = []; for (const d of [path.join(flUserDir(), 'Projects'), ...(Array.isArray(extraDirs) ? extraDirs : [])]) if (typeof d === 'string') flpWalk(d, 3, found);
   found.forEach(add);
-  return [...seen.values()].sort((a, b) => b.time - a.time).slice(0, n || 6).map(x => ({ ...x, name: path.basename(x.path, path.extname(x.path)), dir: path.basename(path.dirname(x.path)) }));
+  return [...seen.values()].sort((a, b) => b.time - a.time).slice(0, n || 6).map(x => withVer({ ...x, name: path.basename(x.path, path.extname(x.path)), dir: path.basename(path.dirname(x.path)) }));
 }
 
 /* ---------- mods: Documents\Compass\Mods\<mod>\ with mod.json, and optional style.css and main.js ---------- */
@@ -191,12 +249,29 @@ compass.addMenuItem('song', 'Copy title (example mod)', s => { navigator.clipboa
 /* .row b { letter-spacing: .01em; } */
 `
 };
+const THEMES_MOD = {
+  'mod.json': JSON.stringify({ name: 'Themes', version: '1.0', author: 'Compass', description: 'Extra color themes. Pick one in Settings › Appearance. Add your own in mod.json.',
+    themes: [
+      { name: 'Midnight', base: 'dark', colors: { bg: '#090e1a', panel: '#0f1628', panel2: '#162036', panel3: '#202c48', line: 'rgba(150,180,255,.12)', ink: '#eef2ff', ink2: 'rgba(238,242,255,.8)', ink3: 'rgba(238,242,255,.6)', onink: '#090e1a' } },
+      { name: 'Forest', base: 'dark', colors: { bg: '#0a110d', panel: '#0f1913', panel2: '#15231b', panel3: '#1e3226', line: 'rgba(160,255,200,.1)', ink: '#eefaf2', ink2: 'rgba(238,250,242,.8)', ink3: 'rgba(238,250,242,.6)', onink: '#0a110d' } },
+      { name: 'Rose', base: 'dark', colors: { bg: '#130a0e', panel: '#1b0f15', panel2: '#25151d', panel3: '#321d28', line: 'rgba(255,170,200,.11)', ink: '#fff0f5', ink2: 'rgba(255,240,245,.8)', ink3: 'rgba(255,240,245,.6)', onink: '#130a0e' } },
+      { name: 'OLED Black', base: 'dark', colors: { bg: '#000000', panel: '#060606', panel2: '#0e0e0f', panel3: '#18181a', line: 'rgba(255,255,255,.07)', ink: '#ffffff', ink2: 'rgba(255,255,255,.78)', ink3: 'rgba(255,255,255,.58)', onink: '#000000' } },
+      { name: 'Sand', base: 'light', colors: { bg: '#eee8dd', panel: '#faf6ee', panel2: '#f1eadd', panel3: '#e4d9c8', line: 'rgba(60,40,10,.12)', ink: '#1f1a13', ink2: 'rgba(31,26,19,.78)', ink3: 'rgba(31,26,19,.62)', onink: '#faf6ee' } },
+      { name: 'Ice', base: 'light', colors: { bg: '#e9eff7', panel: '#f8fbff', panel2: '#edf2f9', panel3: '#dce5f1', line: 'rgba(20,40,80,.11)', ink: '#0f1726', ink2: 'rgba(15,23,38,.78)', ink3: 'rgba(15,23,38,.62)', onink: '#f8fbff' } }
+    ] }, null, 2) + '\n',
+  'README.txt': 'Compass Themes\r\n\r\nEach theme in mod.json has a name, a base (light or dark) and colors.\r\nTo make your own: copy a theme, rename it, change the colors (hex like #1a2b3c or rgba(...)), save,\r\nthen in Compass open Settings and press Reload next to Mods.\r\n\r\nColors: bg (window), panel, panel2, panel3 (cards and fields), line (borders), ink, ink2, ink3 (text), onink (text on solid buttons).\r\n'
+};
+const BUILTIN_MODS = { themes: ['compass-themes', THEMES_MOD] };
+const THEME_KEYS = ['bg', 'panel', 'panel2', 'panel3', 'line', 'ink', 'ink2', 'ink3', 'onink', 'field', 'hover', 'sel', 'shadow'];
+const okColor = v => typeof v === 'string' && /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(,\s*[\d.]+\s*)?\))$/i.test(v.trim());
+const cleanThemes = t => (Array.isArray(t) ? t : []).slice(0, 40).filter(x => x && typeof x.name === 'string' && x.colors && typeof x.colors === 'object')
+  .map(x => ({ name: x.name.slice(0, 40), base: x.base === 'light' ? 'light' : 'dark', colors: Object.fromEntries(THEME_KEYS.filter(k => okColor(x.colors[k])).map(k => [k, x.colors[k].trim()])) }));
 function modsList() {
   const dir = modsDir(), out = []; let ents = []; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
   const read = f => { try { const st = fs.statSync(f); return st.isFile() && st.size < 1048576 ? fs.readFileSync(f, 'utf8') : ''; } catch (e) { return ''; } };
   for (const d of ents) { if (!d.isDirectory() || d.name.startsWith('.')) continue; const base = path.join(dir, d.name); let meta = {};
     try { meta = JSON.parse(read(path.join(base, 'mod.json')) || '{}'); } catch (e) { meta = { error: 'mod.json is not valid JSON' }; }
-    out.push({ id: d.name, name: String(meta.name || d.name).slice(0, 80), version: String(meta.version || '').slice(0, 20), author: String(meta.author || '').slice(0, 60), description: String(meta.description || '').slice(0, 240), error: meta.error || '', css: read(path.join(base, 'style.css')), js: read(path.join(base, 'main.js')) }); }
+    out.push({ id: d.name, themes: cleanThemes(meta.themes), name: String(meta.name || d.name).slice(0, 80), version: String(meta.version || '').slice(0, 20), author: String(meta.author || '').slice(0, 60), description: String(meta.description || '').slice(0, 240), error: meta.error || '', css: read(path.join(base, 'style.css')), js: read(path.join(base, 'main.js')) }); }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -240,6 +315,8 @@ app.whenReady().then(() => {
   ipcMain.handle('tp-recover', () => { try { return require('./recover').findLibraries(app.getPath('userData'), 'glassroom.v2').slice(0, 8).map(x => ({ tracks: x.tracks, cols: x.cols, json: x.json })); } catch (e) { return []; } });
   require('./online').register(ipcMain); // Google sign-in + online profile (hidden until online.json exists)
   ipcMain.handle('tp-mods-list', () => modsList());
+  ipcMain.handle('tp-mods-get', (e, key) => { const b = BUILTIN_MODS[key]; if (!b) return { ok: false }; const dir = path.join(modsDir(), b[0]);
+    try { fs.mkdirSync(dir, { recursive: true }); for (const [f, c] of Object.entries(b[1])) { const fp = path.join(dir, f); if (!fs.existsSync(fp)) fs.writeFileSync(fp, c); } return { ok: true, id: b[0] }; } catch (err) { return { ok: false, error: err.message }; } });
   ipcMain.handle('tp-mods-folder', async () => { const dir = modsDir(); fs.mkdirSync(dir, { recursive: true });
     if (!fs.readdirSync(dir).length) { const ex = path.join(dir, 'example-now-playing'); fs.mkdirSync(ex, { recursive: true }); for (const [f, c] of Object.entries(EXAMPLE_MOD)) fs.writeFileSync(path.join(ex, f), c); }
     await shell.openPath(dir); return dir; });
@@ -251,7 +328,8 @@ app.whenReady().then(() => {
   ipcMain.handle('tp-fl-open', async (e, file, exe) => {
     if (typeof file !== 'string' || !/\.(flp|zip)$/i.test(file) || !fs.existsSync(file)) return { ok: false, error: 'That project file is gone' };
     const zipped = /\.zip$/i.test(file); if (zipped && !zipHasFlp(file)) return { ok: false, error: 'That zip has no FL Studio project in it' };
-    if (typeof exe === 'string' && /\.exe$/i.test(exe) && fs.existsSync(exe)) { try { require('child_process').spawn(exe, [file], { detached: true, stdio: 'ignore', cwd: path.dirname(exe) }).unref(); return { ok: true }; } catch (err) {} }
+    if (!zipped) exe = flExeFor(file, exe);
+    if (typeof exe === 'string' && /\.(exe|app)$/i.test(exe) && fs.existsSync(exe)) { try { require('child_process').spawn(exe, [file], { detached: true, stdio: 'ignore', cwd: path.dirname(exe) }).unref(); return { ok: true }; } catch (err) {} }
     if (zipped) return { ok: false, error: "Compass can't find FL Studio. Use Add DAW in the Launcher, then try again." }; // Windows would open the zip in Explorer instead
     const err = await shell.openPath(file); return err ? { ok: false, error: err } : { ok: true };
   });
@@ -283,7 +361,7 @@ app.whenReady().then(() => {
     item.setSaveDialogOptions({ title: 'Save from Compass Music Player', defaultPath: path.join(app.getPath('documents'), item.getFilename()) });
   });
   ipcMain.handle('tp-check-updates', () => checkForUpdates(true));
-  ipcMain.on('tp-version', e => { e.returnValue = app.getVersion(); });
+  ipcMain.on('tp-version', e => { e.returnValue = appVersion(); });
   createWindow();
   setTimeout(() => checkForUpdates(false), 6000);
 });

@@ -143,7 +143,10 @@ h1 { font-size: 36px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1
 .row.playing { background: linear-gradient(145deg, var(--g1), var(--g2)); border-color: var(--edge); box-shadow: inset 0 1px 0 var(--hi), inset 0 -1px 0 var(--lo); }
 .row.picked { background: var(--panel3); }
 .row.dragging { opacity: .35; } .row.over { box-shadow: 0 0 0 2px var(--ink); background: var(--hover); }
-.row[draggable="true"] { cursor: grab; }
+body[data-rows="comfy"] #main .list .row { padding-top: 10px; padding-bottom: 10px; } body[data-rows="comfy"] #main:has(> .chero) .list .row { padding-top: 6px; padding-bottom: 6px; }
+body[data-rows="roomy"] #main .list .row { padding-top: 13px; padding-bottom: 13px; } body[data-rows="roomy"] #main:has(> .chero) .list .row { padding-top: 9px; padding-bottom: 9px; }
+body[data-rows="comfy"] .discol { gap: 6px; } body[data-rows="roomy"] .discol { gap: 8px; }
+.row[draggable="true"] { cursor: default; } .row.dragging { cursor: grabbing; }
 .rowplay { position: relative; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--field); color: var(--ink); transition: background .2s, color .2s, transform .3s var(--ease); }
 .rowplay .num { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ink2); }
 .rowplay .ic { display: none; } .rowplay.nonum .ic, .row:hover .rowplay .ic, .row.playing .rowplay .ic { display: block; } .row:hover .rowplay .num, .row.playing .rowplay .num { display: none; }
@@ -507,7 +510,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .acard-play { position: absolute; right: 8px; bottom: 8px; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--onink); box-shadow: 0 8px 18px -6px rgba(0,0,0,.6); opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .35s var(--ease); }
 .acard:hover .acard-play, .acard:focus-within .acard-play { opacity: 1; transform: none; }
 .acard-play:hover { transform: scale(1.06) !important; }
-.acard-t { font-weight: 800; font-size: 15px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.acard-t { font-weight: 800; font-size: 15px; line-height: 1.25; min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; } .acard-t .seal { display: inline-block; vertical-align: -3px; margin-left: 5px; }
 .acard-s { font-size: 13px; line-height: 1.35; color: var(--ink2); min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
 .lcard .acard-art { margin-bottom: 4px; }
 @media (max-width: 760px) { .pgrid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); margin: 0 -8px; } .acard { padding: 8px; } .acard-play { opacity: 1; transform: none; width: 40px; height: 40px; } }
@@ -566,7 +569,8 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .shero { position: relative; height: 240px; border-radius: 16px; overflow: hidden; margin: 6px 0 24px; display: flex; align-items: flex-end; } .shero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.75), transparent 70%); }
 .shero > div { position: relative; z-index: 1; padding: 22px; color: #fff; } .shero small { text-transform: uppercase; letter-spacing: .1em; font-weight: 700; opacity: .8; } .shero h2 { font-size: 32px; margin: 4px 0; } .shero p { margin: 0 0 12px; opacity: .85; }
 .srow-h { font-size: 18px; margin: 8px 0 12px; }
-.mine-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 4px 0 14px; } .mine-bar p { margin: 0; }
+.lib-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; } .lib-tools .search { width: 240px; } .lib-none { margin: 4px 0 16px; } .mine-filter select { padding-right: 22px; }
+
 .mk-hero { text-align: center; padding: 36px 16px 26px; } .mk-hero h1 { font-size: clamp(28px, 4vw, 42px); margin: 0 0 6px; } .mk-hero p { color: var(--ink2); margin: 0 0 18px; }
 .mk-search { display: flex; align-items: center; gap: 10px; max-width: 620px; margin: 0 auto 16px; padding: 6px 6px 6px 16px; border-radius: 99px; background: var(--panel2); border: 1px solid var(--line); } .mk-search input { flex: 1; background: none; border: 0; outline: 0; font-size: 15px; color: var(--ink); }
 .mk-hero .chips { justify-content: center; margin-bottom: 10px; }
@@ -583,7 +587,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 @media (max-width: 760px) { .mk-row { grid-template-columns: 34px 44px minmax(0, 1fr) 84px; } .mk-row .mk-n, .mk-row .mono { display: none; } }
 
 /* discs, credits footer, logo, stats */
-.dischead { display: flex; align-items: center; gap: 10px; padding: 14px 12px 6px; margin-top: 6px; border-bottom: 1px solid var(--line); cursor: grab; } .dischead b { font-size: 15px; } .dischead small { color: var(--ink3); flex: 1; } .dischead.over { box-shadow: inset 0 -2px 0 var(--ink); }
+.dischead { display: flex; align-items: center; gap: 10px; padding: 14px 12px 6px; margin-top: 6px; border-bottom: 1px solid var(--line); cursor: default; } .dischead b { font-size: 15px; } .dischead small { color: var(--ink3); flex: 1; } .dischead.over { box-shadow: inset 0 -2px 0 var(--ink); }
 .disc-empty { padding: 10px 12px; margin: 0; } .disc-add { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin: 12px 4px 0; padding: 8px 14px; border-radius: 99px; color: var(--ink2); border: 1px dashed var(--line); font-weight: 600; } .disc-add:hover { color: var(--ink); border-color: var(--ink3); }
 .pfoot { display: flex; flex-direction: column; gap: 2px; padding: 22px 12px 8px; font-size: 12.5px; color: var(--ink3); } .pfoot b { color: var(--ink2); font-weight: 600; }
 .mdet summary { cursor: pointer; font-weight: 700; font-size: 13px; padding: 8px 0; } .mdet[open] summary { margin-bottom: 4px; }
@@ -685,6 +689,7 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .flr { display: grid; grid-template-columns: 30px minmax(0, 2fr) minmax(0, 1.3fr) 130px 70px 28px; align-items: center; gap: 12px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
 .flr:last-child { border-bottom: 0; } .flr:hover { background: var(--hover); }
 .flr-ic { position: relative; width: 28px; height: 28px; display: grid; place-items: center; } .flr-ic img { width: 26px; height: 26px; object-fit: contain; } .flr-ic .flp-zip { right: -6px; bottom: -4px; }
+.flr-ver { position: absolute; right: -9px; bottom: -6px; color: var(--ink); font: italic 800 9.5px/1 Arial, sans-serif; white-space: nowrap; letter-spacing: -.01em; text-shadow: 0 0 2px var(--bg), 0 0 2px var(--bg), 0 0 3px var(--bg); pointer-events: none; }
 .flr-n { font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .flr-f, .flr-t, .flr-s { font-size: 12.5px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .flr-s { text-align: right; }
 .flr-go { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; opacity: 0; background: var(--ink); color: var(--onink); } .flr:hover .flr-go { opacity: 1; }
@@ -1588,7 +1593,11 @@ function renderList() {
 }
 
 const albumArt = c => artOf(c) ? `<img src="${artOf(c)}" alt="" draggable="false" loading="lazy" decoding="async">` : isFolder(c) && kidsOf(c).length ? folderArt(c) : `<span class="acard-ph" style="${cover(c.h1, c.h2)}"></span>${isMine(c) ? `<span class="acard-disc">${ico('disc', 44)}</span>` : ''}`;
-const libSorted = a => { const k = S.libSort || 'recent', nm = (x, y) => x.name.localeCompare(y.name, undefined, { numeric: true, sensitivity: 'base' }); return k === 'recent' ? a : [...a].sort(k === 'name' ? nm : (x, y) => (projArtist(x) || '~').localeCompare(projArtist(y) || '~', undefined, { sensitivity: 'base' }) || nm(x, y)); };
+const libYear = c => c.targetDate || '';
+const libSorted = a => { const k = S.libSort || 'recent', nm = (x, y) => x.name.localeCompare(y.name, undefined, { numeric: true, sensitivity: 'base' }), yr = (x, y) => libYear(y).localeCompare(libYear(x));
+  const q = (S.libQ || '').trim().toLowerCase(); if (q) a = a.filter(c => (c.name + ' ' + projArtist(c)).toLowerCase().includes(q));
+  return k === 'recent' ? a : [...a].sort(k === 'name' ? nm : k === 'year' ? (x, y) => yr(x, y) || nm(x, y) : (x, y) => (projArtist(x) || '~').localeCompare(projArtist(y) || '~', undefined, { sensitivity: 'base' }) || yr(x, y) || nm(x, y)); };
+const libNone = () => S.libQ ? `<p class="faint lib-none">Nothing matches “${esc(S.libQ)}”. <button class="linkbtn" data-act="libq-clear">Clear the search</button></p>` : '';
 function lentOverlay(c) { if (!S.ledger || !isMine(c)) return ''; const a = Ledger.access(c); if (a.state !== 'onloan') return '';
   return `<span class="lent-ov" data-act="loan-menu" data-id="${c.id}" title="Right-click for options"><b>${esc(handleOf(a.loan.to))}</b><small><i data-until="${a.loan.until}">${leftTxt(a.loan.until)}</i> left</small></span>`; }
 function projCard(c, n, all) {
@@ -1596,8 +1605,8 @@ function projCard(c, n, all) {
   const ts = colTracks(c), k = pcolors(c), year = c.targetDate ? fdate(c.targetDate) : '';
   return `<div class="acard ${isFolder(c) ? 'is-folder' : ''}" role="button" tabindex="0" draggable="true" data-act="col" data-id="${c.id}" style="--n:${n};--glow:${k[0]}" aria-label="Open ${esc(c.name)}">
     <div class="acard-art">${albumArt(c)}${lentOverlay(c)}<button class="acard-play" data-act="play-col" data-id="${c.id}" aria-label="Play ${esc(c.name)}" title="Play">${ico(S.playing && c.tracks.includes(S.cur) ? 'pause' : 'play', 20)}</button></div>
-    <div class="acard-t" title="${esc(c.name)}">${esc(c.name)}</div>
-    <div class="acard-s">${(isFolder(c) ? [isMine(c) ? 'Folder' : 'Folder', kidsOf(c).length ? kidsOf(c).length + ' ' + (kidsOf(c).length === 1 ? 'project' : 'projects') : '', ts.length ? ts.length + (ts.length === 1 ? ' song' : ' songs') : ''] : [isMine(c) ? (S.libTab === 'mine' ? '' : 'Digital album') : KINDS[c.type], same ? '' : projArtist(c), ts.length + ' ' + (ts.length === 1 ? 'song' : 'songs'), c.archived ? 'Archived' : year]).filter(Boolean).map(esc).join(' · ')}</div>${S.ledger && isMine(c) && !isFolder(c) ? ownBadge(c, 'card') : ''}
+    <div class="acard-t" title="${esc(c.name)}">${esc(c.name)}${S.ledger && isMine(c) && !isFolder(c) && isVerified(c) ? seal(17) : ''}</div>
+    <div class="acard-s">${(isFolder(c) ? [isMine(c) ? 'Folder' : 'Folder', kidsOf(c).length ? kidsOf(c).length + ' ' + (kidsOf(c).length === 1 ? 'project' : 'projects') : '', ts.length ? ts.length + (ts.length === 1 ? ' song' : ' songs') : ''] : [isMine(c) ? (S.libTab === 'mine' ? '' : 'Digital album') : KINDS[c.type], same && !isMine(c) ? '' : projArtist(c), ts.length + ' ' + (ts.length === 1 ? 'song' : 'songs'), c.archived ? 'Archived' : isMine(c) && c.targetDate ? String(new Date(c.targetDate + 'T12:00').getFullYear()) : year]).filter(Boolean).map(esc).join(' · ')}</div>${S.ledger && isMine(c) && !isFolder(c) ? ownBadge(c, 'card') : ''}
   </div>`;
 }
 
@@ -1675,13 +1684,13 @@ LIBVIEWS.stats = () => {
 };
 const isVerified = c => ['owned', 'onloan', 'borrowed'].includes(Ledger.access(c).state);
 function libMine() {
-  const all = S.cols.filter(c => isMine(c) && shown(c)), nv = all.filter(isVerified).length, f = S.mineF || 'all', a = f === 'verified' ? all.filter(isVerified) : f === 'local' ? all.filter(c => !isVerified(c)) : all;
-  return `<div class="mine-bar">${seg('minef', [['all', `All ${all.length}`], ['verified', `Verified ${nv}`], ['local', `Local ${all.length - nv}`]], f, 'mine-f')}<p class="faint small">Verified albums come from the Store, the Marketplace or your own releases. Local albums are files you added yourself.</p></div>
+  const all = S.cols.filter(c => isMine(c) && shown(c)), f = S.mineF || 'all', a = libSorted(f === 'verified' ? all.filter(isVerified) : f === 'local' ? all.filter(c => !isVerified(c)) : all);
+  return `${S.libQ && !a.length ? libNone() : ''}
   <div class="pgrid">${a.map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="zip-mine" style="--n:${a.length}" aria-label="Add a digital album"><div class="acard-art"><span class="acard-ph plus">${ico('import', 34)}</span></div><div class="acard-t">Add album</div><div class="acard-s">Drop a .zip</div></div></div>
 `;
 }
 function libArchived() {
-  const a = S.cols.filter(c => c.archived);
+  const a = libSorted(S.cols.filter(c => c.archived));
   return `<p class="faint small lib-note">Archived projects are saved as they were and can't be edited. To work on one again, right-click it and choose <b>New version</b>.</p><div class="pgrid">${a.map(projCard).join('') || '<p class="faint">Nothing archived. Right-click a project and choose Archive.</p>'}</div>`;
 }
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many || one + 's'}`;
@@ -1705,9 +1714,12 @@ function renderLibrary(m) {
     <div class="hact"><button class="btn ${S.libTab === 'cds' ? 'on' : ''}" data-act="libtab" data-k="cds" aria-label="CD player" title="CD player">${ico('disc', 16)}</button><button class="btn" data-act="qr-scan" aria-label="Scan QR" title="Scan QR">${ico('qr', 16)}</button><button class="btn" data-act="conv-open" title="Convert & download: links, videos, audio">${ico('link', 16)} Convert</button><button class="btn primary" data-act="add">${ico('upload', 16)} Add music</button></div>
   </header>
   <div class="tools">${seg('libtab', [['projects', 'Projects'], ['mine', 'Digital albums'], ['tracks', 'All songs'], ...LIBTABS_EXTRA], S.libTab, 'libtab')}
+  ${['projects', 'mine', 'archived'].includes(S.libTab) ? `<div class="lib-tools"><label class="search box">${ico('search', 16)}<input id="libq" type="search" placeholder="${S.libTab === 'mine' ? 'Search albums or artists' : 'Search projects or artists'}" value="${esc(S.libQ || '')}" autocomplete="off" aria-label="Search the library"></label>
+    <label class="sel box"><span class="faint">Sort</span><select data-libsort aria-label="Sort">${[['recent', 'Recent'], ['name', 'Name'], ['artist', 'Artist'], ['year', 'Year']].map(([k, l]) => `<option value="${k}" ${(S.libSort || 'recent') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
+  ${S.libTab === 'mine' ? (() => { const all = S.cols.filter(c => isMine(c) && shown(c)), nv = all.filter(isVerified).length, f = S.mineF || 'all'; return `<label class="sel box mine-filter" title="Verified: from the Store, the Marketplace or your own releases. Local: files you added."><span class="faint">Filter</span><select id="mine-f" aria-label="Filter digital albums"><option value="all" ${f === 'all' ? 'selected' : ''}>All (${all.length})</option><option value="verified" ${f === 'verified' ? 'selected' : ''}>Verified (${nv})</option><option value="local" ${f === 'local' ? 'selected' : ''}>Local (${all.length - nv})</option></select></label>`; })() : ''}${['projects', 'mine', 'archived'].includes(S.libTab) ? '</div>' : ''}
   ${S.libTab !== 'tracks' ? '' : `<label class="search box">${ico('search', 16)}<input id="q" type="search" placeholder="Search songs" value="${esc(S.q)}" autocomplete="off"></label>
     <label class="sel box"><span class="faint">Sort</span><select id="sort"><option value="added">Recently added</option><option value="title">Title</option><option value="artist">Artist</option><option value="status">Status</option><option value="bpm">Tempo</option></select></label>`}</div>
-  ${S.libTab === 'mine' ? libMine() : S.libTab === 'archived' ? libArchived() : LIBVIEWS[S.libTab] ? LIBVIEWS[S.libTab]() : projects ? `<div class="lib-sort"><label class="sel box"><span class="faint">Sort</span><select data-libsort aria-label="Sort projects">${[['recent', 'Recent'], ['name', 'Name'], ['artist', 'Artist']].map(([k, l]) => `<option value="${k}" ${(S.libSort || 'recent') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div><div class="pgrid">${libSorted(S.cols.filter(c => !isMine(c) && shown(c))).map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="newcol" style="--n:${S.cols.length}" aria-label="New project"><div class="acard-art"><span class="acard-ph plus">${ico('plus', 34)}</span></div><div class="acard-t">New project</div></div></div>${S.cols.some(c => c.archived && !isMine(c)) ? `<button class="btn sm lib-arch" data-act="libtab" data-k="archived">Archived (${S.cols.filter(c => c.archived && !isMine(c)).length})</button>` : ''}`
+  ${S.libTab === 'mine' ? libMine() : S.libTab === 'archived' ? libArchived() : LIBVIEWS[S.libTab] ? LIBVIEWS[S.libTab]() : projects ? `${libNone()}<div class="pgrid">${libSorted(S.cols.filter(c => !isMine(c) && shown(c))).map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="newcol" style="--n:${S.cols.length}" aria-label="New project"><div class="acard-art"><span class="acard-ph plus">${ico('plus', 34)}</span></div><div class="acard-t">New project</div></div></div>${S.cols.some(c => c.archived && !isMine(c)) ? `<button class="btn sm lib-arch" data-act="libtab" data-k="archived">Archived (${S.cols.filter(c => c.archived && !isMine(c)).length})</button>` : ''}`
     : `<div class="tools"><div class="chips">${['all', ...Object.keys(ST)].map(k => `<button class="chip ${S.filter === k ? 'on' : ''}" data-act="filter" data-k="${k}">${k === 'all' ? 'All' : ST[k]} <em>${counts[k]}</em></button>`).join('')}</div></div>${colhead}<div id="list" class="list"></div>`}`;
   const so = $('#sort'); if (so) so.value = S.sort;
 }
@@ -2652,7 +2664,7 @@ function cdHomeHTML() {
   a.sort(H.sort === 'name' ? (x, y) => x.name.localeCompare(y.name) : H.sort === 'artist' ? (x, y) => (projArtist(x) || '~').localeCompare(projArtist(y) || '~') : (x, y) => when(y) - when(x));
   const ago = t => { if (!t) return 'Not started'; const d = (Date.now() - t) / 1000; return d < 90 ? 'Just now' : d < 3600 ? Math.round(d / 60) + ' minutes ago' : d < 86400 ? Math.round(d / 3600) + ' hours ago' : d < 86400 * 45 ? Math.round(d / 86400) + ' days ago' : Math.round(d / 86400 / 30) + ' months ago'; };
   const models = H.tab === 'models', started = c => !!(S.cd.designs && S.cd.designs[c.id]);
-  const card = (c, n) => `<div class="cdf" role="button" tabindex="0" data-act="${models ? 'cdh-view' : 'cdh-open'}" data-id="${c.id}" style="--n:${n}"><div class="cdf-th">${models ? `<div class="cdjewel"><span class="cdj-art">${albumArt(c)}</span><i class="cdj-hinge"></i><i class="cdj-gloss"></i></div>` : `<span class="cdf-art">${albumArt(c)}</span>`}${started(c) ? `<i class="cdf-ok" title="CD started">${ico('check', 11)}</i>` : ''}</div>
+  const card = (c, n) => `<div class="cdf" role="button" tabindex="0" data-act="${models ? 'cdh-view' : 'cdh-open'}" data-id="${c.id}" style="--n:${n}"><div class="cdf-th">${models ? `<div class="cdjewel"><span class="cdj-art">${albumArt(c)}</span><i class="cdj-hinge"></i><i class="cdj-gloss"></i></div>` : `<span class="cdf-art">${albumArt(c)}</span>`}</div>
       <div class="cdf-m"><span><b title="${esc(c.name)}">${esc(c.name)}</b><small>${models ? esc(projArtist(c) || 'Jewel case') : ago(when(c))}</small></span><button class="ico" data-act="cdh-more" data-id="${c.id}" aria-label="More">${ico('dots', 16)}</button></div></div>`;
   const row = c => `<div class="cdr" role="button" tabindex="0" data-act="${models ? 'cdh-view' : 'cdh-open'}" data-id="${c.id}"><span class="cdr-art">${albumArt(c)}</span><b>${esc(c.name)}</b><span>${esc(projArtist(c))}</span><span>${ago(when(c))}</span><button class="ico" data-act="cdh-more" data-id="${c.id}" aria-label="More">${ico('dots', 16)}</button></div>`;
   return `<div class="cdh">
@@ -3599,6 +3611,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.15.2', d: '2026-11-16', items: ['Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon.', 'Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default).', 'Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json.', 'Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year.', 'CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal.', 'Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer.'] },
   { v: '1.15.1', d: '2026-11-16', items: ['Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time.'] },
   { v: '1.15.0', d: '2026-11-16', items: ['Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.', 'Digital albums: filter All, Verified or Local.', 'Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album.'] },
   { v: '1.14.1', d: '2026-11-16', items: ['CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.', 'New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.', 'Rolled back the 1.14.0 case look.'] },
@@ -3815,7 +3828,8 @@ const DAWS = [['fl', 'FL Studio'], ['ableton', 'Ableton Live'], ['logic', 'Logic
 const DAWLOOK = { fl: ['FL', '#ff8a00', '#2b2b2b'], ableton: ['Live', '#111111', '#f2f2f2'], logic: ['Lp', '#3a3a3c', '#e8e8ea'], studioone: ['S1', '#0a5ad4', '#ffffff'], reaper: ['R', '#2f6f50', '#ffffff'], cubase: ['Cu', '#c4122f', '#ffffff'], bitwig: ['Bw', '#ff5a00', '#1b1b1b'], protools: ['Pt', '#6a1fd8', '#ffffff'], reason: ['Rs', '#d81f26', '#ffffff'], garageband: ['Gb', '#f79400', '#ffffff'] };
 UI.dawIcons = UI.dawIcons || {};
 const dawTile = (id, path) => { const ic = path && UI.dawIcons[path]; if (ic) return `<span class="daw-i img"><img src="${ic}" alt="" draggable="false"></span>`; const [t, bg, fg] = DAWLOOK[id] || ['?', '#444', '#fff']; return `<span class="daw-i" style="--b:${bg};--f:${fg}">${t}</span>`; };
-const flExe = () => (S.daws || {}).fl || (UI.dawScan && UI.dawScan !== 'busy' && UI.dawScan.fl) || '';
+const flExe = () => (S.dawPick || {}).fl || (S.daws || {}).fl || (UI.dawScan && UI.dawScan !== 'busy' && UI.dawScan.fl) || '';
+const flVerTag = p => p.ver ? `<i class="flr-ver" title="Saved in FL Studio ${p.ver >= 24 ? 2000 + p.ver : p.ver}">V. ${p.ver}</i>` : '';
 const flAgo = t => { const d = (Date.now() - t) / 864e5; return d < 1 / 24 ? 'just now' : d < 1 ? Math.round(d * 24) + ' h ago' : d < 2 ? 'yesterday' : d < 30 ? Math.round(d) + ' days ago' : new Date(t).toLocaleDateString(); };
 function flLoad() {
   if (!(window.tpDesktop && tpDesktop.flp)) return; UI.flRecent = 'busy';
@@ -3866,7 +3880,7 @@ function flAllListHTML() {
   if (!r.length) return `<p class="faint fl-note">Nothing matches. <button class="linkbtn" data-act="fl-clear">Clear the search</button></p>`;
   const from = (UI.flPage - 1) * FL_PER, part = r.slice(from, from + FL_PER), exe = flExe(), icon = exe && UI.dawIcons[exe];
   return `<div class="flrows" role="list">${part.map(p => `<button class="flr" role="listitem" data-act="fl-proj" data-k="${esc(p.path)}" title="${esc(p.path)}">
-      <span class="flr-ic">${icon ? `<img src="${icon}" alt="" draggable="false">` : ico('disc', 18)}${/\.zip$/i.test(p.path) ? '<i class="flp-zip">ZIP</i>' : ''}</span>
+      <span class="flr-ic">${icon ? `<img src="${icon}" alt="" draggable="false">` : ico('disc', 18)}${/\.zip$/i.test(p.path) ? '<i class="flp-zip">ZIP</i>' : flVerTag(p)}</span>
       <span class="flr-n">${esc(p.name)}</span><span class="flr-f">${esc(flWhere(p))}</span>
       <span class="flr-t">${p.how === 'opened' ? 'Opened' : 'Saved'} ${flAgo(p.time)}</span><span class="flr-s">${flSize(p.size)}</span>
       <span class="flr-go">${ico('play', 12)}</span></button>`).join('')}</div>
@@ -3926,7 +3940,7 @@ function launcherRecentHTML(flPath) {
   const R = UI.lRecent, icon = UI.dawIcons[flPath];
   const rows = R === 'busy' ? '<p class="faint fl-note">Looking for projects…</p>' : !R.length ? '<p class="faint fl-note">No recent FL Studio projects yet.</p>'
     : `<div class="flrows" role="list">${R.map(p => `<button class="flr" role="listitem" data-act="fl-proj" data-k="${esc(p.path)}" title="${esc(p.path)}">
-      <span class="flr-ic">${icon ? `<img src="${icon}" alt="" draggable="false">` : ico('disc', 18)}</span><span class="flr-n">${esc(p.name)}</span><span class="flr-f">${esc(flWhere(p))}</span>
+      <span class="flr-ic">${icon ? `<img src="${icon}" alt="" draggable="false">` : ico('disc', 18)}${flVerTag(p)}</span><span class="flr-n">${esc(p.name)}</span><span class="flr-f">${esc(flWhere(p))}</span>
       <span class="flr-t">${p.how === 'opened' ? 'Opened' : 'Saved'} ${flAgo(p.time)}</span><span class="flr-s"></span><span class="flr-go">${ico('play', 12)}</span></button>`).join('')}</div>`;
   return `<section class="l-recent"><div class="l-recent-h"><h2>Recent projects</h2><button class="linkbtn" data-act="fl-screen">See all</button></div>${rows}</section>`;
 }
@@ -3936,7 +3950,8 @@ Object.assign(IC, { gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0
 function applyPrefs() {
   const P = S.prefs || {}, r = document.documentElement;
   if (P.theme === 'light' || P.theme === 'dark') r.setAttribute('data-theme', P.theme); else r.removeAttribute('data-theme');
-  document.body.classList.toggle('reduce-motion', !!P.reduceMotion);
+  document.body.classList.toggle('reduce-motion', !!P.reduceMotion); document.body.dataset.rows = P.rows || 'compact';
+  applyModTheme();
 }
 const sw = (k, on, label) => `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" data-act="pref-tog" data-k="${k}"></button>`;
 /* ---------- mods ----------
@@ -3953,6 +3968,14 @@ const MOD_BRIDGE = `(() => { const H = {}, F = {}; let n = 0; const send = (type
     if (d.type === 'event') (H[d.name] || []).forEach(f => { try { f(d.data); } catch (x) { console.error(x); } });
     if (d.type === 'call' && F[d.id]) { try { F[d.id](d.data); } catch (x) { console.error(x); } } }); })();`;
 const modOn = id => !!(S.mods && S.mods[id]);
+const modThemes = () => MODS.list.filter(m => modOn(m.id) && !m.error).flatMap(m => (m.themes || []).map((t, i) => ({ ...t, key: m.id + ':' + i })));
+const THEME_VARS = ['bg', 'panel', 'panel2', 'panel3', 'line', 'ink', 'ink2', 'ink3', 'onink', 'field', 'hover', 'sel', 'shadow'];
+function applyModTheme() {
+  const r = document.documentElement, P = S.prefs || {}, t = P.modTheme && modThemes().find(x => x.key === P.modTheme);
+  THEME_VARS.forEach(k => r.style.removeProperty('--' + k));
+  if (!t) { if (P.theme === 'light' || P.theme === 'dark') r.setAttribute('data-theme', P.theme); else r.removeAttribute('data-theme'); return; }
+  r.setAttribute('data-theme', t.base); Object.entries(t.colors || {}).forEach(([k, v]) => { if (THEME_VARS.includes(k)) r.style.setProperty('--' + k, v); });
+}
 function modStop(id) { const st = document.getElementById('modcss-' + id); if (st) st.remove(); const f = MODS.frames[id]; if (f) f.remove(); delete MODS.frames[id]; MODS.menu = MODS.menu.filter(x => x.mod !== id); }
 function modStart(m) {
   modStop(m.id); if (!modOn(m.id) || m.error) return;
@@ -3964,7 +3987,7 @@ function modStart(m) {
     MODS.frames[m.id] = f; document.body.appendChild(f); }
   modGate();
 }
-async function modsLoad() { if (!(window.tpDesktop && tpDesktop.mods)) return; try { MODS.list = await tpDesktop.mods.list(); } catch (e) { MODS.list = []; } MODS.list.forEach(modStart); }
+async function modsLoad() { if (!(window.tpDesktop && tpDesktop.mods)) return; try { MODS.list = await tpDesktop.mods.list(); } catch (e) { MODS.list = []; } MODS.list.forEach(modStart); applyModTheme(); }
 function modGate() { const off = S.view === 'store' || S.view === 'market'; $$('style[data-mod]').forEach(st => { st.disabled = off; }); }
 function modEmit(name, data) { Object.values(MODS.frames).forEach(f => { try { f.contentWindow.postMessage({ __compass: 1, type: 'event', name, data }, '*'); } catch (e) {} }); }
 function modTrackInfo(t) { const c = t && projOf(t); return t ? { id: t.id, title: dispTitle(t), artist: dispArtist(t), project: c ? c.name : '', bpm: t.bpm || null, key: t.key || '', length: verDur(t) || null } : null; }
@@ -3989,6 +4012,7 @@ function modsSettingsHTML() {
     `<label class="check"><input type="checkbox" data-modtoggle="${esc(m.id)}" ${modOn(m.id) ? 'checked' : ''} ${m.error ? 'disabled' : ''}><span>On</span></label>`)).join('');
   return `<section class="set-card box"><h2>Mods</h2>
       ${setRow('Mods folder', 'Put each mod in its own folder. Mods are off until you turn them on. They can change how Compass looks and add menu items, but never the Music Store or Marketplace. Only turn on mods you trust.', `<div class="crow"><button class="btn sm" data-act="mods-folder">${ico('folder', 14)} Open folder</button><button class="btn sm" data-act="mods-reload">${ico('repeat', 14)} Reload</button></div>`)}
+      ${MODS.list.some(m => m.id === 'compass-themes') ? '' : setRow('Themes', 'Extra color themes, and a file to make your own. Made by Compass.', `<button class="btn sm" data-act="mod-get" data-k="themes">${ico('save', 14)} Get</button>`)}
       ${rows || '<p class="faint small" style="margin:6px 0 0">No mods yet. Open the folder to get an example mod.</p>'}</section>`;
 }
 /* ---------- account (online phase 1): Google sign-in, profile synced to the cloud ---------- */
@@ -4022,6 +4046,8 @@ function renderSettings(m) {
     </section>
     <section class="set-card box"><h2>Appearance</h2>
       ${setRow('Theme', '', seg('settheme', [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']], P.theme, 'pref-theme'))}
+      ${modThemes().length ? setRow('Custom theme', 'From the Themes mod.', `<div class="sel box"><select id="set-modtheme" aria-label="Custom theme"><option value="">None</option>${modThemes().map(t => `<option value="${esc(t.key)}" ${P.modTheme === t.key ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></div>`) : ''}
+      ${setRow('Song spacing', 'Space between songs in lists.', seg('setrows', [['compact', 'Compact'], ['comfy', 'Comfortable'], ['roomy', 'Spacious']], P.rows || 'compact', 'pref-rows'))}
       ${setRow('Reduce animations', 'Turns off motion effects.', sw('reduceMotion', P.reduceMotion, 'Reduce animations'))}
       ${setRow('Project gradient', 'Cover colors behind the project page.', sw('gradient', P.gradient, 'Project gradient'))}
     </section>
@@ -4631,7 +4657,8 @@ function act(a, el, e) {
   }
   if (el.dataset.confirm && !el.dataset.armed) { el.dataset.armed = '1'; el.querySelector('span').textContent = el.dataset.confirm; return; }
   switch (a) {
-    case 'pref-theme': S.prefs.theme = k; applyPrefs(); if (C3) buildCase(); refresh(); break;
+    case 'pref-rows': S.prefs.rows = k; save(); applyPrefs(); renderMain(); break;
+    case 'pref-theme': S.prefs.modTheme = ''; S.prefs.theme = k; applyPrefs(); if (C3) buildCase(); refresh(); break;
     case 'pref-tog': S.prefs[k] = !S.prefs[k]; el.setAttribute('aria-checked', !!S.prefs[k]); applyPrefs(); projGradient(); save(); break;
     case 'backup': backupAll(); break;
     case 'restore': if (!confirmBtn(el, 'Click again, then choose the backup')) break; $('#restorefile').click(); break;
@@ -4682,6 +4709,7 @@ function act(a, el, e) {
     case 'pb-save': publishSave(); break;
     case 'recover': recoverOffer(false); break;
     case 'mine-f': S.mineF = k; save(); renderMain(); break;
+    case 'libq-clear': S.libQ = ''; renderMain(); break;
     case 'pub-finalize': { const c = col(id); if (!c) break; const ts = colTracks(c).filter(t => t.status !== 'final'); ts.forEach(t => { t.status = 'final'; }); save(); refresh(); toast(`Marked ${plural(ts.length, 'song')} Final. Ready to publish.`); break; }
     case 'ws-buy': { const c = col(id), q = +k, v = c.release.wholesale[k]; askSure(`Buy ${q.toLocaleString()} codes for ${c.name}?`, `${usd(v)} each, ${usd(v * q)} total. Test purchase, nothing is charged. You get a zip with a CSV of codes and printable QR cards.${c.release.size ? ` Uses ${q.toLocaleString()} of the ${c.release.size - (c.release.sold || 0)} copies left.` : ''}`, 'Get codes').then(async ok => { if (!ok) return;
       toast(`Making ${q.toLocaleString()} codes…`); const P = await wsPack(c, q), base = `${infoName(c.name)} - ${q} codes`;
@@ -4768,7 +4796,7 @@ function act(a, el, e) {
     case 'ctx-delcol': trashProject(col(id)); break;
     case 'nav': closeDrawer(); if (el.dataset.view === 'cd') S.cd.home = true; S.view = el.dataset.view; refresh(); break;
     case 'col': closeDrawer(); S.view = 'collection'; S.colId = id; refresh(); break;
-    case 'libtab': S.libTab = k; UI.libArtist = null; refresh(); break;
+    case 'libtab': S.libTab = k; UI.libArtist = null; S.libQ = ''; refresh(); break;
     case 'ptab': S.projTab = k; UI.cdSel = null; refresh(); if (k === 'cd') requestAnimationFrame(() => { const ps = $('#ps'); if (ps) ps.scrollIntoView({ block: 'start', behavior: 'smooth' }); }); break;
     case 'newcol': { closeDrawer(); const c = newProject(); S.cols.push(c); S.view = 'collection'; S.colId = c.id; refresh(); UI.mCover = null; openModal('proj', c.id, { isNew: true }); break; }
     case 'add': $('#file').accept = S.view === 'library' ? 'audio/*,.zip,application/zip' : 'audio/*'; $('#file').click(); break;
@@ -4866,6 +4894,8 @@ function act(a, el, e) {
     case 'confirm-ok': closeModal(true); break;
     case 'acct-in': if (window.tpDesktop && tpDesktop.account) acctSignIn(); break;
     case 'acct-out': if (window.tpDesktop && tpDesktop.account) tpDesktop.account.signOut().then(() => { toast('Signed out'); acctLoad(); }); break;
+    case 'mod-get': if (window.tpDesktop && tpDesktop.mods && tpDesktop.mods.get) tpDesktop.mods.get(k).then(async r => { if (!r || !r.ok) return toast("Couldn't install the mod" + (r && r.error ? ': ' + r.error : ''));
+      S.mods = { ...(S.mods || {}), [r.id]: true }; save(); await modsLoad(); renderMain(); toast('Themes installed. Pick one under Appearance › Custom theme.'); }); break;
     case 'mods-folder': if (window.tpDesktop && tpDesktop.mods) tpDesktop.mods.folder().then(() => setTimeout(() => modsLoad().then(() => { if (S.view === 'settings') renderMain(); }), 800)); break;
     case 'mods-reload': MODS.list.forEach(m => modStop(m.id)); modsLoad().then(() => { renderMain(); toast(MODS.list.length ? 'Mods reloaded' : 'No mods found'); }); break;
     case 'mod-menu': { const [mid, iid] = String(k).split(':'), f = MODS.frames[mid]; if (!f) break; const t = trk(id), c = col(id);
@@ -4898,6 +4928,7 @@ document.addEventListener('input', e => {
   if (e.target.id === 'fl-q') { UI.flQ = e.target.value; UI.flPage = 1; flAllPaint(); return; }
   const t = e.target;
   if (t.id === 'q') { S.q = t.value; renderList(); }
+  if (t.id === 'libq') { S.libQ = t.value; const pos = t.selectionStart; renderMain(); const i = $('#libq'); if (i) { i.focus(); i.setSelectionRange(pos, pos); } }
   else if (t.id === 'cdl-name') { const L = selLayer(); if (L) { L.name = t.value.trim() || undefined; const b = $('#pslayers .psl.on .nm'); if (b) b.textContent = layerName(L); save(); } }
   else if (t.id === 'doc-bpm') { const tr = S.tracks.find(x => keyOf(x) === DOC.sel), an = tr && S.an[keyOf(tr)]; const v = +t.value; if (an && v >= 40 && v <= 260) { an.bpm = v; applyAnalysis(keyOf(tr), an); save(); renderDocList(); drawDocWaves(); } }
   else if (t.id === 'doc-title') { const tr = S.tracks.find(x => keyOf(x) === DOC.sel); if (tr) { tr.title = t.value || tr.title; save(); renderDocList(); } }
@@ -4921,7 +4952,9 @@ document.addEventListener('change', e => {
   if (t.id === 'pb-ws') { const b = $('#pb-wsbox'); if (b) b.classList.toggle('hide-folder', !t.checked); return; }
   if (t.id === 'pb-rs') { const b = $('#pb-rsbox'); if (b) b.classList.toggle('hide-folder', !t.checked); return; }
   if (t.dataset.libsort !== undefined) { S.libSort = t.value; save(); renderMain(); return; }
-  if (t.dataset.modtoggle) { const id = t.dataset.modtoggle; S.mods = { ...(S.mods || {}), [id]: t.checked }; save(); const m = MODS.list.find(x => x.id === id); if (m) { if (t.checked) modStart(m); else modStop(id); } toast(t.checked ? 'Mod on' : 'Mod off'); return; }
+  if (t.id === 'mine-f') { S.mineF = t.value; save(); renderMain(); return; }
+  if (t.id === 'set-modtheme') { S.prefs.modTheme = t.value; save(); applyModTheme(); if (C3) buildCase(); refresh(); return; }
+  if (t.dataset.modtoggle) { const id = t.dataset.modtoggle; S.mods = { ...(S.mods || {}), [id]: t.checked }; save(); const m = MODS.list.find(x => x.id === id); if (m) { if (t.checked) modStart(m); else modStop(id); } applyModTheme(); if (S.view === 'settings') renderMain(); toast(t.checked ? 'Mod on' : 'Mod off'); return; }
   if (t.dataset.flv) { S.flView = { ...(S.flView || {}), [t.dataset.flv]: t.value }; UI.flPage = 1; save(); flAllPaint(); return; }
   if (t.id === 'qr-cam') { qrStart(t.value); return; }
   if (t.id === 'sort') { S.sort = t.value; renderList(); save(); }
@@ -5384,7 +5417,7 @@ function ownBadge(c, small) {
   const a = Ledger.access(c), act = `data-act="prov" data-id="${c.id}"`, cls = 'obadge' + (small ? ' sm' : '');
   if (small === 'card') { // short form for album cards; the full wording is in the tooltip and the ownership window
     const full = (ownBadge(c, true).match(/<span>(.*)<\/span><\/button>/) || [, ''])[1].replace(/<[^>]+>/g, '');
-    if (a.state === 'owned') return `<button class="${cls} vseal" ${act} title="${esc(full)}">${seal(15)}${a.r.edition === 'collector' ? '<span>#' + String(a.tk.no).padStart(3, '0') + '</span>' : ''}</button>`;
+    if (a.state === 'owned') return a.r.edition === 'collector' ? `<button class="${cls} vseal" ${act} title="${esc(full)}"><span>#${String(a.tk.no).padStart(3, '0')}</span></button>` : '';
     if (a.state === 'onloan') return `<button class="${cls} lock" ${act} title="${esc(full)}">${ico('lock', 11)}<span>On loan · <i data-until="${a.loan.until}">${leftTxt(a.loan.until)}</i></span></button>`;
     if (a.state === 'borrowed') return `<button class="${cls} borrow" ${act} title="${esc(full)}">${ico('user', 11)}<span>Borrowed · <i data-until="${a.loan.until}">${leftTxt(a.loan.until)}</i></span></button>`;
   }

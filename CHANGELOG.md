@@ -2,6 +2,15 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.15.2 · 2026-11-16
+
+- Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon.
+- Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default).
+- Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json.
+- Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year.
+- CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal.
+- Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer.
+
 ## 1.15.1 · 2026-11-16
 
 - Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time.

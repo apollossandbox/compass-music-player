@@ -42,6 +42,7 @@ if (!top) { console.error("Add a CHANGELOG entry for " + v + " in index.html fir
 const notes = notes0 || top.items.join(" ");
 const f = "../installer/Compass-Setup.exe", size = fs.statSync(f).size;
 const sha256 = require("crypto").createHash("sha256").update(fs.readFileSync(f)).digest("hex");
-fs.writeFileSync("../installer/latest.json", JSON.stringify({ version: v, file: "Compass-Setup.exe", size, sha256, notes, date: new Date().toISOString().slice(0, 10), changelog: changelog.slice(0, 20) }, null, 2) + "\n");
+const live = require("./make-live.js")(); // instant updates: app/ mirrored to installer/app with checksums
+fs.writeFileSync("../installer/latest.json", JSON.stringify({ version: v, file: "Compass-Setup.exe", size, sha256, notes, date: new Date().toISOString().slice(0, 10), changelog: changelog.slice(0, 20), live }, null, 2) + "\n");
 ' "$VERSION" "$NOTES"
 echo "Built installer/Compass-Setup.exe ($VERSION). Commit and push the repo to publish it."

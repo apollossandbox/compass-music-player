@@ -1,11 +1,23 @@
 {
-  "version": "1.15.1",
+  "version": "1.15.2",
   "file": "Compass-Setup.exe",
-  "size": 84907408,
-  "sha256": "609b532c400755069a6ec550ebadbef07fa90a135d43bf104ecfb71e5ab90c01",
-  "notes": "Fix: 1.15.0 could empty your library list on first start. Compass now offers to restore the copy from before the update; your audio and covers were never touched.",
+  "size": 84911582,
+  "sha256": "b1d057aae7a544e305df1e7708549f6c8d99b7fd020111bbd5e946de8b512721",
+  "notes": "Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon. Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default). Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json. Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year. CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal. Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.15.2",
+      "d": "2026-11-16",
+      "items": [
+        "Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon.",
+        "Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default).",
+        "Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json.",
+        "Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year.",
+        "CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal.",
+        "Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer."
+      ]
+    },
     {
       "v": "1.15.1",
       "d": "2026-11-16",
@@ -151,13 +163,66 @@
         "A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.",
         "Second-hand albums are now in the Marketplace instead of the Music Store."
       ]
-    },
-    {
-      "v": "1.11.7",
-      "d": "2026-11-15",
-      "items": [
-        "Artist page: pick a colour for the artist's round picture and for the header (image button on the header). Or use one of their project covers as the picture or header."
-      ]
     }
-  ]
+  ],
+  "live": {
+    "shell": "cbbf8c9165efa86c",
+    "files": [
+      {
+        "p": "icon.png",
+        "sha256": "3c220dca23bcfc72fdd443f4be4217a49f77506c7c0571d70adab790053050b9",
+        "size": 42558
+      },
+      {
+        "p": "index.html",
+        "sha256": "a4586c63931c243574047accb3914ebd0c5a09c5b65a3eac815e1007419b26e4",
+        "size": 674577
+      },
+      {
+        "p": "lib/GLTFExporter.js",
+        "sha256": "a228cae09518e5034600a1aec65c3b3453f706f8943e542721c63c5e5727499c",
+        "size": 57871
+      },
+      {
+        "p": "lib/jsQR.js",
+        "sha256": "bc40c8a15196236b2314db0856f72ca0b49980cd5413b8c852a7349f5fee0859",
+        "size": 256885
+      },
+      {
+        "p": "lib/jszip.min.js",
+        "sha256": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
+        "size": 97630
+      },
+      {
+        "p": "lib/lame.min.js",
+        "sha256": "15d285e2587b3bdbfd18a68de6ce07cc074f7480a82c3815da2dc1c348ec6df4",
+        "size": 156043
+      },
+      {
+        "p": "lib/mp4-muxer.js",
+        "sha256": "bba88082053511b898c921e71a865478821a674d779ba0c7028c78c921fecaf6",
+        "size": 72829
+      },
+      {
+        "p": "lib/qrcode.js",
+        "sha256": "18ae399f81182bc9de916e9c77b195df20cc58d6f2d55a62b085a299f1bf1780",
+        "size": 56694
+      },
+      {
+        "p": "lib/three.min.js",
+        "sha256": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2",
+        "size": 603445
+      },
+      {
+        "p": "store/sxteen-ways-movie/01 Movie Intro.wav",
+        "sha256": "cdcbd582552494f701e8bf857c446774365c23f26a3dd40527fd18ed7d1c28f5",
+        "size": 1940668
+      },
+      {
+        "p": "store/sxteen-ways-movie/12 Movie Outro.wav",
+        "sha256": "aaaa40e5dbdfccd9fa40572681f9634b7eef5b5d34c299c8a76527368ea1282a",
+        "size": 4369844
+      }
+    ]
+  }
 }
