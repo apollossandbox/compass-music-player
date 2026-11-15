@@ -71,7 +71,7 @@ body.side-sorting .colitem:not(.dragging) { transition: transform .22s var(--eas
 .navbtn.on, .colitem.on { color: var(--ink); }
 .colitem.dropping { outline: 2px dashed var(--ink); outline-offset: -2px; }
 .shead { display: flex; align-items: center; justify-content: space-between; padding: 18px 9px 6px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink3); font-weight: 700; }
-.colswrap { overflow-y: auto; min-height: 0; flex: 1 1 0; scrollbar-width: none; } .side-da { flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-width: none; } /* projects and digital albums split the space in half */
+.colswrap { overflow-y: auto; min-height: 0; flex: 0 0 22%; scrollbar-width: none; } .side-da { flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-width: none; } /* projects and digital albums split the space in half */
 .mini { width: 24px; height: 24px; flex: none; border-radius: 7px; background-color: var(--field); }
 .sfoot { display: flex; justify-content: flex-start; padding: 8px 2px 0; }
 .credbtn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: var(--ink3); border: 1px solid var(--lo); transition: color .2s, transform .4s var(--ease), border-color .2s; }
@@ -3679,7 +3679,8 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
-  { v: '1.17.1', d: '2026-11-16', items: ['Sidebar: nine most recently played digital albums.'] },
+  { v: '1.17.2', d: '2026-11-16', items: ['Sidebar: Digital albums starts higher, under a shorter Projects list that scrolls.'] },
+  { v: '1.17.1', d: '2026-11-16', items: ['Sidebar: nine most recently played digital albums, starting just above halfway.'] },
   { v: '1.17.0', d: '2026-11-16', items: ['Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open.', 'Sidebar: Digital albums starts halfway down, Projects has the top half.'] },
   { v: '1.16.9', d: '2026-11-16', items: ['Sidebar: Projects shows up to six; below it, your six most recently played digital albums as cover tiles. Click either heading to open it in the Library.'] },
   { v: '1.16.8', d: '2026-11-16', items: ['CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.'] },
