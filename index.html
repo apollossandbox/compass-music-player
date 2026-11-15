@@ -2778,7 +2778,7 @@ function renderPsOpts() {
   }
   const hist = `<button class="pso-ib" data-act="save-now" title="Save (${MOD}S)" aria-label="Save">${ico('save', 15)}</button><button class="pso-ib" data-act="cd-undo" title="Undo (${MOD}Z)" aria-label="Undo" ${H.stack.length ? '' : 'disabled'}>${ico('undo', 15)}</button><button class="pso-ib" data-act="cd-redo" title="Redo (${MOD}Shift+Z)" aria-label="Redo" ${H.redo.length ? '' : 'disabled'}>${ico('redo', 15)}</button>${sep}`;
   const lockNote = L && L.locked ? `<button class="pso-btn on" data-act="cd-lockl" data-id="${L.id}" title="Unlock layer (${MOD}/)">${ico('lock', 13)} Locked</button>${sep}` : '';
-  const viewCtl = ''; // open case, remove disc and reset view: canvas right-click menu, view-only bar and the viewer
+  const viewCtl = three ? `${sep}<button class="pso-btn ${S.cd.open ? 'on' : ''}" data-act="cd-open">${S.cd.open ? 'Close case' : 'Open case'}</button><button class="pso-btn ${S.cd.discOut ? 'on' : ''}" data-act="cd-disc">${S.cd.discOut ? 'Put disc back' : 'Remove disc'}</button><button class="pso-btn" data-act="cd-resetview">Reset view</button>` : ''; // 3D: case and disc controls
   el.innerHTML = `<span class="pso-tool" title="Current tool">${ico(t === 'orbit' ? 'orbit' : t === 'text' ? 'type' : 'move', 16)}</span>${sep}${hist}${lockNote}<fieldset class="pso-fs" ${L && L.locked ? 'disabled' : ''}>${mid}</fieldset><span class="grow"></span><button class="pso-btn" data-act="cd-tracklist" title="Rewrite the tracklist text from this project's current songs. Fonts, colors and positions stay the same.">${ico('list', 14)} Update tracklist</button>${viewCtl}`
     + (UI.canDl ? `<button class="pso-btn primary" data-act="cd-exportmenu" aria-haspopup="menu" title="Print files, 3D model or a picture">${ico('save', 14)} Export ${ico('down', 12)}</button>` : '');
 }
@@ -3666,6 +3666,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.6', d: '2026-11-16', items: ['CD Creator 3D view: Open/Close case, Remove/Put back disc and Reset view buttons are back in the top bar.'] },
   { v: '1.16.5', d: '2026-11-16', items: ['CD viewer and Store pages: the case always starts closed and slowly turning.'] },
   { v: '1.16.4', d: '2026-11-16', items: ['Fix: the developer account can claim reserved usernames for itself.'] },
   { v: '1.16.3', d: '2026-11-16', items: ['Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).', 'Settings › Profile: change your picture and roles.'] },

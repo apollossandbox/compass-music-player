@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.6 · 2026-11-16
+
+- CD Creator 3D view: Open/Close case, Remove/Put back disc and Reset view buttons are back in the top bar.
+
 ## 1.16.5 · 2026-11-16
 
 - CD viewer and Store pages: the case always starts closed and slowly turning.
