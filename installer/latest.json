@@ -1,11 +1,20 @@
 {
-  "version": "1.14.1",
+  "version": "1.15.0",
   "file": "Compass-Setup.exe",
-  "size": 82255996,
-  "sha256": "10b7e663c2a0d1332879420587f92acf33e432aae0cf73261ba1c25a576bff83",
-  "notes": "CD100 template set (booklet, tray card, disc) with the printer's guides and print sizes. New CDs use it; existing CDs keep Classic and can switch. 1.14.0 case look rolled back.",
+  "size": 84905262,
+  "sha256": "aee278509247f61139118b8c20e8a267bc2c4393bb7ed73892d01ab49e8aa088",
+  "notes": "Verified albums with a green seal, Verified/Local filters, and sxteen ways – Movie free in the Store.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.15.0",
+      "d": "2026-11-16",
+      "items": [
+        "Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.",
+        "Digital albums: filter All, Verified or Local.",
+        "Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album."
+      ]
+    },
     {
       "v": "1.14.1",
       "d": "2026-11-16",
@@ -148,13 +157,6 @@
       "d": "2026-11-15",
       "items": [
         "Artist page is more compact: most played songs on the left (title only), projects and albums in a column on the right."
-      ]
-    },
-    {
-      "v": "1.11.5",
-      "d": "2026-11-15",
-      "items": [
-        "Logo: the W is gone. Compass is the disc on its own, in the app and as the Windows icon."
       ]
     }
   ]

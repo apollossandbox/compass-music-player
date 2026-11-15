@@ -2,6 +2,12 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.15.0 · 2026-11-16
+
+- Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.
+- Digital albums: filter All, Verified or Local.
+- Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album.
+
 ## 1.14.1 · 2026-11-16
 
 - CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.
