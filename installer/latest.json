@@ -1,11 +1,18 @@
 {
-  "version": "1.16.1",
+  "version": "1.16.2",
   "file": "Compass-Setup.exe",
-  "size": 84915646,
-  "sha256": "fdd593795a131bdcad04464935dce5804b86d41773a81f857a35716aab35cf96",
-  "notes": "Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.",
+  "size": 84917012,
+  "sha256": "e078f59d8cd48347b36468e4f212e98bbba07c0e16669615f636f5359ed73808",
+  "notes": "Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.2",
+      "d": "2026-11-16",
+      "items": [
+        "Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account."
+      ]
+    },
     {
       "v": "1.16.1",
       "d": "2026-11-16",
@@ -156,17 +163,10 @@
       "items": [
         "Sidebar: the Compass logo next to Music Player, in Arial bold."
       ]
-    },
-    {
-      "v": "1.12.3",
-      "d": "2026-11-16",
-      "items": [
-        "New name: Compass Music Player. The sidebar shows the Compass logo with Music Player."
-      ]
     }
   ],
   "live": {
-    "shell": "4207d6364859fc67",
+    "shell": "14334aaf0f9b8c0d",
     "files": [
       {
         "p": "icon.png",
@@ -175,8 +175,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "13695ff731713e6426ba533296f1d856a31a2936ebd6d50ec551b09ed1a78eb1",
-        "size": 684741
+        "sha256": "2082ec2a20b059d9162fca4035c6c377605664751769c84806275c246c7c292e",
+        "size": 687178
       },
       {
         "p": "lib/GLTFExporter.js",

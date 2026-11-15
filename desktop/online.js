@@ -88,7 +88,7 @@ function status() { const cfg = config(); return { available: !!cfg, signedIn: !
 
 /* Profile in Firestore: users/<uid> with plain string fields */
 const docUrl = () => `${URLS.firestore}/projects/${encodeURIComponent(config().firebaseProjectId)}/databases/(default)/documents/users/${encodeURIComponent(S.uid)}`;
-const PROFILE_KEYS = ['artist', 'name', 'email', 'photo', 'updated'];
+const PROFILE_KEYS = ['artist', 'name', 'email', 'photo', 'updated', 'username'];
 async function getProfile() {
   const r = await fetch(docUrl(), { headers: { Authorization: 'Bearer ' + await idToken() } });
   if (r.status === 404) return null; const j = await r.json(); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status);
@@ -108,6 +108,18 @@ async function saveLibrary(manifest, counts, app) {
   const r = await fetch(url, { method: 'PATCH', headers: { Authorization: 'Bearer ' + await idToken(), 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) });
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return fields.updated.stringValue;
 }
+/* Usernames: usernames/<name> = { uid, at }. Creating the document claims the name; Firestore refuses a name that exists. */
+const RESERVED = ['sxteenways', 'jesse', 'alexis', 'dris', 'idris', 'akon', 'west', 'young', 'youngwade', 'sxteen', 'ways', 'thedarkknight', 'walid', 'chrome', 'chromehendrixx', 'cpayne', 'collumm', 'tamed', 'trulytamed', 'aiden', 'johnny', 'lucian', 'bandit', 'sweater', 'angel', 'jayden', 'jay', '16', 'compass', 'admin', 'support', 'help', 'official', 'store', 'marketplace'];
+const nameUrl = n => `${URLS.firestore}/projects/${encodeURIComponent(config().firebaseProjectId)}/databases/(default)/documents/usernames/${encodeURIComponent(n)}`;
+const cleanName = n => String(n || '').trim().replace(/^@+/, '').toLowerCase();
+async function claimName(raw, forUid) {
+  const n = cleanName(raw); if (!/^[a-z0-9_.]{2,20}$/.test(n)) throw new Error('Use 2 to 20 letters, numbers, _ or .');
+  if (!forUid && RESERVED.includes(n)) throw new Error('@' + n + ' is reserved');
+  const base = nameUrl('').replace(/\/$/, ''), url = `${base.slice(0, base.lastIndexOf('/'))}/usernames?documentId=${encodeURIComponent(n)}`;
+  const r = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + await idToken(), 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { uid: { stringValue: forUid || S.uid }, at: { stringValue: new Date().toISOString() } } }) });
+  const j = await r.json().catch(() => ({})); if (r.status === 409) throw new Error('@' + n + ' is taken'); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return n;
+}
+async function releaseName(raw) { const r = await fetch(nameUrl(cleanName(raw)), { method: 'DELETE', headers: { Authorization: 'Bearer ' + await idToken() } }); if (!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status); }
 function register(ipcMain) {
   loadSession();
   const wrap = f => async (...a) => { try { return { ok: true, ...(await f(...a)) }; } catch (e) { return { ok: false, error: String(e && e.message || e) }; } };
@@ -116,6 +128,8 @@ function register(ipcMain) {
   ipcMain.handle('tp-acct-signout', () => signOut());
   ipcMain.handle('tp-acct-profile', wrap(async () => ({ profile: await getProfile() })));
   ipcMain.handle('tp-acct-save', wrap(async (e, p) => ({ saved: await saveProfile(p) })));
+  ipcMain.handle('tp-acct-username', wrap(async (e, name, old) => { if (!S) throw new Error('Not signed in'); const n = await claimName(name); if (old && cleanName(old) !== n) await releaseName(old).catch(() => {}); await saveProfile({ username: n }); return { username: n }; }));
+  ipcMain.handle('tp-acct-award', wrap(async (e, name, uid) => { if (!S) throw new Error('Not signed in'); if (!/^[A-Za-z0-9]{10,64}$/.test(String(uid || ''))) throw new Error('Paste their account ID'); return { username: await claimName(name, uid) }; }));
   ipcMain.handle('tp-acct-library', wrap(async (e, m, c, v) => { if (!S) throw new Error('Not signed in'); return { at: await saveLibrary(m, c, v) }; }));
 }
 module.exports = { register };

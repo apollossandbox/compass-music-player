@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.2 · 2026-11-16
+
+- Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.
+
 ## 1.16.1 · 2026-11-16
 
 - Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.

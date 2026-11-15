@@ -1,10 +1,26 @@
 rules_version = '2';
-// Compass: each signed-in person can read and write only their own profile and their own library list.
+// Compass: each signed-in person reads and writes only their own profile and library list.
+// Usernames: usernames/<name> = { uid, at }. One document per name, so a name can only be held once.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // the developer account: can award reserved names and take names back
+    function isDev() { return request.auth != null && request.auth.token.email == 'sxteenways@gmail.com' && request.auth.token.email_verified == true; }
+    function reserved(n) {
+      return n in ['sxteenways', 'jesse', 'alexis', 'dris', 'idris', 'akon', 'west', 'young', 'youngwade', 'sxteen', 'ways', 'thedarkknight', 'walid',
+        'chrome', 'chromehendrixx', 'cpayne', 'collumm', 'tamed', 'trulytamed', 'aiden', 'johnny', 'lucian', 'bandit', 'sweater', 'angel', 'jayden', 'jay', '16',
+        'compass', 'admin', 'support', 'help', 'official', 'store', 'marketplace'];
+    }
+    match /usernames/{name} {
+      allow read: if true;
+      allow create: if request.auth != null && name.matches('^[a-z0-9_.]{2,20}$')
+        && request.resource.data.keys().hasOnly(['uid', 'at']) && request.resource.data.uid is string
+        && ((request.resource.data.uid == request.auth.uid && !reserved(name)) || isDev());
+      allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || isDev());
+      allow update: if false;
+    }
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid
-        && (request.resource == null || request.resource.data.keys().hasOnly(['artist', 'name', 'email', 'photo', 'updated']));
+        && (request.resource == null || request.resource.data.keys().hasOnly(['artist', 'name', 'email', 'photo', 'updated', 'username']));
       // the library list: what is in this person's Compass (no audio), saved as one JSON text field
       match /library/{doc} {
         allow read, write: if request.auth != null && request.auth.uid == uid

@@ -3665,6 +3665,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.2', d: '2026-11-16', items: ['Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.'] },
   { v: '1.16.1', d: '2026-11-16', items: ['Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.'] },
   { v: '1.16.0', d: '2026-11-16', items: ['Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.'] },
   { v: '1.15.3', d: '2026-11-16', items: ['CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column.', 'CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer.', 'Library search also finds projects and albums inside folders.', 'Settings: Recently deleted shows five items, with Show all.'] },
@@ -4074,12 +4075,13 @@ function modsSettingsHTML() {
 }
 /* ---------- account (online phase 1): Google sign-in, profile synced to the cloud ---------- */
 UI.acct = null;
-async function acctLoad() { if (!(window.tpDesktop && tpDesktop.account)) return; try { UI.acct = await tpDesktop.account.status(); } catch (e) { UI.acct = null; } if (S.view === 'settings') renderMain(); }
+async function acctLoad() { if (!(window.tpDesktop && tpDesktop.account)) return; try { UI.acct = await tpDesktop.account.status(); } catch (e) { UI.acct = null; } if (UI.acct && UI.acct.signedIn && !UI.acctProfile) { try { const r = await tpDesktop.account.profile(); if (r && r.ok) UI.acctProfile = r.profile || {}; } catch (e) {} } if (S.view === 'settings') renderMain(); }
 const myArtist = () => (S.concept.artist && S.concept.artist !== 'Artist Name' ? S.concept.artist.trim() : '');
 async function acctSignIn() {
   toast('Finish signing in in your browser…'); UI.acctBusy = true; if (S.view === 'settings') renderMain();
   const r = await tpDesktop.account.signIn(); UI.acctBusy = false;
   if (!r || !r.ok) { toast("Couldn't sign in: " + ((r && r.error) || 'unknown error')); return acctLoad(); }
+  UI.acctProfile = r.profile || {}; if (!UI.acctProfile.username) setTimeout(() => { S.view = 'settings'; refresh(); toast('Pick your username to finish setting up'); const i = $('#acct-name'); if (i) i.focus(); }, 600);
   const remote = r.profile && r.profile.artist;
   if (remote && !myArtist()) { S.concept.artist = remote; save(); } else if (myArtist() && myArtist() !== remote) acctPush();
   toast('Signed in as ' + (r.name || r.email)); await acctLoad(); acctLibSync(true);
@@ -4099,10 +4101,20 @@ function acctLibSync(now) {
     const r = await tpDesktop.account.library(JSON.stringify(m), c, APP_VERSION); if (r && r.ok) { S.acctLib = { at: r.at, counts: c }; save(); } else if (now) toast("Couldn't save your library list: " + ((r && r.error) || 'unknown error'));
     if (now && r && r.ok) toast('Library list saved to your account'); if (S.view === 'settings') renderMain(); }, now ? 0 : 60000);
 }
+/* usernames: picked once you sign in; reserved ones are awarded from the developer account */
+const DEV_EMAIL = 'sxteenways@gmail.com';
+function acctNameRows(A) {
+  const P = UI.acctProfile || {}, u = P.username;
+  let h = setRow('Username', u ? `<b>@${esc(u)}</b> · how people find and invite you.` : 'Pick the name people find you by. 2 to 20 letters, numbers, _ or .',
+    `<div class="crow"><input class="field" id="acct-name" placeholder="${u ? 'New username' : 'username'}" autocomplete="off" style="width:160px"><button class="btn sm ${u ? '' : 'primary'}" data-act="acct-name">${u ? 'Change' : 'Claim'}</button></div>`);
+  h += setRow('Account ID', 'Give this to the developer if you were promised a reserved name.', `<code class="faint small" style="user-select:all">${esc(A.uid || '')}</code>`);
+  if ((A.email || '').toLowerCase() === DEV_EMAIL) h += setRow('Award a reserved name', 'Developer account. Paste the person’s account ID.', `<div class="crow"><input class="field" id="aw-name" placeholder="name" style="width:110px"><input class="field" id="aw-uid" placeholder="account ID" style="width:200px"><button class="btn sm" data-act="acct-award">Award</button></div>`);
+  return h;
+}
 function acctRowHTML() {
   const A = UI.acct; if (!A || !A.available) return '';
   if (!A.signedIn) return setRow('Account', 'Sign in to keep your profile in the cloud. More online features build on this.', `<button class="btn sm" data-act="acct-in" ${UI.acctBusy ? 'disabled' : ''}>${UI.acctBusy ? 'Waiting for the browser…' : 'Sign in with Google'}</button>`);
-  const L = S.acctLib; return setRow('Library in your account', L ? `${esc(L.counts)} · saved ${new Date(L.at).toLocaleString()}. A list of what you have, not the audio.` : 'Not saved yet.', `<button class="btn sm" data-act="acct-lib">Save now</button>`) + setRow('Account', `${esc(A.name || '')}${A.name && A.email ? ' · ' : ''}${esc(A.email || '')}`, `<div class="crow">${A.photo ? `<img class="acct-pic" src="${esc(A.photo)}" alt="" referrerpolicy="no-referrer">` : ''}<button class="btn sm" data-act="acct-out">Sign out</button></div>`);
+  const L = S.acctLib; return acctNameRows(A) + setRow('Library in your account', L ? `${esc(L.counts)} · saved ${new Date(L.at).toLocaleString()}. A list of what you have, not the audio.` : 'Not saved yet.', `<button class="btn sm" data-act="acct-lib">Save now</button>`) + setRow('Account', `${esc(A.name || '')}${A.name && A.email ? ' · ' : ''}${esc(A.email || '')}`, `<div class="crow">${A.photo ? `<img class="acct-pic" src="${esc(A.photo)}" alt="" referrerpolicy="no-referrer">` : ''}<button class="btn sm" data-act="acct-out">Sign out</button></div>`);
 }
 const setRow = (title, desc, control) => `<div class="set-row"><div class="set-txt"><b>${title}</b>${desc ? `<span>${desc}</span>` : ''}</div><div class="set-ctl">${control}</div></div>`;
 function renderSettings(m) {
@@ -4783,6 +4795,8 @@ function act(a, el, e) {
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
     case 'acct-lib': acctLibSync(true); break;
+    case 'acct-name': { const v = ($('#acct-name') || {}).value || ''; tpDesktop.account.username(v, (UI.acctProfile || {}).username).then(r => { if (!r || !r.ok) return toast((r && r.error) || "Couldn't claim that name"); UI.acctProfile = { ...(UI.acctProfile || {}), username: r.username }; toast('You are @' + r.username); renderMain(); }); break; }
+    case 'acct-award': { const n = ($('#aw-name') || {}).value || '', id = (($('#aw-uid') || {}).value || '').trim(); tpDesktop.account.award(n, id).then(r => toast(r && r.ok ? '@' + r.username + ' awarded' : (r && r.error) || "Couldn't award that name")); break; }
     case 'trash-more': UI.trashAll = !UI.trashAll; renderMain(); break;
     case 'recover': recoverOffer(false); break;
     case 'mine-f': S.mineF = k; save(); renderMain(); break;
