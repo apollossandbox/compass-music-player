@@ -2,6 +2,13 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.15.3 · 2026-11-16
+
+- CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column.
+- CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer.
+- Library search also finds projects and albums inside folders.
+- Settings: Recently deleted shows five items, with Show all.
+
 ## 1.15.2 · 2026-11-16
 
 - Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon.

@@ -1,11 +1,21 @@
 {
-  "version": "1.15.2",
+  "version": "1.15.3",
   "file": "Compass-Setup.exe",
-  "size": 84911582,
-  "sha256": "b1d057aae7a544e305df1e7708549f6c8d99b7fd020111bbd5e946de8b512721",
-  "notes": "Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon. Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default). Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json. Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year. CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal. Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer.",
+  "size": 84914444,
+  "sha256": "d7823af77b67c4462efb503dc823f291d52ded432194c385adb2827cd4599799",
+  "notes": "CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column. CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer. Library search also finds projects and albums inside folders. Settings: Recently deleted shows five items, with Show all.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.15.3",
+      "d": "2026-11-16",
+      "items": [
+        "CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column.",
+        "CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer.",
+        "Library search also finds projects and albums inside folders.",
+        "Settings: Recently deleted shows five items, with Show all."
+      ]
+    },
     {
       "v": "1.15.2",
       "d": "2026-11-16",
@@ -153,16 +163,6 @@
       "items": [
         "Fixed: the Artists tab was covered by a grey box when an artist had a project without a cover."
       ]
-    },
-    {
-      "v": "1.12.0",
-      "d": "2026-11-16",
-      "items": [
-        "Library has an Archive tab. Archived projects are saved as they were and can't be edited; right-click one and choose New version to keep working on a copy.",
-        "Albums you own: a $ button on the album page sells it (when the artist allows resale). Lending moved into Share.",
-        "A lent album stays in your library with who has it and how long is left. Right-click it (or its ⋯) for Cancel lending or Adjust lending time.",
-        "Second-hand albums are now in the Marketplace instead of the Music Store."
-      ]
     }
   ],
   "live": {
@@ -175,8 +175,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "a4586c63931c243574047accb3914ebd0c5a09c5b65a3eac815e1007419b26e4",
-        "size": 674577
+        "sha256": "915222f47ccfeeabe9f4fed9cc25000998fef0c8d59b7301bedee1a3537de9be",
+        "size": 682383
       },
       {
         "p": "lib/GLTFExporter.js",

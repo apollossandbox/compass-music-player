@@ -959,6 +959,8 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 /* CD viewer */
 .viewer { position: fixed; inset: 0; z-index: 72; background: #0a0a0b; color: #eee; opacity: 0; visibility: hidden; transition: opacity .45s var(--ease2), visibility 0s .45s; font-family: var(--f); }
 .viewer.open { opacity: 1; visibility: visible; transition: opacity .45s var(--ease2), visibility 0s; }
+.vw-bgl { position: absolute; inset: 0; background-size: cover; background-position: center; } .viewer { overflow: hidden; }
+.viewer.vw-light { color: #111; } .viewer.vw-light .vw-hint { color: rgba(0,0,0,.6); } .viewer.vw-light .vw-title small { color: rgba(0,0,0,.65); }
 .vw-stage { position: absolute; inset: 0; } .vw-stage canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 .vw-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(16px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 16px max(20px, env(safe-area-inset-left, 0px)); pointer-events: none; }
 .vw-top > * { pointer-events: auto; }
@@ -1111,6 +1113,7 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 <div class="scrim" id="scrim" data-act="close-modal"></div>
 <section class="modal glass" id="modal" role="dialog" aria-modal="true" inert></section>
 <section class="viewer" id="viewer" aria-label="CD viewer" inert>
+  <div class="vw-bgl" id="vwbg" aria-hidden="true"></div>
   <div class="vw-stage" id="vwstage"></div>
   <header class="vw-top"><div class="vw-title" id="vwtitle"></div><button class="vw-x" data-act="vw-close" aria-label="Close viewer">Close <kbd>Esc</kbd></button></header>
   <div class="vw-bar" id="vwbar"></div>
@@ -1126,6 +1129,7 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 <input type="file" id="mcoverfile" accept="image/*" hidden>
 <input type="file" id="zipfile" accept=".zip,application/zip" multiple hidden>
 <input type="file" id="artimg" accept="image/*" hidden>
+<input type="file" id="vwbgfile" accept="image/*" hidden>
 <input type="file" id="logofile" accept="image/*" hidden>
 <input type="file" id="replaudio" accept="audio/*,.mp3,.wav,.flac,.m4a,.ogg,.opus,.aif,.aiff" hidden>
 <input type="file" id="replimg" accept="image/*" hidden>
@@ -1684,7 +1688,7 @@ LIBVIEWS.stats = () => {
 };
 const isVerified = c => ['owned', 'onloan', 'borrowed'].includes(Ledger.access(c).state);
 function libMine() {
-  const all = S.cols.filter(c => isMine(c) && shown(c)), f = S.mineF || 'all', a = libSorted(f === 'verified' ? all.filter(isVerified) : f === 'local' ? all.filter(c => !isVerified(c)) : all);
+  const all = S.cols.filter(c => isMine(c) && (S.libQ ? !c.archived : shown(c))), f = S.mineF || 'all', a = libSorted(f === 'verified' ? all.filter(isVerified) : f === 'local' ? all.filter(c => !isVerified(c)) : all);
   return `${S.libQ && !a.length ? libNone() : ''}
   <div class="pgrid">${a.map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="zip-mine" style="--n:${a.length}" aria-label="Add a digital album"><div class="acard-art"><span class="acard-ph plus">${ico('import', 34)}</span></div><div class="acard-t">Add album</div><div class="acard-s">Drop a .zip</div></div></div>
 `;
@@ -1719,7 +1723,7 @@ function renderLibrary(m) {
   ${S.libTab === 'mine' ? (() => { const all = S.cols.filter(c => isMine(c) && shown(c)), nv = all.filter(isVerified).length, f = S.mineF || 'all'; return `<label class="sel box mine-filter" title="Verified: from the Store, the Marketplace or your own releases. Local: files you added."><span class="faint">Filter</span><select id="mine-f" aria-label="Filter digital albums"><option value="all" ${f === 'all' ? 'selected' : ''}>All (${all.length})</option><option value="verified" ${f === 'verified' ? 'selected' : ''}>Verified (${nv})</option><option value="local" ${f === 'local' ? 'selected' : ''}>Local (${all.length - nv})</option></select></label>`; })() : ''}${['projects', 'mine', 'archived'].includes(S.libTab) ? '</div>' : ''}
   ${S.libTab !== 'tracks' ? '' : `<label class="search box">${ico('search', 16)}<input id="q" type="search" placeholder="Search songs" value="${esc(S.q)}" autocomplete="off"></label>
     <label class="sel box"><span class="faint">Sort</span><select id="sort"><option value="added">Recently added</option><option value="title">Title</option><option value="artist">Artist</option><option value="status">Status</option><option value="bpm">Tempo</option></select></label>`}</div>
-  ${S.libTab === 'mine' ? libMine() : S.libTab === 'archived' ? libArchived() : LIBVIEWS[S.libTab] ? LIBVIEWS[S.libTab]() : projects ? `${libNone()}<div class="pgrid">${libSorted(S.cols.filter(c => !isMine(c) && shown(c))).map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="newcol" style="--n:${S.cols.length}" aria-label="New project"><div class="acard-art"><span class="acard-ph plus">${ico('plus', 34)}</span></div><div class="acard-t">New project</div></div></div>${S.cols.some(c => c.archived && !isMine(c)) ? `<button class="btn sm lib-arch" data-act="libtab" data-k="archived">Archived (${S.cols.filter(c => c.archived && !isMine(c)).length})</button>` : ''}`
+  ${S.libTab === 'mine' ? libMine() : S.libTab === 'archived' ? libArchived() : LIBVIEWS[S.libTab] ? LIBVIEWS[S.libTab]() : projects ? `${libNone()}<div class="pgrid">${libSorted(S.cols.filter(c => !isMine(c) && (S.libQ ? !c.archived : shown(c)))).map(projCard).join('')}<div class="acard acard-new" role="button" tabindex="0" data-act="newcol" style="--n:${S.cols.length}" aria-label="New project"><div class="acard-art"><span class="acard-ph plus">${ico('plus', 34)}</span></div><div class="acard-t">New project</div></div></div>${S.cols.some(c => c.archived && !isMine(c)) ? `<button class="btn sm lib-arch" data-act="libtab" data-k="archived">Archived (${S.cols.filter(c => c.archived && !isMine(c)).length})</button>` : ''}`
     : `<div class="tools"><div class="chips">${['all', ...Object.keys(ST)].map(k => `<button class="chip ${S.filter === k ? 'on' : ''}" data-act="filter" data-k="${k}">${k === 'all' ? 'All' : ST[k]} <em>${counts[k]}</em></button>`).join('')}</div></div>${colhead}<div id="list" class="list"></div>`}`;
   const so = $('#sort'); if (so) so.value = S.sort;
 }
@@ -2425,7 +2429,7 @@ function init3D() {
     const rim = new T3.DirectionalLight(0xdfe8ff, .7); rim.position.set(-12, 6, -10); studio.add(rim);
     const key = new T3.SpotLight(0xffffff, .9, 0, .5, .6); key.position.set(10, 22, 18); studio.add(key);
     const tex = {}; Object.keys(SHEETS).filter(k => !SHEETS[k].strip).forEach(k => { const sh = SHEETS[k], cv = document.createElement('canvas'); cv.width = Math.round((sh.w + 2 * BLEED) * TEXMM); cv.height = Math.round((sh.h + 2 * BLEED) * TEXMM); const t = new T3.CanvasTexture(cv); t.encoding = T3.sRGBEncoding; t.anisotropy = r.capabilities.getMaxAnisotropy(); tex[k] = { cv, tex: t }; });
-    C3 = { r, scene, cam, root, tex, studio, shadow, bgTex, rx: 0, ry: 0, tx: 0, ty: 0, z: 44, tz: 44, lidA: 0, discA: 0, ray: new T3.Raycaster(), ndc: new T3.Vector2(), print: [], occ: [] };
+    C3 = { r, scene, cam, root, tex, studio, shadow, bgTex, pm, env0: scene.environment, rx: 0, ry: 0, tx: 0, ty: 0, z: 44, tz: 44, lidA: 0, discA: 0, ray: new T3.Raycaster(), ndc: new T3.Vector2(), print: [], occ: [] };
     const cv = r.domElement; cv.className = 'cd3d';
     cv.addEventListener('pointerdown', e => {
       if (e.button === 2) return;
@@ -2485,8 +2489,14 @@ function buildCase() {
     const tin = add(uvRemap(new T3.PlaneGeometry(bw, th), ...sub('trayIn', 0, SHEETS.trayIn.w)), printM('trayIn'), 0, 0, .108, root); tin.userData.sheet = 'trayIn'; C3.print.push(tin);
     const ls = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', 0, sp)), printM('tray'), W / 2 - .11, 0, .104 + sd / 2, root); ls.rotation.y = Math.PI / 2;
     const rs = add(uvRemap(new T3.PlaneGeometry(sd, th), ...sub('tray', sh.w - sp, sh.w)), printM('tray'), -W / 2 + .11, 0, .104 + sd / 2, root); rs.rotation.y = -Math.PI / 2;
+    // the tray card is one sheet: its inside print carries over each fold, so the inner face of each spine shows that art (seen through the spine column)
+    const tiw = SHEETS.trayIn.w, inner = (x0, x1, px, ry) => { const r = sub('trayIn', x0, x1), q = add(uvRemap(new T3.PlaneGeometry(sd, th), r[1], r[0], r[2], r[3]), printM('trayIn'), px, 0, .104 + sd / 2, root); q.rotation.y = ry; return q; };
+    inner(0, sp, -W / 2 + .12, Math.PI / 2); inner(tiw - sp, tiw, W / 2 - .12, -Math.PI / 2);
     back.userData.sheet = 'tray'; ls.userData.sheet = 'spineL'; rs.userData.sheet = 'spineR'; ls.userData.strip = 'L'; rs.userData.strip = 'R'; C3.print.push(back, ls, rs);
-    const tp = box(W - .5, H - .5, .06, trayM, 0, 0, .66, root, !black); if (black) C3.occ.push(tp);
+    const thick = new T3.MeshPhysicalMaterial({ color: lightUI ? 0xbfc8d2 : 0xe8eef6, metalness: 0, roughness: .12, transparent: true, opacity: lightUI ? .22 : .16, clearcoat: 1, clearcoatRoughness: .05, side: T3.DoubleSide, depthWrite: false });
+    box(.09, H - .34, T * .88, thick, -W / 2 + .66, 0, T * .46); // inner spine wall
+    [1, -1].forEach(sy => box(.66, .82, T * .97, thick, -W / 2 + .33, sy * (H / 2 - .41), T * .49)); // hinge blocks
+    const tp = box(W - 1.02, H - .5, .06, trayM, .26, 0, .66, root, !black); if (black) C3.occ.push(tp);
     const hub = add(new T3.CylinderGeometry(.72, .82, .16, 48), trayM, cdFmt(cdCol()) === 'cd100' ? T100.discOff / 10 : 0, 0, .74, root, !black); hub.rotation.x = Math.PI / 2;
   } else {
     const tp = box(W - .3, H - .3, .05, trayM, 0, 0, .13, root, !black); if (black) C3.occ.push(tp);
@@ -2508,7 +2518,7 @@ function buildCase() {
   const lid = new T3.Group(); lid.position.set(-W / 2, 0, T); root.add(lid); C3.lid = lid;
   box(W, H, .1, clear, W / 2, 0, -.05, lid);
   box(W - 1.4, .1, Math.min(.32, T * .5), clear, W / 2 + .7, H / 2 - .05, -.2, lid); box(W - 1.4, .1, Math.min(.32, T * .5), clear, W / 2 + .7, -H / 2 + .05, -.2, lid);
-  [H / 2 - 1.1, -H / 2 + 1.1].forEach(y => add(new T3.CylinderGeometry(.16, .16, 1.5, 24), clear, .02, y, -.16, lid, true));
+  [H / 2 - .41, -H / 2 + .41].forEach(y => add(new T3.CylinderGeometry(.15, .15, .8, 24), clear, .02, y, -.16, lid, true));
   [[W - .35, 3.5], [W - .35, -3.5]].forEach(([x, y]) => box(.25, 1.2, .12, clear, x, y, -.16, lid));
   const bs = SHEETS.front.w / 10;
   const bf = add(uvRemap(new T3.PlaneGeometry(bs, bs), ...sub('front', 0, SHEETS.front.w)), printM('front'), W / 2 + .45, 0, -.115, lid); bf.userData.sheet = 'front';
@@ -2530,7 +2540,7 @@ function loop3D() {
   /* when the disc is out, pull back and pan right so the case and the disc both fit */
   const dOut = discOnly ? 0 : ease(Math.min(1, Math.max(0, C3.discA))), lOut = discOnly ? 0 : ease(Math.min(1, Math.max(0, C3.lidA))), pan = dOut * 6.5 - lOut * 2.5, back = dOut * 16 + lOut * 8;
   if (V) { C3.cam.position.set(pan, 0, (C3.z + back) * (w < 520 ? 1.5 : 1)); C3.cam.lookAt(pan, 0, 0); } else { C3.cam.position.set(pan, 0, (C3.z + back) * (w < 520 ? 1.35 : 1)); C3.cam.lookAt(pan, 0, 0); }
-  C3.studio.visible = !!V; C3.scene.background = V ? C3.bgTex : null;
+  const cb = !!(V && (S.cd.vwBg || {}).kind); C3.studio.visible = !!V; if (C3.studio.children[0]) C3.studio.children[0].visible = !cb; C3.scene.background = V && !cb ? C3.bgTex : null; // a custom background shows through from the page
   C3.root.children.forEach(o => { o.visible = !discOnly || o === C3.disc; });
   C3.lidA += ((S.cd.open || S.cd.discOut ? 1 : 0) - C3.lidA) * .09; C3.lid.rotation.y = -1.95 * ease(Math.min(1, Math.max(0, C3.lidA)));
   C3.discA += ((S.cd.discOut && C3.lidA > .6 ? 1 : 0) - C3.discA) * .08; const da = ease(Math.min(1, Math.max(0, C3.discA)));
@@ -2547,14 +2557,14 @@ function openViewer(mode = 'case') {
   UI.vw = { mode, auto: !!S.cd.vwAuto, spin: true, saved: { tx: C3.tx, ty: C3.ty, tz: C3.tz, open: S.cd.open, disc: S.cd.discOut } };
   C3.tx = 0; C3.ty = 0; C3.tz = mode === 'disc' ? 34 : 42; C3.rx = 0; C3.ry = 0;
   const v = $('#viewer'); $('#vwstage').appendChild(g.r.domElement); C3.w = 0; buildCase();
-  v.inert = false; v.classList.add('open'); renderViewerBar();
+  v.inert = false; v.classList.add('open'); renderViewerBar(); vwBg();
   { const d = design(c), ls = Object.values(d).flatMap(sd => (sd && sd.layers) || []); ls.filter(l => l.type === 'img').forEach(l => getImg(l.src)); waitFonts(ls).then(() => { if (UI.vw) cdPaintTex(); }); }
   vwTitle();
   if (!g.running) { g.running = true; requestAnimationFrame(loop3D); }
 }
 function viewerFor(id, opts = {}) {
   const c = col(id); if (!c) return; UI.vwList = opts.list || UI.vwList || cdList().map(x => x.id);
-  if (UI.vw) { UI.vwCol = id; S.cd.colId = id; buildCase(); vwTitle(); renderVwList(); } else { UI.vwCol = id; S.cd.colId = id; openViewer('case'); }
+  if (UI.vw) { UI.vwCol = id; S.cd.colId = id; buildCase(); vwTitle(); renderVwList(); vwBg(); } else { UI.vwCol = id; S.cd.colId = id; openViewer('case'); }
   if (opts.store) { UI.vw.store = { price: c.release && c.release.cd }; UI.vw.auto = true; UI.vw.list = true; renderViewerBar(); renderVwList(); }
   if (opts.play) { UI.vw.auto = true; UI.vw.playing = true; const ts = colTracks(c); if (ts.length) { if (S.playing && c.tracks.includes(S.cur)) S.queue = ts.map(t => t.id); else playTrack(ts[0].id, ts.map(t => t.id)); } renderViewerBar(); }
   { const d = design(c), ls = Object.values(d).flatMap(sd => (sd && sd.layers) || []); ls.filter(l => l.type === 'img').forEach(l => getImg(l.src)); waitFonts(ls).then(() => { if (UI.vw) cdPaintTex(); }); }
@@ -2574,10 +2584,44 @@ function storePreview(id) {
 function vwTrack(k) { if (UI.vw && UI.vw.store) { const c = cdCol(), ts = colTracks(c), i = ts.findIndex(t => t.id === S.cur), n = ts[i < 0 ? 0 : (i + k + ts.length) % ts.length]; if (n) storePreview(n.id); return; } const c = cdCol(); if (!c) return; const ts = colTracks(c), i = ts.findIndex(t => t.id === S.cur), n = ts[i < 0 ? 0 : (i + k + ts.length) % ts.length]; if (n) { playTrack(n.id, ts.map(t => t.id)); if (UI.vw) UI.vw.playing = true; renderViewerBar(); renderVwList(); } }
 function vwHelp() { toast('Space play · ←/→ song · [ ] CD · O open · D disc · A spin · -/= speed · R reset · L songs · H hide · V video · Esc close'); }
 function closeViewer() {
-  if (!UI.vw) return; if (UI.vw.store) { clearTimeout(UI.prevT); if (S.playing) toggle(); } const sv = UI.vw.saved; UI.vw = null; UI.vwCol = null; $('#viewer').classList.remove('bare'); const vl = $('#vwlist'); if (vl) vl.hidden = true;
+  if (!UI.vw) return; if (UI.vw.store) { clearTimeout(UI.prevT); if (S.playing) toggle(); } const sv = UI.vw.saved; UI.vw = null; UI.vwCol = null; vwEnv(); $('#viewer').classList.remove('bare'); const vl = $('#vwlist'); if (vl) vl.hidden = true;
   const v = $('#viewer'); v.classList.remove('open'); v.inert = true;
   if (C3) { C3.tx = sv.tx; C3.ty = sv.ty; C3.tz = sv.tz; S.cd.open = sv.open; S.cd.discOut = sv.disc; C3.r.domElement.remove(); C3.w = 0; buildCase(); }
   refresh();
+}
+/* CD viewer background: Dark (default), Light, the album's colours, its cover blurred, any colour, or your own image */
+const VW_BGS = [['', 'Dark'], ['light', 'Light'], ['colors', 'Album colors'], ['cover', 'Blurred cover']];
+const lightHex = h => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return false; const n = parseInt(m[1], 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 150; };
+function vwBg() {
+  const el = $('#vwbg'), v = $('#viewer'); if (!el || !v) return; const B = S.cd.vwBg || {}, c = cdCol(), st = el.style; st.cssText = ''; let light = false;
+  if (B.kind === 'light') { st.background = '#f1f1ee'; light = true; }
+  else if (B.kind === 'color' && /^#[0-9a-f]{6}$/i.test(B.color || '')) { st.background = B.color; light = lightHex(B.color); }
+  else if (B.kind === 'colors' && c) { const k = pcolors(c); st.background = `radial-gradient(110% 90% at 25% 15%, ${k[0]}, transparent 62%), radial-gradient(110% 90% at 80% 90%, ${k[1] || k[0]}, transparent 62%), #0a0a0b`; }
+  else if (B.kind === 'cover' && c && artFull(c)) { st.backgroundImage = `url("${artFull(c)}")`; st.filter = 'blur(46px) brightness(.5) saturate(1.25)'; st.transform = 'scale(1.18)'; }
+  else if (B.kind === 'image' && srcs.vwbg) st.backgroundImage = `url("${srcs.vwbg}")`;
+  v.classList.toggle('vw-light', light); vwEnv();
+}
+function vwEnv() {
+  if (!C3 || !C3.pm) return; const B = S.cd.vwBg || {}, c = cdCol(), T3 = THREE, W = 1024, H = 512, tok = vwEnv.tok = (vwEnv.tok || 0) + 1;
+  const reset = () => { C3.scene.environment = C3.env0; if (C3.envT) { C3.envT.dispose(); C3.envT = null; } };
+  if (!UI.vw || !B.kind) return reset();
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+  const done = () => { if (tok !== vwEnv.tok || !UI.vw) return; { const k = document.createElement('canvas'); k.width = W; k.height = H; k.getContext('2d').drawImage(cv, 0, 0); if (C3.bgCustom) C3.bgCustom.dispose(); C3.bgCustom = new T3.CanvasTexture(k); C3.bgCustom.encoding = T3.sRGBEncoding; } // flat copy for video exports
+    x.fillStyle = 'rgba(255,255,255,.8)'; [[110, 70, 190, 70], [610, 40, 90, 150], [850, 310, 130, 46]].forEach(r => x.fillRect(...r)); // soft light panels, so edges still catch highlights
+    const t = new T3.CanvasTexture(cv); t.mapping = T3.EquirectangularReflectionMapping; t.encoding = T3.sRGBEncoding; const env = C3.pm.fromEquirectangular(t).texture; t.dispose(); if (C3.envT) C3.envT.dispose(); C3.envT = env; C3.scene.environment = env; };
+  const img = src => { const im = new Image(); im.onload = () => { const k = Math.max(W / im.width, H / im.height); x.drawImage(im, (W - im.width * k) / 2, (H - im.height * k) / 2, im.width * k, im.height * k); done(); }; im.onerror = reset; im.src = src; };
+  if (B.kind === 'light') { x.fillStyle = '#f1f1ee'; x.fillRect(0, 0, W, H); done(); }
+  else if (B.kind === 'color' && /^#[0-9a-f]{6}$/i.test(B.color || '')) { x.fillStyle = B.color; x.fillRect(0, 0, W, H); done(); }
+  else if (B.kind === 'colors' && c) { const k = pcolors(c), g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, k[0]); g.addColorStop(1, k[1] || k[0]); x.fillStyle = g; x.fillRect(0, 0, W, H); done(); }
+  else if (B.kind === 'cover' && c && artFull(c)) img(artFull(c));
+  else if (B.kind === 'image' && srcs.vwbg) img(srcs.vwbg);
+  else reset();
+}
+function vwBgMenu(el) {
+  const r = el.getBoundingClientRect(), cur = (S.cd.vwBg || {}).kind || '';
+  ctxMenu(r.left, r.top - 8 - 250, [{ head: 'Viewer background' }, ...VW_BGS.map(([k, l]) => ({ label: l, act: 'vw-bg', k, icon: cur === k ? 'check' : null })), { sep: 1 },
+    { label: 'Custom color…', act: 'vw-bgcolor', icon: cur === 'color' ? 'check' : 'picker' }, { label: srcs.vwbg ? 'Your image' : 'Image…', act: srcs.vwbg ? 'vw-bg' : 'vw-bgimg', k: 'image', icon: cur === 'image' ? 'check' : 'image' },
+    ...(srcs.vwbg ? [{ label: 'Choose another image…', act: 'vw-bgimg', icon: 'upload' }] : [])]);
 }
 function renderViewerBar() {
   const b = $('#vwbar'), V = UI.vw; if (!b || !V) return;
@@ -2585,8 +2629,9 @@ function renderViewerBar() {
     ${V.mode === 'case' ? `<button class="vw-b ${S.cd.open ? 'on' : ''}" data-act="vw-open">${S.cd.open ? 'Close case' : 'Open case'}</button><button class="vw-b ${S.cd.discOut ? 'on' : ''}" data-act="vw-disc">${S.cd.discOut ? 'Put disc back' : 'Remove disc'}</button>`
       : `<button class="vw-b" data-act="vw-flip">Flip disc</button><button class="vw-b ${V.spin ? 'on' : ''}" data-act="vw-spin" aria-pressed="${V.spin}" title="Spin the disc during playback">Spin with music</button>`}
     <span class="vw-sep"></span><button class="vw-ib" data-act="vw-prev" title="Previous song (←)" aria-label="Previous song">${ico('prev', 16)}</button><button class="vw-ib play" data-act="vw-pp" title="Play or pause (Space)" aria-label="Play or pause">${ico(S.playing ? 'pause' : 'play', 16)}</button><button class="vw-ib" data-act="vw-next" title="Next song (→)" aria-label="Next song">${ico('next', 16)}</button><button class="vw-b ${V.list ? 'on' : ''}" data-act="vw-list" title="Songs (L)">${ico('list', 14)} Songs</button>
+    <label class="vw-spd" title="Volume">${ico('vol', 14)}<input type="range" min="0" max="1" step="0.01" value="${S.vol}" data-vol aria-label="Volume"></label>
     <span class="vw-sep"></span><button class="vw-b ${V.auto ? 'on' : ''}" data-act="vw-auto" aria-pressed="${V.auto}" title="Auto-rotate (A)">Auto-rotate</button>${V.store ? "" : `<label class="vw-spd" title="Case spin speed (- and =)">Case spin<input type="range" min="0" max="4" step=".25" value="${S.cd.spinCase ?? 1}" data-spin="spinCase" aria-label="Case spin speed"></label><label class="vw-spd" title="Disc spin speed">Disc spin<input type="range" min="0" max="4" step=".25" value="${S.cd.spinDisc ?? 1}" data-spin="spinDisc" aria-label="Disc spin speed"></label>`}<button class="vw-b" data-act="vw-reset" title="Reset view (R)">Reset</button>
-    ${V.store ? `<span class="vw-sep"></span><button class="vw-b vw-buy" data-act="store-buy">Buy CD${V.store.price != null ? ' · $' + V.store.price.toFixed(2) : ''}</button>` : ''}${V.store ? "" : `<span class="vw-sep"></span><button class="vw-b" data-act="vw-exportmenu" aria-haspopup="menu">${ico('save', 14)} Export ${ico('down', 12)}</button><button class="vw-ib" data-act="vw-ui" title="Hide controls (H)" aria-label="Hide controls">${ico('expand', 15)}</button>`}`;
+    ${V.store ? `<span class="vw-sep"></span><button class="vw-b vw-buy" data-act="store-buy">Buy CD${V.store.price != null ? ' · $' + V.store.price.toFixed(2) : ''}</button>` : ''}${V.store ? "" : `<span class="vw-sep"></span><button class="vw-b" data-act="vw-bgmenu" aria-haspopup="menu" title="Viewer background">Background</button><button class="vw-b" data-act="vw-exportmenu" aria-haspopup="menu">${ico('save', 14)} Export ${ico('down', 12)}</button><button class="vw-ib" data-act="vw-ui" title="Hide controls (H)" aria-label="Hide controls">${ico('expand', 15)}</button>`}`;
   applySlides();
 }
 let cdQueued = false;
@@ -2983,7 +3028,7 @@ function showcasePose(t) {
   C3.root.rotation.set(rx, ry, 0); C3.lid.rotation.y = -1.95 * lid;
   C3.disc.position.set((C3.discX || 0) + disc * 15, 0, C3.discZ + Math.sin(disc * Math.PI) * 2.6 + disc * .4); C3.disc.rotation.z = -Math.max(0, t - 3.6) * 2.2;
   const pan = disc * 6.5 - lid * 2.5, back = disc * 16 + lid * 8; C3.cam.position.set(pan, 0, 40 + back); C3.cam.lookAt(pan, 0, 0);
-  C3.shadow.scale.set(disc > .5 ? 1.9 : 1, 1, 1); C3.shadow.position.x = disc * 6; C3.studio.visible = true; C3.scene.background = C3.bgTex; C3.root.children.forEach(o => { o.visible = true; });
+  C3.shadow.scale.set(disc > .5 ? 1.9 : 1, 1, 1); C3.shadow.position.x = disc * 6; C3.studio.visible = true; C3.scene.background = (S.cd.vwBg || {}).kind && C3.bgCustom ? C3.bgCustom : C3.bgTex; C3.root.children.forEach(o => { o.visible = true; });
 }
 async function exportShowcase() {
   if (UI.recBusy) return; const c = cdCol(); if (!c) return toast('Make a project first');
@@ -3611,6 +3656,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.15.3', d: '2026-11-16', items: ['CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column.', 'CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer.', 'Library search also finds projects and albums inside folders.', 'Settings: Recently deleted shows five items, with Show all.'] },
   { v: '1.15.2', d: '2026-11-16', items: ['Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon.', 'Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default).', 'Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json.', 'Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year.', 'CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal.', 'Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer.'] },
   { v: '1.15.1', d: '2026-11-16', items: ['Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time.'] },
   { v: '1.15.0', d: '2026-11-16', items: ['Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.', 'Digital albums: filter All, Verified or Local.', 'Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album.'] },
@@ -4075,7 +4121,7 @@ function renderSettings(m) {
       ${setRow('Compass ' + esc(APP_VERSION), 'Made by sxteen ways, trulytamed and all of KGB.', `<div class="crow">${window.tpDesktop ? `<button class="btn sm" data-act="desk-update" title="Updates install over this version. Your projects are kept.">${ico('repeat', 14)} Check for updates</button>` : ''}<button class="btn sm" data-act="changelog">${ico('list', 14)} What's new</button><button class="btn sm" data-act="credits">${ico('star', 14)} Credits</button></div>`)}
     </section>
     <section class="set-card box"><h2>Recently deleted</h2><p class="faint small" style="margin:0 0 8px">Kept for 30 days.</p>
-      ${S.trash.length ? S.trash.map((x, i) => setRow(esc(x.kind === 'project' ? x.c.name : x.t.title), `${x.kind === 'project' ? (KINDS[x.c.type] || 'Project') : 'Song'} · deleted ${new Date(x.at).toLocaleDateString()} · ${Math.max(0, 30 - Math.floor((Date.now() - x.at) / DAY))} days left`, `<div class="crow"><button class="btn sm" data-act="trash-restore" data-k="${i}">Restore</button><button class="btn sm" data-act="trash-purge" data-k="${i}">Delete now</button></div>`)).join('') + `<div class="crow" style="margin-top:8px"><button class="btn sm" data-act="trash-empty">${ico('trash', 13)} Delete all</button></div>` : '<p class="faint small">Nothing deleted.</p>'}
+      ${S.trash.length ? S.trash.slice(0, UI.trashAll ? Infinity : 5).map((x, i) => setRow(esc(x.kind === 'project' ? x.c.name : x.t.title), `${x.kind === 'project' ? (KINDS[x.c.type] || 'Project') : 'Song'} · deleted ${new Date(x.at).toLocaleDateString()} · ${Math.max(0, 30 - Math.floor((Date.now() - x.at) / DAY))} days left`, `<div class="crow"><button class="btn sm" data-act="trash-restore" data-k="${i}">Restore</button><button class="btn sm" data-act="trash-purge" data-k="${i}">Delete now</button></div>`)).join('') + `<div class="crow" style="margin-top:8px">${S.trash.length > 5 ? `<button class="btn sm" data-act="trash-more">${UI.trashAll ? 'Show fewer' : `Show all ${S.trash.length}`}</button>` : ''}<button class="btn sm" data-act="trash-empty">${ico('trash', 13)} Delete all</button></div>` : '<p class="faint small">Nothing deleted.</p>'}
     </section>
     <section class="set-card box danger"><h2>Erase all data</h2>
       ${setRow('Erase everything on this device', 'Every project, song, cover and setting. Back up first.', `<button class="btn sm" data-act="wipe">${ico('trash', 14)} Erase</button>`)}
@@ -4634,6 +4680,11 @@ function act(a, el, e) {
   if (a.startsWith('vw-') && UI.vw) {
     const V = UI.vw;
     if (a === 'vw-close') closeViewer();
+    else if (a === 'vw-bgmenu') vwBgMenu(el);
+    else if (a === 'vw-bg') { S.cd.vwBg = { ...(S.cd.vwBg || {}), kind: el.dataset.k || '' }; save(); vwBg(); }
+    else if (a === 'vw-bgimg') $('#vwbgfile').click();
+    else if (a === 'vw-bgcolor') { const i = document.createElement('input'); i.type = 'color'; i.value = (S.cd.vwBg || {}).color || '#1a2233'; i.style.cssText = 'position:fixed;left:50%;bottom:90px;opacity:0;pointer-events:none'; document.body.appendChild(i);
+      i.addEventListener('input', () => { S.cd.vwBg = { ...(S.cd.vwBg || {}), kind: 'color', color: i.value }; vwBg(); }); i.addEventListener('change', () => { save(); i.remove(); }); i.click(); }
     else if (a === 'vw-mode') { V.mode = el.dataset.k; C3.tz = V.mode === 'disc' ? 34 : 42; C3.tx = 0; renderViewerBar(); }
     else if (a === 'vw-open') { S.cd.open = !S.cd.open; if (!S.cd.open) S.cd.discOut = false; renderViewerBar(); }
     else if (a === 'vw-disc') { S.cd.discOut = !S.cd.discOut; renderViewerBar(); }
@@ -4707,6 +4758,7 @@ function act(a, el, e) {
         mintOwn(n, 'publish'); c.archived = true; c.publishedTo = n.id; S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id);
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
+    case 'trash-more': UI.trashAll = !UI.trashAll; renderMain(); break;
     case 'recover': recoverOffer(false); break;
     case 'mine-f': S.mineF = k; save(); renderMain(); break;
     case 'libq-clear': S.libQ = ''; renderMain(); break;
@@ -4971,6 +5023,7 @@ document.addEventListener('change', e => {
   else if (t.id === 'set-deftype') { S.prefs.defType = t.value; save(); }
   else if (t.id === 'mcoverfile') { const f = t.files[0]; t.value = ''; if (f) setModalCover(f); }
   else if (t.id === 'zipfile') { const fl = [...t.files]; t.value = ''; if (fl.length) importFiles(fl); }
+  else if (t.id === 'vwbgfile') { const f = t.files[0]; t.value = ''; if (f) (async () => { await DB.put('vwbg', f); if (srcs.vwbg) URL.revokeObjectURL(srcs.vwbg); srcs.vwbg = URL.createObjectURL(f); S.cd.vwBg = { ...(S.cd.vwBg || {}), kind: 'image' }; save(); vwBg(); toast('Viewer background set'); })(); }
   else if (t.id === 'artimg') { const f = t.files[0], A = UI.artFor; t.value = ''; if (f && A) (async () => { const key = 'artist:' + A.kind + ':' + A.name; await DB.put(key, f); if (srcs[key]) URL.revokeObjectURL(srcs[key]); srcs[key] = URL.createObjectURL(f); S.artists = S.artists || {}; S.artists[A.name] = { ...(S.artists[A.name] || {}), [A.kind]: true }; save(); refresh(); toast(A.kind === 'pic' ? 'Artist picture updated' : 'Header image updated'); })(); }
   else if (t.id === 'logofile') { const f = t.files[0]; t.value = ''; if (f) { UI.mLogo = { file: f, url: URL.createObjectURL(f) }; const b = $('.mlogo-pv'); if (b) { b.style.backgroundImage = `url(${UI.mLogo.url})`; b.innerHTML = ''; } } }
   else if (t.id === 'replaudio') { const f = t.files[0], tr = trk(UI.replFor); t.value = ''; if (f && tr) (async () => {
@@ -5589,6 +5642,7 @@ addEventListener('blur', closeCtx); addEventListener('resize', closeCtx);
   for (const c of S.cols) if (c.logo) { const b = await DB.get(c.logo); if (b) srcs[c.logo] = URL.createObjectURL(b); }
   for (const c of S.cols) for (const cv of c.covers) { const b = await DB.get('art:' + cv.id); if (b) { srcs['art:' + cv.id] = URL.createObjectURL(b); const th = await DB.get('thumb:' + cv.id); if (th) srcs['thumb:' + cv.id] = URL.createObjectURL(th); if (!cv.colors) cv.colors = await extractColors(srcs['art:' + cv.id]); } }
   await loadCustomFonts();
+  { const b = await DB.get('vwbg'); if (b) srcs.vwbg = URL.createObjectURL(b); }
   for (const [n, a] of Object.entries(S.artists || {})) for (const k of ['pic', 'bg']) if (a[k]) { const b = await DB.get('artist:' + k + ':' + n); if (b) srcs['artist:' + k + ':' + n] = URL.createObjectURL(b); }
   for (const dd of Object.values(S.cd.designs || {})) for (const sd of Object.values(dd)) for (const l of (sd.layers || [])) if (l.src && l.src.startsWith('cdimg:') && !srcs[l.src]) { const b = await DB.get(l.src); if (b) srcs[l.src] = URL.createObjectURL(b); }
   S.cols.forEach(c => { c.covers = c.covers.filter(cv => srcs['art:' + cv.id]); if (!c.covers.some(cv => cv.id === c.cover)) c.cover = c.covers.length ? c.covers[0].id : null; });
