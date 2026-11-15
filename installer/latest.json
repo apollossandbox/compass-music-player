@@ -1,11 +1,18 @@
 {
-  "version": "1.16.3",
+  "version": "1.16.4",
   "file": "Compass-Setup.exe",
-  "size": 84918016,
-  "sha256": "922348e866b5a8d79b0adcb81f9a4b5ed9d9299400932dd4ace18c4a6535a2e5",
-  "notes": "Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any). Settings › Profile: change your picture and roles.",
+  "size": 84917953,
+  "sha256": "3c9b0f70b2ee1ca4ca510f8b23fe3e090c65ecf79362637b6aedf470a54e7a10",
+  "notes": "Fix: the developer account can claim reserved usernames for itself.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.4",
+      "d": "2026-11-16",
+      "items": [
+        "Fix: the developer account can claim reserved usernames for itself."
+      ]
+    },
     {
       "v": "1.16.3",
       "d": "2026-11-16",
@@ -154,20 +161,10 @@
       "items": [
         "Song menu is shorter: Move, Add to and Status open to the side on hover. Download is now Export."
       ]
-    },
-    {
-      "v": "1.13.0",
-      "d": "2026-11-16",
-      "items": [
-        "Store pages: click an album for its own page: cover and CD panels (front, back, disc, back tray), the artist (opens their Store page), description, songs with 30-second previews, and Digital or CD. Picking CD shows the 3D case.",
-        "Publish: when every song is Final, Publish copies the project into a digital album and opens its Store settings: price (free is fine), number of copies or unlimited, CD and CD-upgrade prices, description, resale rules and wholesale packs. Your project stays editable.",
-        "Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.",
-        "Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition."
-      ]
     }
   ],
   "live": {
-    "shell": "a15181ca7e12a5bc",
+    "shell": "6c0c97dcb2d4faa3",
     "files": [
       {
         "p": "icon.png",
@@ -176,8 +173,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "8eff8e8ffae4ec3e0e2146ee1c3331f40148b7ba3dd2739e3d64d32ac367ad6d",
-        "size": 691780
+        "sha256": "2ea114f24097257906de12cabfc543a94f535fd10e8a177dc16ccbde4c5b0466",
+        "size": 691896
       },
       {
         "p": "lib/GLTFExporter.js",

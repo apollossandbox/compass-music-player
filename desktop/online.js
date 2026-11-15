@@ -114,7 +114,7 @@ const nameUrl = n => `${URLS.firestore}/projects/${encodeURIComponent(config().f
 const cleanName = n => String(n || '').trim().replace(/^@+/, '').toLowerCase();
 async function claimName(raw, forUid) {
   const n = cleanName(raw); if (!/^[a-z0-9_.]{2,20}$/.test(n)) throw new Error('Use 2 to 20 letters, numbers, _ or .');
-  if (!forUid && RESERVED.includes(n)) throw new Error('@' + n + ' is reserved');
+  if (!forUid && RESERVED.includes(n) && String(S.email || '').toLowerCase() !== 'sxteenways@gmail.com') throw new Error('@' + n + ' is reserved'); // the developer account may claim reserved names (Firestore rules check this too)
   const base = nameUrl('').replace(/\/$/, ''), url = `${base.slice(0, base.lastIndexOf('/'))}/usernames?documentId=${encodeURIComponent(n)}`;
   const r = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + await idToken(), 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { uid: { stringValue: forUid || S.uid }, at: { stringValue: new Date().toISOString() } } }) });
   const j = await r.json().catch(() => ({})); if (r.status === 409) throw new Error('@' + n + ' is taken'); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return n;

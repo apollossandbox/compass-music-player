@@ -3666,6 +3666,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.4', d: '2026-11-16', items: ['Fix: the developer account can claim reserved usernames for itself.'] },
   { v: '1.16.3', d: '2026-11-16', items: ['Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).', 'Settings › Profile: change your picture and roles.'] },
   { v: '1.16.2', d: '2026-11-16', items: ['Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.'] },
   { v: '1.16.1', d: '2026-11-16', items: ['Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.'] },

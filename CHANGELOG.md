@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.4 · 2026-11-16
+
+- Fix: the developer account can claim reserved usernames for itself.
+
 ## 1.16.3 · 2026-11-16
 
 - Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).
