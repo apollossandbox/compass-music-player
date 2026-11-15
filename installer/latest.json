@@ -1,11 +1,19 @@
 {
-  "version": "1.16.9",
+  "version": "1.17.0",
   "file": "Compass-Setup.exe",
-  "size": 84919262,
-  "sha256": "bd89e4c1318f15e2aa8ce9a2f5e2e1e538e7341b40464b7327d60ec20977fca2",
-  "notes": "Sidebar: Projects shows up to six; below it, your six most recently played digital albums as cover tiles. Click either heading to open it in the Library.",
+  "size": 84919616,
+  "sha256": "eca41dfbb96845ba7f97e984fca779f6b6a3e885d4d51dcc0146553f364c193e",
+  "notes": "Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open. Sidebar: Digital albums starts halfway down, Projects has the top half.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.17.0",
+      "d": "2026-11-16",
+      "items": [
+        "Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open.",
+        "Sidebar: Digital albums starts halfway down, Projects has the top half."
+      ]
+    },
     {
       "v": "1.16.9",
       "d": "2026-11-16",
@@ -154,17 +162,10 @@
       "items": [
         "Reordering songs only animates the disc you’re moving them on; the other discs stay still."
       ]
-    },
-    {
-      "v": "1.13.6",
-      "d": "2026-11-16",
-      "items": [
-        "Publish moves the project out of Projects: you get the digital album in Digital albums and the project in Archive. New version in Archive brings it back to work on."
-      ]
     }
   ],
   "live": {
-    "shell": "6c0c97dcb2d4faa3",
+    "shell": "7f7dce089b4abc65",
     "files": [
       {
         "p": "icon.png",
@@ -173,8 +174,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "f63f7918d3c20e05137d437201d7d89d9868ca35013780a54b02a726f8a767e7",
-        "size": 698836
+        "sha256": "34ad87c6c5cebdb6ac1b7ecbf570110f5557db6b891425aea5791cc8218c4346",
+        "size": 699578
       },
       {
         "p": "lib/GLTFExporter.js",

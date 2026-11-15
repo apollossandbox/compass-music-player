@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld('tpDesktop', {
   mods: { list: () => ipcRenderer.invoke('tp-mods-list'), folder: () => ipcRenderer.invoke('tp-mods-folder'), get: key => ipcRenderer.invoke('tp-mods-get', key) },
   account: { status: () => ipcRenderer.invoke('tp-acct-status'), username: (n, old) => ipcRenderer.invoke('tp-acct-username', n, old), award: (n, uid) => ipcRenderer.invoke('tp-acct-award', n, uid), library: (m, c, v) => ipcRenderer.invoke('tp-acct-library', m, c, v), signIn: () => ipcRenderer.invoke('tp-acct-signin'), signOut: () => ipcRenderer.invoke('tp-acct-signout'), profile: () => ipcRenderer.invoke('tp-acct-profile'), save: p => ipcRenderer.invoke('tp-acct-save', p) },
   openCameraSettings: () => ipcRenderer.invoke('tp-camera-settings'),
+  onLiveReady: fn => ipcRenderer.on('tp-live-ready', (e, v) => fn(v)),
+  liveReload: () => ipcRenderer.invoke('tp-live-reload'),
   onChangelog: fn => ipcRenderer.on('tp-changelog', (e, data) => fn(data)),
   // FL Studio link: install the FL script, keep sent WAVs on disk, and drag them into FL
   fl: {

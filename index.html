@@ -71,7 +71,7 @@ body.side-sorting .colitem:not(.dragging) { transition: transform .22s var(--eas
 .navbtn.on, .colitem.on { color: var(--ink); }
 .colitem.dropping { outline: 2px dashed var(--ink); outline-offset: -2px; }
 .shead { display: flex; align-items: center; justify-content: space-between; padding: 18px 9px 6px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink3); font-weight: 700; }
-.colswrap { overflow-y: auto; min-height: 0; flex: 1; scrollbar-width: none; }
+.colswrap { overflow-y: auto; min-height: 0; flex: 1 1 0; scrollbar-width: none; } .side-da { flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-width: none; } /* projects and digital albums split the space in half */
 .mini { width: 24px; height: 24px; flex: none; border-radius: 7px; background-color: var(--field); }
 .sfoot { display: flex; justify-content: flex-start; padding: 8px 2px 0; }
 .credbtn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: var(--ink3); border: 1px solid var(--lo); transition: color .2s, transform .4s var(--ease), border-color .2s; }
@@ -1532,7 +1532,7 @@ function renderSide() {
       <span class="mini" style="${pcov(c)}"></span><span class="cn"><span class="cn-t">${esc(c.name)}</span><span class="cn-k">${esc([KINDS[c.type], S.side.sort === 'artist' || one ? '' : a].filter(Boolean).join(' · '))}</span></span>
     </button>`; }).join(''); })() || `<p class="faint pad small">${S.cols.some(c => !isFolder(c) && !isMine(c)) ? 'No matching projects.' : 'No projects yet.'}</p>`}</div></div>
   ${(() => { const lp = c => Math.max(0, ...colTracks(c).map(t => t.lastPlayed || 0)), da = S.cols.filter(c => isMine(c) && !isFolder(c) && !c.archived).sort((a, b) => lp(b) - lp(a)).slice(0, 6);
-    return da.length ? `<div class="shead"><button class="shead-l" data-act="side-mine" title="All digital albums">Digital albums</button><button class="ico" data-act="side-mine" aria-label="All digital albums" title="All digital albums">${ico('grid', 15)}</button></div><div class="side-tiles">${da.map(c => `<button class="stile ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" title="${esc(c.name)}" style="${pcov(c)}"></button>`).join('')}</div>` : ''; })()}
+    return da.length ? `<div class="side-da"><div class="shead"><button class="shead-l" data-act="side-mine" title="All digital albums">Digital albums</button><button class="ico" data-act="side-mine" aria-label="All digital albums" title="All digital albums">${ico('grid', 15)}</button></div><div class="side-tiles">${da.map(c => `<button class="stile ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" title="${esc(c.name)}" style="${pcov(c)}"></button>`).join('')}</div></div>` : ''; })()}
   <div class="sfoot"><button class="credbtn" data-act="credits" aria-label="Credits" title="Credits">${ico('star', 14)}</button>${window.tpDesktop ? `<button class="credbtn upd" data-act="desk-update" aria-label="Check for updates" title="Check for updates">${ico('update', 15)}</button><button class="sver" data-act="desk-update" title="Version ${esc(tpDesktop.version)}. Check for updates">v${esc(tpDesktop.version)}</button>` : ''}</div>`;
 }
 
@@ -3679,6 +3679,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.17.0', d: '2026-11-16', items: ['Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open.', 'Sidebar: Digital albums starts halfway down, Projects has the top half.'] },
   { v: '1.16.9', d: '2026-11-16', items: ['Sidebar: Projects shows up to six; below it, your six most recently played digital albums as cover tiles. Click either heading to open it in the Library.'] },
   { v: '1.16.8', d: '2026-11-16', items: ['CD case: the spine column is as thin as a real one, so art in the tray card’s spine window lines up and shows in full.'] },
   { v: '1.16.7', d: '2026-11-16', items: ['Account button in the top right on every page: your picture; click it for your stats (projects, albums, songs, plays, listening time, most played). Friends will live here later.'] },
@@ -5752,6 +5753,7 @@ addEventListener('blur', closeCtx); addEventListener('resize', closeCtx);
   if (!S.tracks.length && !S.cols.length) setTimeout(() => recoverOffer(true), 900);
   setInterval(tick, 250); setInterval(modTick, 500); setInterval(tokenTick, 20000); setTimeout(tokenTick, 1500);
   modsLoad(); acctLoad();
+  if (window.tpDesktop && tpDesktop.onLiveReady) tpDesktop.onLiveReady(v => { const go = () => { if (S.playing || UI.modal || UI.vw || document.querySelector('.inl-edit')) return setTimeout(go, 5000); save(); tpDesktop.liveReload(); }; toast('Compass ' + v + ' downloaded. It loads when nothing is playing.'); setTimeout(go, 3000); });
   setTimeout(checkWhatsNew, 1200);
   setTimeout(async () => { let n = 0; for (const c of S.cols) for (const cv of c.covers) { if (srcs['thumb:' + cv.id] || cv.noThumb) continue; const b = await DB.get('art:' + cv.id); if (!b) continue; await makeThumb(cv.id, b); if (srcs['thumb:' + cv.id]) n++; else cv.noThumb = true; } if (n) refresh(); }, 1500);
   setTimeout(() => queueAnalysis(S.tracks.map(keyOf)), 2500);

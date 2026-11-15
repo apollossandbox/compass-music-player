@@ -46,9 +46,7 @@ async function liveUpdate(info) {
   fs.rmSync(dest, { recursive: true, force: true }); fs.renameSync(tmp, dest);
   fs.writeFileSync(path.join(root, 'current.json'), JSON.stringify({ version: info.version, shell: SHELL, dir: dirName }));
   for (const n of fs.readdirSync(root)) if (n !== dirName && n !== 'current.json') fs.rmSync(path.join(root, n), { recursive: true, force: true });
-  const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Reload now', 'Later'], defaultId: 0, cancelId: 1, message: `Compass ${info.version} is ready`,
-    detail: 'It downloaded in the background. Reloading takes a second and keeps everything you have open saved.' });
-  if (response === 0 && win) win.loadFile(indexPath());
+  if (win) win.webContents.send('tp-live-ready', info.version); // the page reloads itself once nothing is playing
 }
 
 let win = null;
@@ -362,6 +360,7 @@ app.whenReady().then(() => {
   });
   ipcMain.handle('tp-check-updates', () => checkForUpdates(true));
   ipcMain.on('tp-version', e => { e.returnValue = appVersion(); });
+  ipcMain.handle('tp-live-reload', () => { if (win && liveCurrent()) win.loadFile(indexPath()); });
   createWindow();
   setTimeout(() => checkForUpdates(false), 6000);
 });
