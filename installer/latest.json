@@ -1,11 +1,19 @@
 {
-  "version": "1.16.2",
+  "version": "1.16.3",
   "file": "Compass-Setup.exe",
-  "size": 84917012,
-  "sha256": "e078f59d8cd48347b36468e4f212e98bbba07c0e16669615f636f5359ed73808",
-  "notes": "Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.",
+  "size": 84918016,
+  "sha256": "922348e866b5a8d79b0adcb81f9a4b5ed9d9299400932dd4ace18c4a6535a2e5",
+  "notes": "Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any). Settings › Profile: change your picture and roles.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.3",
+      "d": "2026-11-16",
+      "items": [
+        "Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).",
+        "Settings › Profile: change your picture and roles."
+      ]
+    },
     {
       "v": "1.16.2",
       "d": "2026-11-16",
@@ -156,17 +164,10 @@
         "Songs have a Type (Main, Bonus, Demo, Instrumental, Interlude) so bonus demos can be Final too.",
         "Marketplace: Wholesale code packs (500, 1500, 5000, 10000) for shops and vendors. Each pack downloads as a CSV plus printable QR cards; every code works once and counts toward a limited edition."
       ]
-    },
-    {
-      "v": "1.12.4",
-      "d": "2026-11-16",
-      "items": [
-        "Sidebar: the Compass logo next to Music Player, in Arial bold."
-      ]
     }
   ],
   "live": {
-    "shell": "14334aaf0f9b8c0d",
+    "shell": "a15181ca7e12a5bc",
     "files": [
       {
         "p": "icon.png",
@@ -175,8 +176,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "2082ec2a20b059d9162fca4035c6c377605664751769c84806275c246c7c292e",
-        "size": 687178
+        "sha256": "8eff8e8ffae4ec3e0e2146ee1c3331f40148b7ba3dd2739e3d64d32ac367ad6d",
+        "size": 691780
       },
       {
         "p": "lib/GLTFExporter.js",

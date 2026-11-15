@@ -88,7 +88,7 @@ function status() { const cfg = config(); return { available: !!cfg, signedIn: !
 
 /* Profile in Firestore: users/<uid> with plain string fields */
 const docUrl = () => `${URLS.firestore}/projects/${encodeURIComponent(config().firebaseProjectId)}/databases/(default)/documents/users/${encodeURIComponent(S.uid)}`;
-const PROFILE_KEYS = ['artist', 'name', 'email', 'photo', 'updated', 'username'];
+const PROFILE_KEYS = ['artist', 'name', 'email', 'photo', 'updated', 'username', 'roles', 'avatar'];
 async function getProfile() {
   const r = await fetch(docUrl(), { headers: { Authorization: 'Bearer ' + await idToken() } });
   if (r.status === 404) return null; const j = await r.json(); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status);
@@ -96,7 +96,7 @@ async function getProfile() {
 }
 async function saveProfile(p) {
   const fields = {}, keys = [];
-  for (const k of PROFILE_KEYS) { const v = k === 'updated' ? new Date().toISOString() : k === 'email' ? S.email : k === 'photo' ? S.photo : p && p[k] != null ? String(p[k]).slice(0, 200) : (k === 'name' ? S.name : null); if (v == null) continue; fields[k] = { stringValue: v }; keys.push(k); }
+  for (const k of PROFILE_KEYS) { const v = k === 'updated' ? new Date().toISOString() : k === 'email' ? S.email : k === 'photo' ? S.photo : p && p[k] != null ? String(p[k]).slice(0, k === 'avatar' ? 140000 : 200) : (k === 'name' ? S.name : null); if (v == null) continue; fields[k] = { stringValue: v }; keys.push(k); }
   const q = keys.map(k => 'updateMask.fieldPaths=' + k).join('&');
   const r = await fetch(`${docUrl()}?${q}`, { method: 'PATCH', headers: { Authorization: 'Bearer ' + await idToken(), 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) });
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return true;

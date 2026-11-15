@@ -2,6 +2,11 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.3 · 2026-11-16
+
+- Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).
+- Settings › Profile: change your picture and roles.
+
 ## 1.16.2 · 2026-11-16
 
 - Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.

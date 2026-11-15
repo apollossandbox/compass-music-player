@@ -570,6 +570,8 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .shero { position: relative; height: 240px; border-radius: 16px; overflow: hidden; margin: 6px 0 24px; display: flex; align-items: flex-end; } .shero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.75), transparent 70%); }
 .shero > div { position: relative; z-index: 1; padding: 22px; color: #fff; } .shero small { text-transform: uppercase; letter-spacing: .1em; font-weight: 700; opacity: .8; } .shero h2 { font-size: 32px; margin: 4px 0; } .shero p { margin: 0 0 12px; opacity: .85; }
 .srow-h { font-size: 18px; margin: 8px 0 12px; }
+.ob-top { display: flex; gap: 16px; align-items: flex-end; } .ob-av { width: 72px; height: 72px; flex: none; border-radius: 50%; border: 1px dashed var(--ink3); background: var(--panel2) center/cover; display: grid; place-items: center; color: var(--ink3); cursor: pointer; }
+.ob-roles { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; } .ob-role { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; border: 1px solid var(--line); cursor: pointer; font-weight: 700; } .ob-role:has(input:checked) { border-color: var(--ink); background: var(--panel2); }
 .lib-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; } .lib-tools .search { width: 240px; } .lib-none { margin: 4px 0 16px; } .mine-filter select { padding-right: 22px; }
 
 .mk-hero { text-align: center; padding: 36px 16px 26px; } .mk-hero h1 { font-size: clamp(28px, 4vw, 42px); margin: 0 0 6px; } .mk-hero p { color: var(--ink2); margin: 0 0 18px; }
@@ -1131,6 +1133,7 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 <input type="file" id="zipfile" accept=".zip,application/zip" multiple hidden>
 <input type="file" id="artimg" accept="image/*" hidden>
 <input type="file" id="vwbgfile" accept="image/*" hidden>
+<input type="file" id="acctpic" accept="image/*" hidden>
 <input type="file" id="logofile" accept="image/*" hidden>
 <input type="file" id="replaudio" accept="audio/*,.mp3,.wav,.flac,.m4a,.ogg,.opus,.aif,.aiff" hidden>
 <input type="file" id="replimg" accept="image/*" hidden>
@@ -1909,6 +1912,13 @@ function openModal(kind, id, x = {}) {
     const c = col(id), a = Ledger.access(c);
     h = `<h2>Adjust lending time</h2><p class="faint small" style="margin:0">${esc(c.name)} is with ${esc(handleOf(a.loan.to))} until ${new Date(a.loan.until).toLocaleString()}.</p>
     <label class="lab">Give it back in</label>${seg('lnfor', LOAN_TIMES, '604800000', 'ln-for', 'full')}<p class="faint small" style="margin:6px 0 0">Counted from now.</p>`;
+  } else if (kind === 'onboard') {
+    const P = UI.acctProfile || {}, R = new Set(String(P.roles || '').split(',').filter(Boolean));
+    h = `<h2>Set up your account</h2><p class="faint small" style="margin:-4px 0 12px">Pick the name people find you by, and what you do. You can change these later in Settings.</p>
+    <div class="ob-top"><button class="ob-av" data-act="acct-pic" title="Profile picture" style="${P.avatar ? `background-image:url(${P.avatar})` : ''}">${P.avatar ? '' : ico('user', 26)}</button>
+    <div><label class="lab" for="ob-name">Username</label><div class="pb-row"><span class="pb-cur">@</span><input class="field" id="ob-name" value="${esc(P.username || '')}" placeholder="yourname" autocomplete="off" style="width:220px" ${P.username ? 'disabled' : ''}></div></div></div>
+    <label class="lab" style="margin-top:14px">I am a…</label><div class="ob-roles">${[['listener', 'Listener'], ['artist', 'Artist'], ['producer', 'Producer'], ['manager', 'Manager']].map(([k, l]) => `<label class="ob-role"><input type="checkbox" value="${k}" ${R.has(k) ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div>
+    <p class="faint small">Pick any that apply.</p><p class="small" id="ob-err" role="alert" style="margin:6px 0 0;color:#e5484d"></p>`;
   } else if (kind === 'publish') {
     const c = col(id), R = c.release || {}, n = colTracks(c).length, dp = R.digital ?? (n <= 1 ? .99 : n <= 6 ? 4.99 : 9.99), W = R.wholesale || {};
     h = `<h2>${c.release ? 'Store settings' : 'Publish'} · ${esc(c.name)}</h2>
@@ -1973,7 +1983,7 @@ function openModal(kind, id, x = {}) {
     <div class="dropzone" id="m-drop">${ico('import', 26)}<b>Drop the .zip here</b><span class="faint small">or loose audio and image files</span><button class="btn sm primary" data-act="zip-pick">Choose files</button></div>
     <p class="faint small" id="m-status" role="status"></p>`;
   }
-  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' || kind === 'artcov' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'publish' && (col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}${kind === 'publish' ? `<button class="btn primary" data-act="pb-save">${(col(id) || {}).release ? 'Save' : 'Put in the Store'}</button>` : ''}${kind === 'loanadj' ? '<button class="btn primary" data-act="la-ok">Save</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
+  md.innerHTML = h + `<div class="crow" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="close-modal">${kind === 'import' || kind === 'changelog' || kind === 'qr' || kind === 'prov' || kind === 'addtrack' || kind === 'artcov' ? 'Close' : 'Cancel'}</button>${kind === 'name' ? '<button class="btn primary" data-act="name-ok">Import</button>' : ''}${kind === 'ask' ? '<button class="btn primary" data-act="ask-ok">Save</button>' : ''}${kind === 'feat' ? '<button class="btn primary" data-act="fx-ok">Save</button>' : ''}${kind === 'conv' ? '<button class="btn primary" data-act="cv-ok">Convert</button>' : ''}${kind === 'lend' ? '<button class="btn primary" data-act="ln-ok">Lend</button>' : ''}${kind === 'onboard' ? '<button class="btn primary" data-act="ob-ok">Done</button>' : ''}${kind === 'publish' && (col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}${kind === 'publish' ? `<button class="btn primary" data-act="pb-save">${(col(id) || {}).release ? 'Save' : 'Put in the Store'}</button>` : ''}${kind === 'loanadj' ? '<button class="btn primary" data-act="la-ok">Save</button>' : ''}${kind === 'sell' ? '<button class="btn primary" data-act="sl-ok">List for sale</button>' : ''}${kind === 'prov' ? provActions(col(id)) : ''}${kind === 'confirm' ? `<button class="btn primary danger" data-act="confirm-ok">${esc(x.ok || 'Delete')}</button>` : ''}${kind === 'lstyle' ? '<button class="btn primary" data-act="ls-ok">OK</button>' : ''}${kind === 'release' ? `${(col(id) || {}).release ? '<button class="btn" data-act="rel-pull">Remove from Store</button>' : ''}<button class="btn primary" data-act="rel-ok">${(col(id) || {}).release ? 'Save' : 'Release'}</button>` : ''}${kind === 'proj' || kind === 'meta' ? `<button class="btn primary" data-act="modal-save">${x.isNew ? 'Create project' : 'Save'}</button>` : ''}</div>`;
   md.classList.toggle('wide', kind === 'meta' || kind === 'lstyle'); md.classList.toggle('clogm', kind === 'changelog' || kind === 'qr');
   if (kind === 'qr') qrStart();
   if (kind === 'addtrack') setTimeout(() => { const i = $('#at-q'); if (i) i.focus(); }, 60);
@@ -3665,6 +3675,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.3', d: '2026-11-16', items: ['Signing in opens a short setup: profile picture, @username, and listener / artist / producer / manager (pick any).', 'Settings › Profile: change your picture and roles.'] },
   { v: '1.16.2', d: '2026-11-16', items: ['Usernames: after signing in, claim your @username in Settings › Profile. Names are unique. Reserved names can only be awarded from the developer account.'] },
   { v: '1.16.1', d: '2026-11-16', items: ['Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.'] },
   { v: '1.16.0', d: '2026-11-16', items: ['Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.'] },
@@ -4075,13 +4086,13 @@ function modsSettingsHTML() {
 }
 /* ---------- account (online phase 1): Google sign-in, profile synced to the cloud ---------- */
 UI.acct = null;
-async function acctLoad() { if (!(window.tpDesktop && tpDesktop.account)) return; try { UI.acct = await tpDesktop.account.status(); } catch (e) { UI.acct = null; } if (UI.acct && UI.acct.signedIn && !UI.acctProfile) { try { const r = await tpDesktop.account.profile(); if (r && r.ok) UI.acctProfile = r.profile || {}; } catch (e) {} } if (S.view === 'settings') renderMain(); }
+async function acctLoad() { if (!(window.tpDesktop && tpDesktop.account)) return; try { UI.acct = await tpDesktop.account.status(); } catch (e) { UI.acct = null; } if (UI.acct && UI.acct.signedIn && !UI.acctProfile) { try { const r = await tpDesktop.account.profile(); if (r && r.ok) { UI.acctProfile = r.profile || {}; if (!UI.acctProfile.username || !UI.acctProfile.roles) setTimeout(() => { if (!UI.modal) openModal('onboard'); }, 1500); } } catch (e) {} } if (S.view === 'settings') renderMain(); }
 const myArtist = () => (S.concept.artist && S.concept.artist !== 'Artist Name' ? S.concept.artist.trim() : '');
 async function acctSignIn() {
   toast('Finish signing in in your browser…'); UI.acctBusy = true; if (S.view === 'settings') renderMain();
   const r = await tpDesktop.account.signIn(); UI.acctBusy = false;
   if (!r || !r.ok) { toast("Couldn't sign in: " + ((r && r.error) || 'unknown error')); return acctLoad(); }
-  UI.acctProfile = r.profile || {}; if (!UI.acctProfile.username) setTimeout(() => { S.view = 'settings'; refresh(); toast('Pick your username to finish setting up'); const i = $('#acct-name'); if (i) i.focus(); }, 600);
+  UI.acctProfile = r.profile || {}; if (!UI.acctProfile.username || !UI.acctProfile.roles) setTimeout(() => openModal('onboard'), 500);
   const remote = r.profile && r.profile.artist;
   if (remote && !myArtist()) { S.concept.artist = remote; save(); } else if (myArtist() && myArtist() !== remote) acctPush();
   toast('Signed in as ' + (r.name || r.email)); await acctLoad(); acctLibSync(true);
@@ -4107,6 +4118,8 @@ function acctNameRows(A) {
   const P = UI.acctProfile || {}, u = P.username;
   let h = setRow('Username', u ? `<b>@${esc(u)}</b> · how people find and invite you.` : 'Pick the name people find you by. 2 to 20 letters, numbers, _ or .',
     `<div class="crow"><input class="field" id="acct-name" placeholder="${u ? 'New username' : 'username'}" autocomplete="off" style="width:160px"><button class="btn sm ${u ? '' : 'primary'}" data-act="acct-name">${u ? 'Change' : 'Claim'}</button></div>`);
+  h += setRow('Profile picture', '', `<div class="crow">${P.avatar ? `<img class="acct-pic" src="${P.avatar}" alt="">` : ''}<button class="btn sm" data-act="acct-pic">${P.avatar ? 'Change' : 'Add'}</button></div>`);
+  h += setRow('Roles', P.roles ? esc(P.roles.split(',').map(x => x[0].toUpperCase() + x.slice(1)).join(', ')) : 'Not set.', '<button class="btn sm" data-act="acct-roles">Edit</button>');
   h += setRow('Account ID', 'Give this to the developer if you were promised a reserved name.', `<code class="faint small" style="user-select:all">${esc(A.uid || '')}</code>`);
   if ((A.email || '').toLowerCase() === DEV_EMAIL) h += setRow('Award a reserved name', 'Developer account. Paste the person’s account ID.', `<div class="crow"><input class="field" id="aw-name" placeholder="name" style="width:110px"><input class="field" id="aw-uid" placeholder="account ID" style="width:200px"><button class="btn sm" data-act="acct-award">Award</button></div>`);
   return h;
@@ -4795,6 +4808,13 @@ function act(a, el, e) {
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
     case 'acct-lib': acctLibSync(true); break;
+    case 'ob-ok': (async () => { const err = m => { const e = $('#ob-err'); if (e) e.textContent = m; }, P = UI.acctProfile || {}, roles = $$('.ob-role input:checked').map(x => x.value);
+      if (!roles.length) return err('Pick at least one.'); el.disabled = true;
+      if (!P.username) { const r = await tpDesktop.account.username(($('#ob-name') || {}).value || ''); if (!r || !r.ok) { el.disabled = false; return err((r && r.error) || "Couldn't claim that name"); } P.username = r.username; }
+      const r2 = await tpDesktop.account.save({ artist: myArtist(), username: P.username, roles: roles.join(',') }); if (!r2 || !r2.ok) { el.disabled = false; return err((r2 && r2.error) || "Couldn't save"); }
+      UI.acctProfile = { ...P, roles: roles.join(',') }; closeModal(); toast('Welcome, @' + P.username); if (S.view === 'settings') renderMain(); })(); break;
+    case 'acct-roles': openModal('onboard'); break;
+    case 'acct-pic': $('#acctpic').click(); break;
     case 'acct-name': { const v = ($('#acct-name') || {}).value || ''; tpDesktop.account.username(v, (UI.acctProfile || {}).username).then(r => { if (!r || !r.ok) return toast((r && r.error) || "Couldn't claim that name"); UI.acctProfile = { ...(UI.acctProfile || {}), username: r.username }; toast('You are @' + r.username); renderMain(); }); break; }
     case 'acct-award': { const n = ($('#aw-name') || {}).value || '', id = (($('#aw-uid') || {}).value || '').trim(); tpDesktop.account.award(n, id).then(r => toast(r && r.ok ? '@' + r.username + ' awarded' : (r && r.error) || "Couldn't award that name")); break; }
     case 'trash-more': UI.trashAll = !UI.trashAll; renderMain(); break;
@@ -5062,6 +5082,10 @@ document.addEventListener('change', e => {
   else if (t.id === 'set-deftype') { S.prefs.defType = t.value; save(); }
   else if (t.id === 'mcoverfile') { const f = t.files[0]; t.value = ''; if (f) setModalCover(f); }
   else if (t.id === 'zipfile') { const fl = [...t.files]; t.value = ''; if (fl.length) importFiles(fl); }
+  else if (t.id === 'acctpic') { const f = t.files[0]; t.value = ''; if (f) (async () => { // 256 px JPEG kept in the profile
+      try { const bm = await createImageBitmap(f), k = 256 / Math.min(bm.width, bm.height), cv = document.createElement('canvas'); cv.width = cv.height = 256; cv.getContext('2d').drawImage(bm, (256 - bm.width * k) / 2, (256 - bm.height * k) / 2, bm.width * k, bm.height * k); bm.close();
+        const url = cv.toDataURL('image/jpeg', .82), r = await tpDesktop.account.save({ artist: myArtist(), avatar: url }); if (!r || !r.ok) return toast("Couldn't save the picture: " + ((r && r.error) || ''));
+        UI.acctProfile = { ...(UI.acctProfile || {}), avatar: url }; toast('Profile picture saved'); if (UI.modal && UI.modal.kind === 'onboard') { const b = $('.ob-av'); if (b) { b.style.backgroundImage = `url(${url})`; b.innerHTML = ''; } } else renderMain(); } catch (e) { toast("Couldn't read that image"); } })(); }
   else if (t.id === 'vwbgfile') { const f = t.files[0]; t.value = ''; if (f) (async () => { await DB.put('vwbg', f); if (srcs.vwbg) URL.revokeObjectURL(srcs.vwbg); srcs.vwbg = URL.createObjectURL(f); S.cd.vwBg = { ...(S.cd.vwBg || {}), kind: 'image' }; save(); vwBg(); toast('Viewer background set'); })(); }
   else if (t.id === 'artimg') { const f = t.files[0], A = UI.artFor; t.value = ''; if (f && A) (async () => { const key = 'artist:' + A.kind + ':' + A.name; await DB.put(key, f); if (srcs[key]) URL.revokeObjectURL(srcs[key]); srcs[key] = URL.createObjectURL(f); S.artists = S.artists || {}; S.artists[A.name] = { ...(S.artists[A.name] || {}), [A.kind]: true }; save(); refresh(); toast(A.kind === 'pic' ? 'Artist picture updated' : 'Header image updated'); })(); }
   else if (t.id === 'logofile') { const f = t.files[0]; t.value = ''; if (f) { UI.mLogo = { file: f, url: URL.createObjectURL(f) }; const b = $('.mlogo-pv'); if (b) { b.style.backgroundImage = `url(${UI.mLogo.url})`; b.innerHTML = ''; } } }

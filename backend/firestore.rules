@@ -20,7 +20,8 @@ service cloud.firestore {
     }
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid
-        && (request.resource == null || request.resource.data.keys().hasOnly(['artist', 'name', 'email', 'photo', 'updated', 'username']));
+        && (request.resource == null || request.resource.data.keys().hasOnly(['artist', 'name', 'email', 'photo', 'updated', 'username', 'roles', 'avatar'])
+            && (!('avatar' in request.resource.data) || request.resource.data.avatar.size() < 150000));
       // the library list: what is in this person's Compass (no audio), saved as one JSON text field
       match /library/{doc} {
         allow read, write: if request.auth != null && request.auth.uid == uid
