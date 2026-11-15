@@ -1,11 +1,18 @@
 {
-  "version": "1.16.0",
+  "version": "1.16.1",
   "file": "Compass-Setup.exe",
-  "size": 84914695,
-  "sha256": "5da3e5bf6e22e345e85af7aaefd1a7d1c4c2ff2f79003a80a537398ee01efc05",
-  "notes": "Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.",
+  "size": 84915646,
+  "sha256": "fdd593795a131bdcad04464935dce5804b86d41773a81f857a35716aab35cf96",
+  "notes": "Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.",
   "date": "2026-11-15",
   "changelog": [
+    {
+      "v": "1.16.1",
+      "d": "2026-11-16",
+      "items": [
+        "Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved."
+      ]
+    },
     {
       "v": "1.16.0",
       "d": "2026-11-16",
@@ -156,17 +163,10 @@
       "items": [
         "New name: Compass Music Player. The sidebar shows the Compass logo with Music Player."
       ]
-    },
-    {
-      "v": "1.12.2",
-      "d": "2026-11-16",
-      "items": [
-        "Stats fit on one screen: totals in a compact strip, your most played songs, artists and projects side by side, and buttons to sort by plays, time listened or average per play. Click a row to play the song or open the project."
-      ]
     }
   ],
   "live": {
-    "shell": "0c13869e2c637232",
+    "shell": "4207d6364859fc67",
     "files": [
       {
         "p": "icon.png",
@@ -175,8 +175,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "a6caed254f9d3361f774f74aae58fd88ad745b8d53aa11633ea550b8e3b0bdc2",
-        "size": 682601
+        "sha256": "13695ff731713e6426ba533296f1d856a31a2936ebd6d50ec551b09ed1a78eb1",
+        "size": 684741
       },
       {
         "p": "lib/GLTFExporter.js",

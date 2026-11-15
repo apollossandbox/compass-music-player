@@ -102,6 +102,12 @@ async function saveProfile(p) {
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return true;
 }
 
+/* Library list: users/<uid>/library/manifest holds what is in this person's Compass (no audio) as JSON text */
+async function saveLibrary(manifest, counts, app) {
+  const url = docUrl() + '/library/manifest', fields = { manifest: { stringValue: String(manifest).slice(0, 899000) }, counts: { stringValue: String(counts || '').slice(0, 200) }, updated: { stringValue: new Date().toISOString() }, app: { stringValue: String(app || '').slice(0, 20) } };
+  const r = await fetch(url, { method: 'PATCH', headers: { Authorization: 'Bearer ' + await idToken(), 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) });
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return fields.updated.stringValue;
+}
 function register(ipcMain) {
   loadSession();
   const wrap = f => async (...a) => { try { return { ok: true, ...(await f(...a)) }; } catch (e) { return { ok: false, error: String(e && e.message || e) }; } };
@@ -110,5 +116,6 @@ function register(ipcMain) {
   ipcMain.handle('tp-acct-signout', () => signOut());
   ipcMain.handle('tp-acct-profile', wrap(async () => ({ profile: await getProfile() })));
   ipcMain.handle('tp-acct-save', wrap(async (e, p) => ({ saved: await saveProfile(p) })));
+  ipcMain.handle('tp-acct-library', wrap(async (e, m, c, v) => { if (!S) throw new Error('Not signed in'); return { at: await saveLibrary(m, c, v) }; }));
 }
 module.exports = { register };

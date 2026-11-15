@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('tpDesktop', {
   conv: { link: url => ipcRenderer.invoke('tp-conv-link', url), save: (name, data, dir, pick) => ipcRenderer.invoke('tp-conv-save', name, data, dir, pick), reveal: f => ipcRenderer.invoke('tp-conv-reveal', f) },
   recover: () => ipcRenderer.invoke('tp-recover'),
   mods: { list: () => ipcRenderer.invoke('tp-mods-list'), folder: () => ipcRenderer.invoke('tp-mods-folder'), get: key => ipcRenderer.invoke('tp-mods-get', key) },
-  account: { status: () => ipcRenderer.invoke('tp-acct-status'), signIn: () => ipcRenderer.invoke('tp-acct-signin'), signOut: () => ipcRenderer.invoke('tp-acct-signout'), profile: () => ipcRenderer.invoke('tp-acct-profile'), save: p => ipcRenderer.invoke('tp-acct-save', p) },
+  account: { status: () => ipcRenderer.invoke('tp-acct-status'), library: (m, c, v) => ipcRenderer.invoke('tp-acct-library', m, c, v), signIn: () => ipcRenderer.invoke('tp-acct-signin'), signOut: () => ipcRenderer.invoke('tp-acct-signout'), profile: () => ipcRenderer.invoke('tp-acct-profile'), save: p => ipcRenderer.invoke('tp-acct-save', p) },
   openCameraSettings: () => ipcRenderer.invoke('tp-camera-settings'),
   onChangelog: fn => ipcRenderer.on('tp-changelog', (e, data) => fn(data)),
   // FL Studio link: install the FL script, keep sent WAVs on disk, and drag them into FL

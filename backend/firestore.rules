@@ -1,10 +1,16 @@
 rules_version = '2';
-// Compass, phase 1: each signed-in person can read and write only their own profile.
+// Compass: each signed-in person can read and write only their own profile and their own library list.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid
         && (request.resource == null || request.resource.data.keys().hasOnly(['artist', 'name', 'email', 'photo', 'updated']));
+      // the library list: what is in this person's Compass (no audio), saved as one JSON text field
+      match /library/{doc} {
+        allow read, write: if request.auth != null && request.auth.uid == uid
+          && (request.resource == null || (request.resource.data.keys().hasOnly(['manifest', 'counts', 'updated', 'app'])
+              && request.resource.data.manifest is string && request.resource.data.manifest.size() < 900000));
+      }
     }
     // everything else is closed until later phases add it on purpose
     match /{document=**} {

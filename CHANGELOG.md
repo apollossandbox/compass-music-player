@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.16.1 · 2026-11-16
+
+- Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.
+
 ## 1.16.0 · 2026-11-16
 
 - Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.

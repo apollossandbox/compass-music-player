@@ -1252,7 +1252,7 @@ const ROLES = ['Producer', 'Co-producer', 'Executive producer', 'Songwriter', 'C
 const creditLine = t => { const g = {}; (t.credits || []).forEach(c => { if (c.role && c.name) (g[c.role] = g[c.role] || []).push(c.name); }); return Object.entries(g).map(([r, n]) => `${r}: ${n.join(', ')}`).join(' · '); };
 function stampAdds() { const now = Date.now(); for (const c of S.cols) { c.addedAt = c.addedAt || {}; for (const id of c.tracks) if (!c.addedAt[id]) { const t = trk(id); c.addedAt[id] = (t && t.added) || now; } } }
 let LOADED = false;
-const save = () => { if (!LOADED) return; stampAdds(); if (typeof cdTrack === 'function') cdTrack(); try { localStorage.setItem(KEY, JSON.stringify({ ...S, playing: false, q: '', editId: null, cx: { ...S.cx, open: false } })); } catch (e) { } };
+const save = () => { if (!LOADED) return; if (typeof acctLibSync === 'function' && UI.acct && UI.acct.signedIn && !save.inLib) { save.inLib = true; acctLibSync(); save.inLib = false; } stampAdds(); if (typeof cdTrack === 'function') cdTrack(); try { localStorage.setItem(KEY, JSON.stringify({ ...S, playing: false, q: '', editId: null, cx: { ...S.cx, open: false } })); } catch (e) { } };
 
 function load() {
   try { const r = JSON.parse(localStorage.getItem(KEY)); if (r && r.tracks) S = { ...S, ...r, playing: false, concept: { ...S.concept, ...r.concept } }; } catch (e) { }
@@ -3665,6 +3665,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.16.1', d: '2026-11-16', items: ['Accounts: once you sign in, Compass saves a list of your library to your account (every project, digital album and song, and which albums are verified; not the audio). It updates a minute after you change something. Settings › Profile shows when it last saved.'] },
   { v: '1.16.0', d: '2026-11-16', items: ['Accounts: Settings › Profile › Sign in with Google. Your artist name syncs to your account and comes back on any computer. Your login is stored encrypted by Windows.'] },
   { v: '1.15.3', d: '2026-11-16', items: ['CD case: the hinge side is modelled like a real jewel case: a clear spine column with the inside tray card showing through it, hinge blocks at the corners, and a tray that stops at the column.', 'CD viewer: Background button with Dark, Light, Album colors, Blurred cover, any color, or your own image. The background reflects in the case’s plastic. Volume slider in the viewer.', 'Library search also finds projects and albums inside folders.', 'Settings: Recently deleted shows five items, with Show all.'] },
   { v: '1.15.2', d: '2026-11-16', items: ['Launcher: projects open in the FL Studio version that saved them (FL 20, 21, 2024, 2025…), or the version you picked by right-clicking the icon. Each project shows its version on its icon.', 'Songs: normal cursor on hover. Settings › Appearance › Song spacing (Compact is the default).', 'Themes mod: Settings › Mods › Themes › Get, then pick a theme under Appearance. Add your own in its mod.json.', 'Library: search and sort (Recent, Name, Artist, Year) for Projects, Digital albums and Archive, plus a Filter menu (All, Verified, Local) for digital albums. Cards: the verified seal sits right after the name, long names wrap to two lines, and digital albums show artist · songs · year.', 'CD Creator: removed the green “CD started” check on CD cards, so it isn’t mistaken for the verified seal.', 'Updates: most updates now install inside Compass in the background and load with Reload, no installer. Releases that change the Windows side still use the installer.'] },
@@ -4081,14 +4082,27 @@ async function acctSignIn() {
   if (!r || !r.ok) { toast("Couldn't sign in: " + ((r && r.error) || 'unknown error')); return acctLoad(); }
   const remote = r.profile && r.profile.artist;
   if (remote && !myArtist()) { S.concept.artist = remote; save(); } else if (myArtist() && myArtist() !== remote) acctPush();
-  toast('Signed in as ' + (r.name || r.email)); acctLoad();
+  toast('Signed in as ' + (r.name || r.email)); await acctLoad(); acctLibSync(true);
 }
 let acctT = 0;
 function acctPush() { clearTimeout(acctT); acctT = setTimeout(async () => { if (!(UI.acct && UI.acct.signedIn)) return; const r = await tpDesktop.account.save({ artist: myArtist() }); if (r && !r.ok) toast("Couldn't save your profile online: " + r.error); }, 900); }
+/* the library list, saved to the account: what this computer's Compass holds (no audio) */
+function libManifest() {
+  const songs = S.tracks.map(t => ({ id: t.id, title: t.title, artist: t.artist || '', dur: Math.round(verDur(t) || 0), size: t.size || 0, status: t.status, versions: t.versions.length }));
+  const albums = S.cols.map(c => ({ id: c.id, name: c.name, type: c.type, artists: projArtists(c), digital: !!c.mine, verified: !!(isMine(c) && isVerified(c)), archived: !!c.archived, released: c.targetDate || '', songs: c.tracks }));
+  return { version: 1, at: new Date().toISOString(), artist: myArtist(), albums, songs };
+}
+let acctLibT = 0;
+function acctLibSync(now) {
+  clearTimeout(acctLibT); if (!(UI.acct && UI.acct.signedIn && tpDesktop.account.library)) return;
+  acctLibT = setTimeout(async () => { const m = libManifest(), c = `${m.albums.filter(a => !a.digital).length} projects · ${m.albums.filter(a => a.digital).length} digital albums · ${m.songs.length} songs`;
+    const r = await tpDesktop.account.library(JSON.stringify(m), c, APP_VERSION); if (r && r.ok) { S.acctLib = { at: r.at, counts: c }; save(); } else if (now) toast("Couldn't save your library list: " + ((r && r.error) || 'unknown error'));
+    if (now && r && r.ok) toast('Library list saved to your account'); if (S.view === 'settings') renderMain(); }, now ? 0 : 60000);
+}
 function acctRowHTML() {
   const A = UI.acct; if (!A || !A.available) return '';
   if (!A.signedIn) return setRow('Account', 'Sign in to keep your profile in the cloud. More online features build on this.', `<button class="btn sm" data-act="acct-in" ${UI.acctBusy ? 'disabled' : ''}>${UI.acctBusy ? 'Waiting for the browser…' : 'Sign in with Google'}</button>`);
-  return setRow('Account', `${esc(A.name || '')}${A.name && A.email ? ' · ' : ''}${esc(A.email || '')}`, `<div class="crow">${A.photo ? `<img class="acct-pic" src="${esc(A.photo)}" alt="" referrerpolicy="no-referrer">` : ''}<button class="btn sm" data-act="acct-out">Sign out</button></div>`);
+  const L = S.acctLib; return setRow('Library in your account', L ? `${esc(L.counts)} · saved ${new Date(L.at).toLocaleString()}. A list of what you have, not the audio.` : 'Not saved yet.', `<button class="btn sm" data-act="acct-lib">Save now</button>`) + setRow('Account', `${esc(A.name || '')}${A.name && A.email ? ' · ' : ''}${esc(A.email || '')}`, `<div class="crow">${A.photo ? `<img class="acct-pic" src="${esc(A.photo)}" alt="" referrerpolicy="no-referrer">` : ''}<button class="btn sm" data-act="acct-out">Sign out</button></div>`);
 }
 const setRow = (title, desc, control) => `<div class="set-row"><div class="set-txt"><b>${title}</b>${desc ? `<span>${desc}</span>` : ''}</div><div class="set-ctl">${control}</div></div>`;
 function renderSettings(m) {
@@ -4768,6 +4782,7 @@ function act(a, el, e) {
         mintOwn(n, 'publish'); c.archived = true; c.publishedTo = n.id; S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id);
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
+    case 'acct-lib': acctLibSync(true); break;
     case 'trash-more': UI.trashAll = !UI.trashAll; renderMain(); break;
     case 'recover': recoverOffer(false); break;
     case 'mine-f': S.mineF = k; save(); renderMain(); break;
