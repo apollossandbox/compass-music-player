@@ -590,6 +590,10 @@ body.side-off .side-show { display: grid; }
 .coverpop.open { opacity: 1; } .coverpop img { width: min(70vh, 80vw); aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 40px 90px -30px #000; transform: scale(.96); transition: transform .25s var(--ease2); } .coverpop.open img { transform: none; }
 .coverpop span { color: rgba(255,255,255,.6); font-size: 12px; } .cp-dots { display: flex; gap: 6px; justify-content: center; } .cp-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.35); } .cp-dots i.on { background: #fff; }
 .vwl-ctl { display: flex; gap: 2px; margin-left: auto; margin-right: 6px; }
+.intro { position: fixed; top: 0; left: var(--side); right: 0; bottom: 86px; z-index: 30; display: grid; place-items: center; background: radial-gradient(80% 70% at 50% 20%, color-mix(in srgb, var(--k) 55%, transparent), transparent 70%), var(--bg); transition: opacity .25s; }
+.intro.out { opacity: 0; } body.side-off .intro { left: 0; } .in-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; max-width: 520px; padding: 20px; }
+.in-cov { width: 220px; height: 220px; border-radius: 12px; background-size: cover; box-shadow: 0 30px 70px -30px #000; margin-bottom: 14px; } .in-card small { color: var(--ink2); letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+.in-card h1 { margin: 0; font-size: 34px; } .in-art { margin: 0; color: var(--ink2); } .in-notes { font-size: 13.5px; line-height: 1.55; color: var(--ink2); margin: 10px 0 14px; } .in-notes a { color: var(--ink); }
 .side-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px 10px 10px; } .stile { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; background-size: cover; background-position: center; cursor: pointer; } .stile:hover { border-color: var(--ink3); } .stile.on { border-color: var(--ink); }
 .lib-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; } .lib-tools .search { width: 240px; } .lib-none { margin: 4px 0 16px; } .mine-filter select { padding-right: 22px; }
 
@@ -1759,6 +1763,12 @@ function renderLibrary(m) {
   const so = $('#sort'); if (so) so.value = S.sort;
 }
 
+/* intro screen: cover, title, artist and the publisher's notes, once per visit, with Enter */
+function introHTML(c) {
+  const ts = colTracks(c), links = t => esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (m, a, u) => `<a href="${u}" target="_blank" rel="noopener">${a}</a>`).replace(/\n/g, '<br>');
+  return `<div class="intro" id="intro" style="--k:${pcolors(c)[0]}"><div class="in-card"><span class="in-cov" style="${pcovFull(c)}"></span><small>${plural(ts.length, 'track')} · ${total(ts)}</small><h1>${esc(c.name)}</h1><p class="in-art">${esc(projArtist(c))}</p>
+    ${c.intro.notes ? `<p class="in-notes">${links(c.intro.notes)}</p>` : ''}<button class="btn primary" data-act="intro-enter">Enter ${ico('chevR', 14)}</button></div></div>`;
+}
 function renderProject(m) {
   const c = col(S.colId); if (!c) { S.view = 'library'; return renderLibrary(m); }
   const ts = colTracks(c), link = `compass.fm/${slug(S.concept.artist)}/${slug(c.name)}`;
@@ -1791,6 +1801,7 @@ function renderProject(m) {
     ${fol ? `<section class="fkids"><h3>Projects</h3>${kidsOf(c).length ? `<div class="pgrid">${kidsOf(c).map(projCard).join('')}</div>` : '<p class="faint small">Empty. Drag projects onto this folder in the Library.</p>'}</section>` : ''}
     ${isMine(c) ? colhead.replace('class="colhead"', 'class="colhead ro"') : colhead}${c.archived && !isMine(c) ? `<div class="arch-note">${ico('lock', 15)}<span>Archived. It's saved exactly as it was and can't be edited.</span><button class="btn sm" data-act="ctx-newver" data-id="${c.id}">New version</button></div>` : ''}<div id="list" class="list${isMine(c) ? ' ro' : ''}"></div>`;
   S.projTab = 'tracks';
+  UI.introSeen = UI.introSeen || new Set(); if (c.intro && c.intro.on && !UI.introSeen.has(c.id)) { UI.introSeen.add(c.id); m.insertAdjacentHTML('beforeend', introHTML(c)); m.scrollTop = 0; }
 }
 
 /* ---------- dates ---------- */
@@ -1949,6 +1960,9 @@ function openModal(kind, id, x = {}) {
       <label class="lab" for="pb-up">CD upgrade</label><div class="pb-row" id="pb-upbox"><span class="pb-cur">$</span><input class="field" id="pb-up" type="number" min="0" step=".01" value="${R.cdUpgrade ?? 9.99}" ${R.cd != null ? '' : 'disabled'}><span class="faint small">for people who own the digital</span></div>
       <label class="lab" for="pb-desc">Description</label><textarea class="field" id="pb-desc" rows="2" maxlength="400" placeholder="A line or two for the Store page">${esc(R.desc || c.desc || '')}</textarea>
     </div>
+    <details class="mdet" ${(c.intro || {}).on ? 'open' : ''}><summary>Intro screen</summary>
+      <label class="check"><input type="checkbox" id="pb-intro" ${(c.intro || {}).on ? 'checked' : ''}><span>Show an opening screen with the cover and your notes before people enter</span></label>
+      <textarea class="field" id="pb-introtxt" rows="3" maxlength="600" placeholder="Say something about this album. [text](https://link) for links." style="margin-top:6px">${esc((c.intro || {}).notes || '')}</textarea></details>
     <details class="mdet" ${R.resale ? 'open' : ''}><summary>Resale</summary>
       <label class="check"><input type="checkbox" id="pb-rs" ${R.resale ? 'checked' : ''}><span>Owners can resell it in the Marketplace</span></label>
       <div id="pb-rsbox" class="pb-row ${R.resale ? '' : 'hide-folder'}"><span class="faint small">Seller keeps</span><input class="field" id="pb-share" type="number" min="0" max="97.5" step=".5" value="${R.sellerShare ?? 92.5}"><span class="faint small">% · max price $</span><input class="field" id="pb-max" type="number" min="1" step=".01" value="${R.maxResale ?? ''}" placeholder="none"></div>
@@ -3695,7 +3709,8 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
-  { v: '1.17.4', d: '2026-11-21', items: ['Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu.', 'FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.'] },
+  { v: '1.17.5', d: '2026-11-21', items: [] },
+  { v: '1.17.4', d: '2026-11-21', items: [d: '2026-11-21', items: ['Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button.', 'Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu.', 'FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.'] },
   { v: '1.17.3', d: '2026-11-16', items: ['Artists: a song imported more than once counts once, so artist song counts are right.', 'Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.', 'Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.', 'Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.', 'Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files).', 'Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even.', 'Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.'] },
   { v: '1.17.2', d: '2026-11-16', items: ['Sidebar: Digital albums starts higher, under a shorter Projects list that scrolls.'] },
   { v: '1.17.1', d: '2026-11-16', items: ['Sidebar: nine most recently played digital albums, starting just above halfway.'] },
@@ -4875,6 +4890,7 @@ function act(a, el, e) {
         mintOwn(n, 'publish'); c.archived = true; c.publishedTo = n.id; S.cd.tabs = (S.cd.tabs || []).filter(x => x !== c.id);
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
+    case 'intro-enter': { const el2 = $('#intro'); if (el2) { el2.classList.add('out'); setTimeout(() => el2.remove(), 250); } break; }
     case 'side-projects': S.view = 'library'; S.libTab = 'projects'; refresh(); break;
     case 'cd-vis': { const c = col(id); if (!c) break; viewerFor(c.id, { play: true }); setTimeout(() => { const v = $('#viewer'); if (v && UI.vw) v.classList.add('bare'); }, 200); break; }
     case 'side-toggle': S.sideOff = !S.sideOff; document.body.classList.toggle('side-off', S.sideOff); save(); break;
@@ -5724,6 +5740,7 @@ function publishSave() {
       if (price && v >= price) return err(`${q.toLocaleString()} codes: each code has to cost less than the Store price (${usd(price)}).`);
       if (v > prev) return err(`${q.toLocaleString()} codes can't cost more per code than a smaller pack.`); ws[q] = v; prev = v; }
     if (!Object.keys(ws).length) return err('Set a price for at least one wholesale pack, or turn wholesale off.'); }
+  c.intro = { on: !!($('#pb-intro') || {}).checked, notes: (($('#pb-introtxt') || {}).value || '').trim().slice(0, 600) };
   c.release = { ...(c.release || {}), digital: price, cd, cdUpgrade: cdOn ? up : null, size, edition: size ? 'collector' : 'open', desc: ($('#pb-desc').value || '').trim(), resale: rs, tradable: rs, sellerShare: rs ? share : null, maxResale: rs ? max : null, lend: true, wholesale: ws, at: (c.release && c.release.at) || Date.now() };
   save(); closeModal(); refresh(); toast(`${c.name} is in the Store: ${usd(price)}${cd != null ? ' · CD ' + usd(cd) : ''}${size ? ' · ' + size + ' copies' : ' · unlimited'}`);
 }
