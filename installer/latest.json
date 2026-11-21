@@ -1,11 +1,18 @@
 {
-  "version": "1.17.5",
+  "version": "1.17.6",
   "file": "Compass-Setup.exe",
-  "size": 84867929,
-  "sha256": "84fb7685e25001d9f7cf3a90a34bfd2ff69e2c546f7cfa629135e0a40f22c33e",
-  "notes": "Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button.",
+  "size": 84868500,
+  "sha256": "49f7c816ca4f7f27b0244f6e400886ee491331f085d22901f3b5d073554b45a4",
+  "notes": "Cover pop-up tilts in 3D toward your cursor with a soft light, like Spotify’s. Click the dots or use the arrow keys to see the other covers.",
   "date": "2026-11-21",
   "changelog": [
+    {
+      "v": "1.17.6",
+      "d": "2026-11-21",
+      "items": [
+        "Cover pop-up tilts in 3D toward your cursor with a soft light, like Spotify’s. Click the dots or use the arrow keys to see the other covers."
+      ]
+    },
     {
       "v": "1.17.5",
       "d": "2026-11-21",
@@ -154,15 +161,6 @@
       "d": "2026-11-16",
       "items": [
         "Fix: 1.15.0 could empty your library list the first time it started. If yours is empty, Compass offers to restore the copy from before the update (your audio and covers were never touched). Settings › Backup › Find an older copy does the same any time."
-      ]
-    },
-    {
-      "v": "1.15.0",
-      "d": "2026-11-16",
-      "items": [
-        "Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.",
-        "Digital albums: filter All, Verified or Local.",
-        "Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album."
       ]
     }
   ]
