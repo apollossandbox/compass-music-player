@@ -4,6 +4,7 @@ Every Compass release, newest first. The app shows the same list under Settings 
 
 ## 1.17.3 · 2026-11-16
 
+- Artists: a song imported more than once counts once, so artist song counts are right.
 - Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.
 - Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.
 - Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.

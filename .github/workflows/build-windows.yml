@@ -1,0 +1,56 @@
+# Builds the Windows installer on a real Windows machine and publishes it to installer/
+# (Compass-Setup.exe + latest.json), the files installed copies of Compass check for updates.
+# Run it from the Actions tab (Run workflow) after the version in index.html's CHANGELOG is bumped.
+name: Build Windows installer
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: build-windows
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        working-directory: desktop
+        run: npm ci --no-audit --no-fund
+      - name: Sign-in config (kept out of the repo)
+        working-directory: desktop
+        env:
+          ONLINE_JSON: ${{ secrets.ONLINE_JSON }}
+        run: |
+          if [ -n "$ONLINE_JSON" ]; then printf '%s' "$ONLINE_JSON" > online.json; else echo "No ONLINE_JSON secret: sign-in will be hidden in this build"; fi
+      - name: Build
+        working-directory: desktop
+        run: |
+          VERSION=$(node -e "const s=require('fs').readFileSync('../index.html','utf8');console.log(s.match(/\{ v: '([\d.]+)'/)[1])")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          npm pkg set version="$VERSION"
+          node make-page.js
+          npx electron-builder --win nsis --x64 --publish never -c.win.icon=build/icon.ico
+          test -f "dist/Compass-Setup-$VERSION.exe"
+          mkdir -p ../installer
+          cp "dist/Compass-Setup-$VERSION.exe" ../installer/Compass-Setup.exe
+          node -e '
+          const fs = require("fs"), v = process.argv[1];
+          const changelog = JSON.parse(fs.readFileSync("changelog.json", "utf8")), top = changelog.find(e => e.v === v);
+          const f = "../installer/Compass-Setup.exe", size = fs.statSync(f).size;
+          if (size < 20e6) { console.error("Installer is too small (" + size + " bytes)"); process.exit(1); }
+          const sha256 = require("crypto").createHash("sha256").update(fs.readFileSync(f)).digest("hex");
+          fs.writeFileSync("../installer/latest.json", JSON.stringify({ version: v, file: "Compass-Setup.exe", size, sha256, notes: top ? top.items.join(" ") : "", date: new Date().toISOString().slice(0, 10), changelog: changelog.slice(0, 20) }, null, 2) + "\n");
+          ' "$VERSION"
+      - name: Publish
+        run: |
+          git config user.name "Compass build"
+          git config user.email "actions@users.noreply.github.com"
+          git add installer/Compass-Setup.exe installer/latest.json desktop/package.json CHANGELOG.md
+          git commit -m "Windows installer $VERSION (built on GitHub Actions)" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
