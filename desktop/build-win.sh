@@ -20,11 +20,15 @@ npx electron-builder --win dir --x64 --publish never -c.win.signAndEditExecutabl
 # 2. Stamp icon and version info into the exe with the 64-bit resource editor.
 RCEDIT="$(ls ~/.cache/electron-builder/winCodeSign/winCodeSign-*/rcedit-x64.exe | head -1)"
 WINE64="$(command -v wine64 || echo /usr/lib/wine/wine64)"
-WINEARCH=win64 WINEPREFIX="$HOME/.wine64" "$WINE64" "$RCEDIT" "dist/win-unpacked/Compass.exe" \
+# If Wine fails here, STAMPED_EXE can point at a Compass.exe taken from an earlier installer (same Electron version, icon already set).
+if ! WINEARCH=win64 WINEPREFIX="$HOME/.wine64" "$WINE64" "$RCEDIT" "dist/win-unpacked/Compass.exe" \
   --set-version-string FileDescription "Compass Music Player" --set-version-string ProductName "Compass Music Player" \
   --set-version-string LegalCopyright "trulytamed and KGB" --set-version-string CompanyName trulytamed \
   --set-version-string InternalName "Compass" --set-version-string OriginalFilename "Compass.exe" \
-  --set-file-version "$VERSION" --set-product-version "$VERSION.0" --set-icon build/icon.ico
+  --set-file-version "$VERSION" --set-product-version "$VERSION.0" --set-icon build/icon.ico; then
+  test -n "${STAMPED_EXE:-}" && test -f "$STAMPED_EXE" || { echo "rcedit failed; set STAMPED_EXE to a stamped Compass.exe"; exit 1; }
+  cp "$STAMPED_EXE" dist/win-unpacked/Compass.exe; echo "rcedit failed; used $STAMPED_EXE"
+fi
 
 # 3. Build the installer from the prepared app. (A trailing "channel" error from electron-builder is harmless.)
 npx electron-builder --win nsis --x64 --prepackaged dist/win-unpacked --publish never \

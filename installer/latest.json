@@ -1,11 +1,23 @@
 {
-  "version": "1.17.2",
+  "version": "1.17.3",
   "file": "Compass-Setup.exe",
-  "size": 84919527,
-  "sha256": "7c142671f03b2d9c2a12c71702b359890056c18e528336771767aa2ae71a14e9",
-  "notes": "Sidebar: Digital albums starts higher, under a shorter Projects list that scrolls.",
-  "date": "2026-11-15",
+  "size": 219888,
+  "sha256": "5209fddf9482c9ade354c87e70a86d8b86901c65ce6e80b6790294e1cb8f4725",
+  "notes": "Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it. Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX. Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B. Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files). Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even. Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.",
+  "date": "2026-11-21",
   "changelog": [
+    {
+      "v": "1.17.3",
+      "d": "2026-11-16",
+      "items": [
+        "Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.",
+        "Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.",
+        "Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.",
+        "Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files).",
+        "Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even.",
+        "Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away."
+      ]
+    },
     {
       "v": "1.17.2",
       "d": "2026-11-16",
@@ -152,18 +164,10 @@
       "items": [
         "CD case look updated (rolled back in 1.14.1)."
       ]
-    },
-    {
-      "v": "1.13.9",
-      "d": "2026-11-16",
-      "items": [
-        "Store pages: right-clicking the CD case no longer opens the CD Creator’s editing menu.",
-        "Convert: YouTube links work again. Compass gives the link tool its own built-in JavaScript runtime (YouTube now requires one), keeps the tool up to date weekly, and shows the real error instead of a warning."
-      ]
     }
   ],
   "live": {
-    "shell": "7f7dce089b4abc65",
+    "shell": "97279647adaeb1c4",
     "files": [
       {
         "p": "icon.png",
@@ -172,8 +176,8 @@
       },
       {
         "p": "index.html",
-        "sha256": "53bf80d07a576f3dad1c65603ce1073718ba0c6588ac222177cf6f6932a066ef",
-        "size": 699839
+        "sha256": "76af49e49a72df32c5013fcabeebb63b315e9a88709e78ed2de4ebb93d0a2a7a",
+        "size": 707862
       },
       {
         "p": "lib/GLTFExporter.js",
