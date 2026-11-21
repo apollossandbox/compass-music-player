@@ -2,6 +2,10 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.17.6 · 2026-11-21
+
+- Cover pop-up tilts in 3D toward your cursor with a soft light, like Spotify’s. Click the dots or use the arrow keys to see the other covers.
+
 ## 1.17.5 · 2026-11-21
 
 - Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button.

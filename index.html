@@ -587,7 +587,7 @@ body.side-off .app { grid-template-columns: 0 minmax(0, 1fr); } body.side-off #s
 body.side-off .side-show { display: grid; }
 .bigcov { cursor: zoom-in; }
 .coverpop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; align-content: center; gap: 12px; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); cursor: zoom-out; opacity: 0; transition: opacity .2s; }
-.coverpop.open { opacity: 1; } .coverpop img { width: min(70vh, 80vw); aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 40px 90px -30px #000; transform: scale(.96); transition: transform .25s var(--ease2); } .coverpop.open img { transform: none; }
+.coverpop.open { opacity: 1; } .cp-tilt { position: relative; border-radius: 12px; transition: transform .18s ease-out; transform-style: preserve-3d; will-change: transform; } .coverpop img { display: block; width: min(70vh, 80vw); aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 50px 100px -30px #000; } .cp-glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; mix-blend-mode: screen; } .cp-dots i { cursor: pointer; padding: 0; }
 .coverpop span { color: rgba(255,255,255,.6); font-size: 12px; } .cp-dots { display: flex; gap: 6px; justify-content: center; } .cp-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.35); } .cp-dots i.on { background: #fff; }
 .vwl-ctl { display: flex; gap: 2px; margin-left: auto; margin-right: 6px; }
 .intro { position: fixed; top: 0; left: var(--side); right: 0; bottom: 86px; z-index: 30; display: grid; place-items: center; background: radial-gradient(80% 70% at 50% 20%, color-mix(in srgb, var(--k) 55%, transparent), transparent 70%), var(--bg); transition: opacity .25s; }
@@ -3709,6 +3709,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.17.6', d: '2026-11-21', items: ['Cover pop-up tilts in 3D toward your cursor with a soft light, like Spotify’s. Click the dots or use the arrow keys to see the other covers.'] },
   { v: '1.17.5', d: '2026-11-21', items: ['Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button.'] },
   { v: '1.17.4', d: '2026-11-21', items: ['Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu.', 'FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.'] },
   { v: '1.17.3', d: '2026-11-16', items: ['Artists: a song imported more than once counts once, so artist song counts are right.', 'Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.', 'Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.', 'Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.', 'Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files).', 'Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even.', 'Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.'] },
@@ -4410,8 +4411,18 @@ function versHTML(t) {
 }
 function coverPop(from) {
   const c = S.view === 'collection' && col(S.colId), url = c && artFull(c); if (!url) return; let el = $('#coverpop'); if (el) el.remove();
-  el = document.createElement('div'); el.id = 'coverpop'; el.className = 'coverpop'; el.innerHTML = `<img src="${url}" alt="${esc(c.name)} cover">${(c.covers || []).length > 1 ? `<div class="cp-dots">${c.covers.map(cv => `<i class="${cv.id === c.cover ? 'on' : ''}"></i>`).join('')}</div>` : ''}<span>Click anywhere to close</span>`;
+  const cs = (c.covers || []).filter(cv => srcs['art:' + cv.id]); let i = Math.max(0, cs.findIndex(cv => cv.id === c.cover));
+  el = document.createElement('div'); el.id = 'coverpop'; el.className = 'coverpop';
+  el.innerHTML = `<div class="cp-tilt"><img src="${url}" alt="${esc(c.name)} cover"><i class="cp-glare"></i></div>${cs.length > 1 ? `<div class="cp-dots">${cs.map((cv, n) => `<i class="${n === i ? 'on' : ''}" data-n="${n}"></i>`).join('')}</div>` : ''}<span>Click anywhere to close</span>`;
   document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('open'));
+  const tilt = el.querySelector('.cp-tilt'), img = tilt.querySelector('img'), glare = tilt.querySelector('.cp-glare');
+  const show = n => { i = (n + cs.length) % cs.length; img.src = srcs['art:' + cs[i].id]; el.querySelectorAll('.cp-dots i').forEach((d, k) => d.classList.toggle('on', k === i)); };
+  // tilts toward the cursor, with a soft light following it
+  el.addEventListener('pointermove', e => { const r = tilt.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5, cx = Math.max(-.6, Math.min(.6, x)), cy = Math.max(-.6, Math.min(.6, y));
+    tilt.style.transform = `perspective(1100px) rotateY(${cx * 18}deg) rotateX(${-cy * 18}deg) scale(1.02)`; glare.style.background = `radial-gradient(circle at ${(x + .5) * 100}% ${(y + .5) * 100}%, rgba(255,255,255,.22), transparent 55%)`; });
+  el.addEventListener('pointerleave', () => { tilt.style.transform = ''; glare.style.background = ''; });
+  el.addEventListener('click', e => { const d = e.target.closest('.cp-dots i'); if (d) { e.stopPropagation(); show(+d.dataset.n); } }, true);
+  el.tabIndex = -1; el.focus(); el.addEventListener('keydown', e => { if (cs.length > 1 && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); show(i + (e.key === 'ArrowRight' ? 1 : -1)); } });
 }
 addEventListener('keydown', e => { if (e.key === 'Escape') { const p = $('#coverpop'); if (p) p.remove(); } });
 function mediaMeta(t) {
