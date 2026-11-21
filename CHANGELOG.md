@@ -2,9 +2,12 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
-## 1.17.4 · 2026-11-21
+## 1.17.5 · 2026-11-21
 
 - Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button.
+
+## 1.17.4 · 2026-11-21
+
 - Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu.
 - FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.
 
