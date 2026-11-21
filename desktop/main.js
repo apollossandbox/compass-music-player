@@ -214,6 +214,26 @@ function flExeFor(file, fallback) {
 }
 const withVer = x => ({ ...x, ver: /\.flp$/i.test(x.path) ? flMajor(flpVersion(x.path)) || 0 : 0 });
 /* FL Studio's own autosaves live in Projects\\Backup; a different backup folder can be chosen in Compass */
+/* FL Studio templates: the ones that ship with each installed FL version (Data\Templates) and your own (Documents\Image-Line\FL Studio\Projects\Templates) */
+function flTemplates() {
+  const dirs = [path.join(flUserDir(), 'Projects', 'Templates'), path.join(flUserDir(), 'Templates')], seen = new Set(), out = [];
+  for (const v of ((dawScan().versions || {}).fl || [])) dirs.push(path.join(path.dirname(v.path), 'Data', 'Templates'));
+  for (const d of dirs) { const found = []; flpWalk(d, 3, found);
+    for (const x of found) { const k = x.path.toLowerCase(); if (seen.has(k)) continue; seen.add(k); const rel = path.relative(d, path.dirname(x.path));
+      out.push({ path: x.path, name: path.basename(x.path, '.flp'), folder: rel ? rel.split(/[\\/]+/).join(' › ') : '', time: x.time, own: d.startsWith(flUserDir()) }); } }
+  return out.sort((a, b) => (b.own - a.own) || a.name.localeCompare(b.name));
+}
+// a new project from a template: copy it into Projects, so the template itself is never saved over
+function flNewFrom(tpl) {
+  if (typeof tpl !== 'string' || !/\.flp$/i.test(tpl) || !fs.existsSync(tpl)) throw new Error('That template is gone');
+  const dir = path.join(flUserDir(), 'Projects'); fs.mkdirSync(dir, { recursive: true });
+  const d = new Date(), stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
+  let f = path.join(dir, `${path.basename(tpl, '.flp')} ${stamp}.flp`); for (let i = 2; fs.existsSync(f); i++) f = path.join(dir, `${path.basename(tpl, '.flp')} ${stamp} (${i}).flp`);
+  fs.copyFileSync(tpl, f); return f;
+}
+/* project files linked to songs, from any DAW */
+const PROJ_EXT = { fl: ['flp'], ableton: ['als'], logic: ['logicx'], studioone: ['song'], reaper: ['rpp'], cubase: ['cpr'], bitwig: ['bwproject'], protools: ['ptx'], reason: ['reason'], garageband: ['band'] };
+const PROJ_RE = new RegExp('\\.(' + [].concat(...Object.values(PROJ_EXT)).join('|') + ')$', 'i');
 function flBackups(dir) {
   const root = typeof dir === 'string' && dir && fs.existsSync(dir) ? dir : path.join(flUserDir(), 'Projects', 'Backup'), found = [];
   flpWalk(root, 2, found);
@@ -333,6 +353,18 @@ app.whenReady().then(() => {
     if (zipped) return { ok: false, error: "Compass can't find FL Studio. Use Add DAW in the Launcher, then try again." }; // Windows would open the zip in Explorer instead
     const err = await shell.openPath(file); return err ? { ok: false, error: err } : { ok: true };
   });
+  ipcMain.handle('tp-fl-templates', () => { try { return flTemplates(); } catch (e) { return []; } });
+  ipcMain.handle('tp-fl-newfrom', async (e, tpl, exe) => { try { const f = flNewFrom(tpl); const x = flExeFor(f, exe);
+      if (typeof x === 'string' && /\.exe$/i.test(x) && fs.existsSync(x)) require('child_process').spawn(x, [f], { detached: true, stdio: 'ignore', cwd: path.dirname(x) }).unref(); else { const err = await shell.openPath(f); if (err) throw new Error(err); }
+      return { ok: true, path: f }; } catch (err) { return { ok: false, error: err.message }; } });
+  ipcMain.handle('tp-proj-pick', async (e, daw) => { const ext = PROJ_EXT[daw] || [].concat(...Object.values(PROJ_EXT));
+    const r = await dialog.showOpenDialog(win, { title: 'Link a project file', properties: daw === 'logic' ? ['openFile', 'openDirectory'] : ['openFile'], filters: [{ name: 'Project files', extensions: ext }] });
+    return r.canceled ? null : r.filePaths[0]; });
+  ipcMain.handle('tp-proj-open', async (e, file, exe) => {
+    if (typeof file !== 'string' || !PROJ_RE.test(file) || !fs.existsSync(file)) return { ok: false, error: 'That project file is gone' };
+    if (/\.flp$/i.test(file)) { const x = flExeFor(file, exe); if (typeof x === 'string' && /\.exe$/i.test(x) && fs.existsSync(x)) { require('child_process').spawn(x, [file], { detached: true, stdio: 'ignore', cwd: path.dirname(x) }).unref(); return { ok: true }; } }
+    const err = await shell.openPath(file); return err ? { ok: false, error: err } : { ok: true }; });
+  ipcMain.handle('tp-proj-reveal', (e, file) => { if (typeof file === 'string' && PROJ_RE.test(file) && fs.existsSync(file)) { shell.showItemInFolder(file); return true; } return false; });
   ipcMain.handle('tp-fl-pick', async (e, what) => {
     const dir = path.join(flUserDir(), 'Projects'), folder = what === 'folder';
     const r = await dialog.showOpenDialog(win, { title: folder ? 'Add a folder with FL Studio projects' : 'Open an FL Studio project', defaultPath: fs.existsSync(dir) ? dir : app.getPath('documents'), properties: folder ? ['openDirectory'] : ['openFile'], filters: folder ? [] : [{ name: 'FL Studio projects and zipped loop packages', extensions: ['flp', 'zip'] }] });

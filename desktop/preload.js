@@ -3,6 +3,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('tpDesktop', {
   version: ipcRenderer.sendSync('tp-version') || '',
   checkForUpdates: () => ipcRenderer.invoke('tp-check-updates'),
+  proj: { pick: daw => ipcRenderer.invoke('tp-proj-pick', daw), open: (f, exe) => ipcRenderer.invoke('tp-proj-open', f, exe), reveal: f => ipcRenderer.invoke('tp-proj-reveal', f) },
+  flTpl: { list: () => ipcRenderer.invoke('tp-fl-templates'), newFrom: (tpl, exe) => ipcRenderer.invoke('tp-fl-newfrom', tpl, exe) },
   flp: { recent: (dirs, opened, n) => ipcRenderer.invoke('tp-fl-recent', dirs, opened, n), all: (dirs, kind, bdir) => ipcRenderer.invoke('tp-fl-all', dirs, kind, bdir), reveal: file => ipcRenderer.invoke('tp-fl-reveal', file), open: (file, exe) => ipcRenderer.invoke('tp-fl-open', file, exe), pick: what => ipcRenderer.invoke('tp-fl-pick', what) },
   daw: { scan: () => ipcRenderer.invoke('tp-daw-scan'), icon: f => ipcRenderer.invoke('tp-daw-icon', f), open: f => ipcRenderer.invoke('tp-daw-open', f), locate: n => ipcRenderer.invoke('tp-daw-locate', n) },
   saveToDownloads: (name, data) => ipcRenderer.invoke('tp-save-downloads', name, data),

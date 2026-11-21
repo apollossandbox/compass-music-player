@@ -3695,6 +3695,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.17.4', d: '2026-11-21', items: ['Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu.', 'FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.'] },
   { v: '1.17.3', d: '2026-11-16', items: ['Artists: a song imported more than once counts once, so artist song counts are right.', 'Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.', 'Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.', 'Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.', 'Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files).', 'Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even.', 'Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.'] },
   { v: '1.17.2', d: '2026-11-16', items: ['Sidebar: Digital albums starts higher, under a shorter Projects list that scrolls.'] },
   { v: '1.17.1', d: '2026-11-16', items: ['Sidebar: nine most recently played digital albums, starting just above halfway.'] },
@@ -3923,6 +3924,7 @@ function renderMarket(m) {
     ${wholesaleHTML()}${S.ledger ? resaleHTML() : ''}`;
 }
 /* ---------- Launcher: find the DAWs on this computer and open them ---------- */
+const dawName = k => (DAWS.find(d => d[0] === k) || [, k])[1];
 const DAWS = [['fl', 'FL Studio'], ['ableton', 'Ableton Live'], ['logic', 'Logic Pro'], ['studioone', 'Studio One'], ['reaper', 'REAPER'], ['cubase', 'Cubase'], ['bitwig', 'Bitwig Studio'], ['protools', 'Pro Tools'], ['reason', 'Reason'], ['garageband', 'GarageBand']];
 const DAWLOOK = { fl: ['FL', '#ff8a00', '#2b2b2b'], ableton: ['Live', '#111111', '#f2f2f2'], logic: ['Lp', '#3a3a3c', '#e8e8ea'], studioone: ['S1', '#0a5ad4', '#ffffff'], reaper: ['R', '#2f6f50', '#ffffff'], cubase: ['Cu', '#c4122f', '#ffffff'], bitwig: ['Bw', '#ff5a00', '#1b1b1b'], protools: ['Pt', '#6a1fd8', '#ffffff'], reason: ['Rs', '#d81f26', '#ffffff'], garageband: ['Gb', '#f79400', '#ffffff'] };
 UI.dawIcons = UI.dawIcons || {};
@@ -3935,6 +3937,7 @@ function flLoad() {
   if (tpDesktop.flp.all) { UI.flAll = UI.flAll && UI.flAll !== 'busy' ? UI.flAll : 'busy'; tpDesktop.flp.all(S.flDirs || []).then(r => { UI.flAll = r || []; flAllPaint(); }).catch(() => { UI.flAll = []; flAllPaint(); });
     UI.flZip = UI.flZip && UI.flZip !== 'busy' ? UI.flZip : 'busy'; tpDesktop.flp.all(S.flDirs || [], 'zip').then(r => { UI.flZip = r || []; flAllPaint(); }).catch(() => { UI.flZip = []; flAllPaint(); });
     UI.flBak = UI.flBak && UI.flBak !== 'busy' ? UI.flBak : 'busy'; tpDesktop.flp.all([], 'backup', S.flBackupDir || '').then(r => { UI.flBak = r || []; flAllPaint(); }).catch(() => { UI.flBak = []; flAllPaint(); }); }
+  if (tpDesktop.flTpl) { UI.flTpl = UI.flTpl && UI.flTpl !== 'busy' ? UI.flTpl : 'busy'; flTplLoad().then(flAllPaint); }
   tpDesktop.flp.recent(S.flDirs || [], S.flOpened || [], 6).then(r => { UI.flRecent = r || []; flAllPaint(); }).catch(() => { UI.flRecent = []; flAllPaint(); });
 }
 async function flOpen(file) {
@@ -3944,10 +3947,12 @@ async function flOpen(file) {
   toast('Opening ' + file.split(/[\\/]/).pop().replace(/\.(flp|zip)$/i, '') + ' in FL Studio'); UI.lRecent = null; if (UI.flScreen) flLoad(); else if (S.view === 'launcher') renderMain();
 }
 /* FL Studio screen: tabs (Recent, All projects, Zipped loops, Backups), one toolbar, a compact list, 12 per page */
-const FL_TABS = [['recent', 'Recent'], ['flp', 'All projects'], ['zip', 'Zipped loops'], ['backup', 'Backups']];
+const FL_TABS = [['recent', 'Recent'], ['flp', 'All projects'], ['zip', 'Zipped loops'], ['backup', 'Backups'], ['tpl', 'Templates']];
 const flTab = () => { const k = (S.flView || {}).kind; return FL_TABS.some(t => t[0] === k) ? k : 'recent'; };
 const flZipTab = () => flTab() === 'zip';
-const flList = () => ({ recent: UI.flRecent, flp: UI.flAll, zip: UI.flZip, backup: UI.flBak })[flTab()];
+const flList = () => ({ recent: UI.flRecent, flp: UI.flAll, zip: UI.flZip, backup: UI.flBak, tpl: UI.flTpl })[flTab()];
+const flTplName = () => S.flTemplate ? S.flTemplate.split(/[\\/]/).pop().replace(/\.flp$/i, '') : '';
+function flTplLoad() { if (!(window.tpDesktop && tpDesktop.flTpl)) return Promise.resolve([]); return tpDesktop.flTpl.list().then(r => (UI.flTpl = r || [])).catch(() => (UI.flTpl = [])); }
 const FL_PER = 12;
 const FL_SORTS = [['new', 'Recently saved'], ['old', 'Oldest first'], ['az', 'Name A–Z'], ['za', 'Name Z–A'], ['big', 'Largest first']];
 const flSize = b => !b ? '' : b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
@@ -3978,9 +3983,9 @@ function flAllListHTML() {
   const r = flFiltered(), pages = Math.max(1, Math.ceil(r.length / FL_PER)); UI.flPage = Math.min(Math.max(1, UI.flPage || 1), pages);
   if (!r.length) return `<p class="faint fl-note">Nothing matches. <button class="linkbtn" data-act="fl-clear">Clear the search</button></p>`;
   const from = (UI.flPage - 1) * FL_PER, part = r.slice(from, from + FL_PER), exe = flExe(), icon = exe && UI.dawIcons[exe];
-  return `<div class="flrows" role="list">${part.map(p => `<button class="flr" role="listitem" data-act="fl-proj" data-k="${esc(p.path)}" title="${esc(p.path)}">
+  return `<div class="flrows" role="list">${part.map(p => `<button class="flr" role="listitem" data-act="${flTab() === 'tpl' ? 'fl-tpl-new' : 'fl-proj'}" data-k="${esc(p.path)}" title="${esc(p.path)}">
       <span class="flr-ic">${icon ? `<img src="${icon}" alt="" draggable="false">` : ico('disc', 18)}${/\.zip$/i.test(p.path) ? '<i class="flp-zip">ZIP</i>' : flVerTag(p)}</span>
-      <span class="flr-n">${esc(p.name)}</span><span class="flr-f">${esc(flWhere(p))}</span>
+      <span class="flr-n">${esc(p.name)}${S.flTemplate === p.path ? ' <small class="faint">· Default</small>' : ''}</span><span class="flr-f">${esc(flWhere(p))}</span>
       <span class="flr-t">${p.how === 'opened' ? 'Opened' : 'Saved'} ${flAgo(p.time)}</span><span class="flr-s">${flSize(p.size)}</span>
       <span class="flr-go">${ico('play', 12)}</span></button>`).join('')}</div>
     ${pages > 1 || r.length !== A.length ? `<div class="fl-foot"><span class="faint small">${from + 1}–${from + part.length} of ${r.length}${r.length !== A.length ? ` (of ${A.length})` : ''}</span>${flPager(UI.flPage, pages)}</div>` : ''}`;
@@ -4924,7 +4929,13 @@ function act(a, el, e) {
     case 'daw-open-ver': { S.dawPick = { ...(S.dawPick || {}), [k]: id }; save(); if (window.tpDesktop) tpDesktop.daw.open(id).then(r => toast(r && r.ok ? 'Opening ' + id.split(/[\\/]/).slice(-2, -1)[0] + '…' : 'Could not open: ' + ((r && r.error) || 'unknown error'))); renderMain(); break; }
     case 'daw-add': { const r = el.getBoundingClientRect(), onMac = /Mac/i.test(navigator.platform || navigator.userAgent), have = id => (S.daws || {})[id] || (UI.dawScan && UI.dawScan[id]); ctxMenu(r.left, r.top + 40, [{ head: 'Which DAW?' }, ...DAWS.filter(([id]) => (onMac || !['logic', 'garageband'].includes(id)) && !have(id)).map(([id, n]) => ({ label: n + '…', act: 'daw-locate', k: id }))]); break; }
     case 'daw-forget': { if (S.daws) delete S.daws[k]; if (S.dawPick) delete S.dawPick[k]; if (UI.dawScan && UI.dawScan !== 'busy') delete UI.dawScan[k]; save(); renderMain(); break; }
-    case 'daw-open': { const p = (S.dawPick || {})[k] || (S.daws || {})[k] || (UI.dawScan || {})[k]; if (p && window.tpDesktop) tpDesktop.daw.open(p).then(r => toast(r && r.ok ? 'Opening ' + (DAWS.find(d => d[0] === k) || [, k])[1] + '…' : 'Could not open: ' + ((r && r.error) || 'unknown error'))); break; }
+    case 'proj-link': { const tr = trk(id); if (!tr) break; tpDesktop.proj.pick(k).then(async f => { if (!f) return; const role = await askText('What is this project for?', (tr.links || []).length ? 'Instrumental' : 'Song'); if (role == null) return;
+      tr.links = [...(tr.links || []), { daw: k, path: f, role: role.trim().slice(0, 40), at: Date.now() }]; save(); toast(`Linked ${f.split(/[\\/]/).pop()} to ${dispTitle(tr)}`); }); break; }
+    case 'proj-open': { const tr = trk(id), L = tr && (tr.links || [])[+k]; if (!L) break; tpDesktop.proj.open(L.path, L.daw === 'fl' ? flExe() : '').then(r => toast(r && r.ok ? 'Opening ' + L.path.split(/[\\/]/).pop() : (r && r.error) || "Couldn't open that project")); break; }
+    case 'proj-unlink': { const tr = trk(id); if (!tr || !tr.links) break; const L = tr.links.splice(+k, 1)[0]; save(); if (L) toast('Unlinked ' + L.path.split(/[\\/]/).pop()); break; }
+    case 'fl-tpl-def': S.flTemplate = k || ''; save(); toast(k ? 'FL Studio launches into ' + flTplName() : 'FL Studio launches normally'); if (UI.flScreen) flAllPaint(); break;
+    case 'fl-tpl-new': if (window.tpDesktop && tpDesktop.flTpl) tpDesktop.flTpl.newFrom(k, flExe()).then(r => { if (!r || !r.ok) return toast((r && r.error) || "Couldn't start from that template"); S.flOpened = [{ path: r.path, time: Date.now() }, ...(S.flOpened || [])].slice(0, 20); save(); toast('New project from ' + k.split(/[\\/]/).pop().replace(/\.flp$/i, '')); }); break;
+    case 'daw-open': if (k === 'fl' && S.flTemplate && window.tpDesktop && tpDesktop.flTpl) { act('fl-tpl-new', { dataset: { k: S.flTemplate } }); break; } { const p = (S.dawPick || {})[k] || (S.daws || {})[k] || (UI.dawScan || {})[k]; if (p && window.tpDesktop) tpDesktop.daw.open(p).then(r => toast(r && r.ok ? 'Opening ' + (DAWS.find(d => d[0] === k) || [, k])[1] + '…' : 'Could not open: ' + ((r && r.error) || 'unknown error'))); break; }
     case 'daw-locate': if (window.tpDesktop) tpDesktop.daw.locate((DAWS.find(d => d[0] === k) || [, k])[1]).then(p => { if (p) { (S.daws = S.daws || {})[k] = p; save(); renderMain(); toast('Added'); } }); break;
     case 'bulk-play': { const ids = k.split(','); playTrack(ids[0], ids); break; }
     case 'bulk-export': { const pc = S.view === 'collection' && col(S.colId); if (pc && S.ledger && !Ledger.canExport(pc)) { toast(lockMsg(pc)); break; } exportTracks(k.split(',')); break; }
@@ -5489,6 +5500,9 @@ function trackMenuBase(t, inCol) {
   const on = S.cur === t.id && S.playing;
   return [{ head: dispTitle(t) }, { label: on ? 'Pause' : 'Play', act: 'play', id: t.id, icon: on ? 'pause' : 'play' }, { sep: 1 },
     { label: 'Edit song', act: 'edit', id: t.id, icon: 'edit' }, { label: 'Details & credits…', act: 'meta-open', id: t.id, icon: 'list' }, { sep: 1 },
+    ...(window.tpDesktop && tpDesktop.proj ? [...(t.links || []).map((L, i) => ({ label: `Open in ${dawName(L.daw)}${L.role ? ' (' + L.role + ')' : ''}`, act: 'proj-open', id: t.id, k: String(i), icon: 'play' })),
+      { label: 'Link project', icon: 'link', sub: DAWS.map(([k, l]) => ({ label: l, act: 'proj-link', id: t.id, k })) },
+      ...((t.links || []).length ? [{ label: 'Unlink project', icon: 'x', sub: t.links.map((L, i) => ({ label: `${dawName(L.daw)}${L.role ? ' (' + L.role + ')' : ''}`, act: 'proj-unlink', id: t.id, k: String(i) })) }] : []), { sep: 1 }] : []),
     { label: 'Replace audio…', act: 'ctx-replaudio', id: t.id, icon: 'upload' }, { label: 'Add version…', act: 'ctx-addver', id: t.id, icon: 'plus' }, { label: 'Export', act: 'bulk-export', k: t.id, icon: 'save' }, { label: 'Duplicate', act: 'bulk-dup', k: t.id, icon: 'copy' }, { sep: 1 },
     ...(inCol && !isMine(col(S.colId)) ? [{ label: 'Move', icon: 'move', sub: targetsMenu([t.id], 'bulk-move', '') }] : []), { label: 'Add to', icon: 'plus', sub: targetsMenu([t.id], 'bulk-copy', '') },
     { label: 'Status', icon: 'list', kbd: ST[t.status] || '', sub: Object.entries(ST).map(([k, l]) => ({ label: l, act: 'set-st', id: t.id, k, icon: t.status === k ? 'check' : null })) }, { sep: 1 },
@@ -5749,9 +5763,10 @@ function onContext(e) {
     e.preventDefault(); ctxMenu(e.clientX, e.clientY, [{ head: col(S.colId).name }, { label: 'Add a track…', act: 'add-track', id: S.colId, icon: 'plus' }, { label: 'Add audio files…', act: 'add', icon: 'upload' }, { label: 'Convert & download…', act: 'conv-open', id: S.colId, icon: 'link' }]); return; }
   { const tile = t.closest('.daw[data-daw]'); if (tile && window.tpDesktop) { e.preventDefault(); const id = tile.dataset.daw, name = (DAWS.find(d => d[0] === id) || [, id])[1];
       const vers = [...(((UI.dawScan || {}).versions || {})[id] || [])], custom = (S.daws || {})[id]; if (custom && !vers.some(v => v.path === custom)) vers.unshift({ label: name + ' (added by you)', path: custom });
-      const cur = (S.dawPick || {})[id] || custom || (UI.dawScan || {})[id];
+      const cur = (S.dawPick || {})[id] || custom || (UI.dawScan || {})[id]; if (id === 'fl' && !Array.isArray(UI.flTpl)) flTplLoad();
       ctxMenu(e.clientX, e.clientY, [{ head: vers.length > 1 ? 'Open which version?' : name }, ...vers.map(v => ({ label: v.label, act: 'daw-open-ver', k: id, id: v.path, icon: v.path === cur ? 'check' : null })),
-        ...(id === 'fl' && tpDesktop.flp ? [{ sep: 1 }, { label: 'FL Studio projects', act: 'fl-screen', icon: 'folder' }] : []), { sep: 1 }, { label: 'Remove from Launcher', act: 'daw-forget', k: id, icon: 'x' }]); return; } }
+        ...(id === 'fl' && tpDesktop.flp ? [{ sep: 1 }, { label: 'Default template', icon: 'sheet', kbd: flTplName() || 'None', sub: [{ label: 'None (FL Studio’s own)', act: 'fl-tpl-def', k: '', icon: S.flTemplate ? null : 'check' }, ...(Array.isArray(UI.flTpl) ? UI.flTpl : []).slice(0, 40).map(x => ({ label: x.name, act: 'fl-tpl-def', k: x.path, icon: S.flTemplate === x.path ? 'check' : null }))] }, { label: 'FL Studio projects', act: 'fl-screen', icon: 'folder' }] : []), { sep: 1 }, { label: 'Remove from Launcher', act: 'daw-forget', k: id, icon: 'x' }]); return; } }
+  { const r = t.closest('.flr'); if (r && r.dataset.act === 'fl-tpl-new') { e.preventDefault(); const f = r.dataset.k; ctxMenu(e.clientX, e.clientY, [{ head: f.split(/[\\/]/).pop() }, { label: 'New project from this', act: 'fl-tpl-new', k: f, icon: 'plus' }, S.flTemplate === f ? { label: 'Stop launching into this', act: 'fl-tpl-def', k: '', icon: 'x' } : { label: 'Launch into this every time', act: 'fl-tpl-def', k: f, icon: 'check' }, { label: 'Show in folder', act: 'fl-reveal', k: f, icon: 'folder' }]); return; } }
   { const r = t.closest('.flr'); if (r) { e.preventDefault(); const f = r.dataset.k; ctxMenu(e.clientX, e.clientY, [{ head: f.split(/[\\/]/).pop() }, { label: 'Open in FL Studio', act: 'fl-proj', k: f, icon: 'play' }, { label: 'Show in folder', act: 'fl-reveal', k: f, icon: 'folder' }]); return; } }
   if (t.closest && t.closest('#sp-3d')) { e.preventDefault(); return; } // Store page: the case only turns, no CD Creator menus
   if (t.id === 'cd2d') {
