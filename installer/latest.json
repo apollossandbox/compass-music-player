@@ -1,11 +1,19 @@
 {
-  "version": "1.17.3",
+  "version": "1.17.4",
   "file": "Compass-Setup.exe",
-  "size": 84865614,
-  "sha256": "15aced13acfba8ff25f36d061555a79f380e1f511011eba525db1d99f37c3abf",
-  "notes": "Artists: a song imported more than once counts once, so artist song counts are right. Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it. Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX. Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B. Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files). Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even. Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.",
+  "size": 84867388,
+  "sha256": "1184c29dc04fbac3db339d10fdbaf5f476b150be896c904d0072dd0b2fdc01cd",
+  "notes": "Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu. FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.",
   "date": "2026-11-21",
   "changelog": [
+    {
+      "v": "1.17.4",
+      "d": "2026-11-21",
+      "items": [
+        "Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu.",
+        "FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over."
+      ]
+    },
     {
       "v": "1.17.3",
       "d": "2026-11-16",
@@ -157,13 +165,6 @@
         "CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.",
         "New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.",
         "Rolled back the 1.14.0 case look."
-      ]
-    },
-    {
-      "v": "1.14.0",
-      "d": "2026-11-16",
-      "items": [
-        "CD case look updated (rolled back in 1.14.1)."
       ]
     }
   ]
