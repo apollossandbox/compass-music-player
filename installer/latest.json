@@ -1,11 +1,18 @@
 {
-  "version": "1.17.4",
+  "version": "1.17.5",
   "file": "Compass-Setup.exe",
-  "size": 84867388,
-  "sha256": "1184c29dc04fbac3db339d10fdbaf5f476b150be896c904d0072dd0b2fdc01cd",
-  "notes": "Link project files from any DAW to a song: right-click › Link project › pick the DAW and the file, and say what it’s for (song, instrumental…). Link several; each shows as Open in FL Studio (Song) etc. Unlink from the same menu. FL Studio templates: new Templates tab. Right-click a template (or the FL Studio icon › Default template) to launch into it every time; Open FL Studio then starts a fresh project from it, so the template is never saved over.",
+  "size": 84867929,
+  "sha256": "84fb7685e25001d9f7cf3a90a34bfd2ff69e2c546f7cfa629135e0a40f22c33e",
+  "notes": "Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button.",
   "date": "2026-11-21",
   "changelog": [
+    {
+      "v": "1.17.5",
+      "d": "2026-11-21",
+      "items": [
+        "Intro screen for published albums: in the album’s Store settings, turn on Intro screen and write notes. Opening the album first shows the cover, title, artist, track count and your notes, with an Enter button."
+      ]
+    },
     {
       "v": "1.17.4",
       "d": "2026-11-21",
@@ -156,15 +163,6 @@
         "Verified albums: digital albums from the Store, the Marketplace, a QR card or your own Publish carry a green verified seal. Albums you add from files are Local. Everything already in your Digital albums is verified.",
         "Digital albums: filter All, Verified or Local.",
         "Music Store: sxteen ways – Movie is free. Get adds a verified copy to your library; the QR card gives the same album."
-      ]
-    },
-    {
-      "v": "1.14.1",
-      "d": "2026-11-16",
-      "items": [
-        "CD Creator: new CD100 template set (CD100 booklet, CDT100 tray card, UD100 disc). Guides follow the printer’s templates: bleed, trim, safety, spine folds, the spine window inside the tray card, and the disc’s print rings. Print files use ⅛ in bleed and a full 122 mm disc square.",
-        "New CDs use the CD100 set. Existing CDs stay on Classic; switch any CD under Template in the side panel.",
-        "Rolled back the 1.14.0 case look."
       ]
     }
   ]
