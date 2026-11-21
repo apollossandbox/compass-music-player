@@ -12,7 +12,7 @@ app.setAppUserModelId('com.trulytamed.tamedplayer');
 if (!app.requestSingleInstanceLock()) app.quit();
 
 // Every new installer pushed to GitHub updates this file; the app compares versions against it.
-const FEED = process.env.COMPASS_FEED || 'https://raw.githubusercontent.com/apollossandbox/tamed-player/main/installer/latest.json';
+const FEED = process.env.COMPASS_FEED || 'https://raw.githubusercontent.com/apollossandbox/compass-music-player/main/installer/latest.json';
 
 /* ---------- instant updates: most releases only change app/ (the page). Those download in the background,
    are checked file by file against latest.json, and load on Reload. A release that changes the native part
@@ -72,7 +72,7 @@ async function checkForUpdates(manual) {
   if (checking) return; checking = true;
   try {
     // GitHub's API answers without the raw-file cache, so a new version shows up right away; the raw address is the fallback
-    let r = await net.fetch('https://api.github.com/repos/apollossandbox/tamed-player/contents/installer/latest.json?ref=main', { cache: 'no-store', headers: { Accept: 'application/vnd.github.raw', 'User-Agent': 'Compass' } }).catch(() => null);
+    let r = await net.fetch('https://api.github.com/repos/apollossandbox/compass-music-player/contents/installer/latest.json?ref=main', { cache: 'no-store', headers: { Accept: 'application/vnd.github.raw', 'User-Agent': 'Compass' } }).catch(() => null);
     if (process.env.COMPASS_FEED || !r || !r.ok) r = await net.fetch(FEED + '?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error(r.status === 404 ? 'Update file not found. The tamed-player repository on GitHub must be public.' : 'GitHub returned error ' + r.status + '.');
     const info = await r.json();
