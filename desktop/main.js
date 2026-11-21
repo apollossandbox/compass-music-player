@@ -21,6 +21,7 @@ const SHELL = require('./shell-hash')(__dirname, process.versions.electron);
 const sha = b => require('crypto').createHash('sha256').update(b).digest('hex');
 const liveRoot = () => path.join(app.getPath('userData'), 'live');
 function liveCurrent() {
+  return null; // instant updates are off: always run the installed version (installers only)
   try { const c = JSON.parse(fs.readFileSync(path.join(liveRoot(), 'current.json'), 'utf8'));
     if (c && c.shell === SHELL && /^v[\d.]+$/.test(c.dir) && newer(c.version, app.getVersion()) && fs.existsSync(path.join(liveRoot(), c.dir, 'index.html'))) return c; } catch (e) {}
   return null;
@@ -70,7 +71,9 @@ let checking = false;
 async function checkForUpdates(manual) {
   if (checking) return; checking = true;
   try {
-    const r = await net.fetch(FEED + '?t=' + Date.now(), { cache: 'no-store' });
+    // GitHub's API answers without the raw-file cache, so a new version shows up right away; the raw address is the fallback
+    let r = await net.fetch('https://api.github.com/repos/apollossandbox/tamed-player/contents/installer/latest.json?ref=main', { cache: 'no-store', headers: { Accept: 'application/vnd.github.raw', 'User-Agent': 'Compass' } }).catch(() => null);
+    if (process.env.COMPASS_FEED || !r || !r.ok) r = await net.fetch(FEED + '?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error(r.status === 404 ? 'Update file not found. The tamed-player repository on GitHub must be public.' : 'GitHub returned error ' + r.status + '.');
     const info = await r.json();
     const showLog = () => { if (win) win.webContents.send('tp-changelog', { changelog: Array.isArray(info.changelog) ? info.changelog : [], since: app.getVersion() }); };
@@ -78,7 +81,6 @@ async function checkForUpdates(manual) {
       if (manual) { const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['OK', "What's new"], defaultId: 0, cancelId: 0, message: 'Compass is up to date', detail: 'You have version ' + appVersion() + '.' }); if (response === 1) showLog(); }
       return;
     }
-    if (info.live && info.live.shell === SHELL) return await liveUpdate(info); // page-only update: no installer
     const { response } = await dialog.showMessageBox(win, {
       type: 'info', buttons: ['Download and install', "What's new", 'Later'], defaultId: 0, cancelId: 2,
       message: `Compass ${info.version} is available`,

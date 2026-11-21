@@ -579,6 +579,17 @@ h1 { font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
 .ap-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0 8px; } .ap-stats div { display: flex; flex-direction: column; padding: 8px; border-radius: 10px; background: var(--panel2); } .ap-stats b { font-size: 16px; } .ap-stats small { font-size: 11px; color: var(--ink2); }
 .ap-line { margin: 4px 0; font-size: 12.5px; } .acct-pop .crow { margin-top: 10px; }
 .shead-l { all: unset; flex: 1; cursor: pointer; } .shead-l:hover { color: var(--ink); text-decoration: underline; }
+.mini, .stile { position: relative; } .sp-play { position: absolute; inset: 0; display: grid; place-items: center; border-radius: inherit; background: rgba(0,0,0,.45); color: #fff; opacity: 0; transition: opacity .15s; font-style: normal; }
+.mini:hover .sp-play, .stile:hover .sp-play { opacity: 1; } body.shift-down .sp-play { display: none; }
+.brand { position: relative; } .side-x { margin-left: auto; opacity: .55; } .side-x:hover { opacity: 1; }
+body.side-off .app { grid-template-columns: 0 minmax(0, 1fr); } body.side-off #side { display: none; } body.side-off .bar { left: 0; }
+.side-show { display: none; position: fixed; left: 8px; top: 14px; z-index: 60; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink2); place-items: center; cursor: pointer; }
+body.side-off .side-show { display: grid; }
+.bigcov { cursor: zoom-in; }
+.coverpop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; align-content: center; gap: 12px; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); cursor: zoom-out; opacity: 0; transition: opacity .2s; }
+.coverpop.open { opacity: 1; } .coverpop img { width: min(70vh, 80vw); aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 40px 90px -30px #000; transform: scale(.96); transition: transform .25s var(--ease2); } .coverpop.open img { transform: none; }
+.coverpop span { color: rgba(255,255,255,.6); font-size: 12px; } .cp-dots { display: flex; gap: 6px; justify-content: center; } .cp-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.35); } .cp-dots i.on { background: #fff; }
+.vwl-ctl { display: flex; gap: 2px; margin-left: auto; margin-right: 6px; }
 .side-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px 10px 10px; } .stile { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; background-size: cover; background-position: center; cursor: pointer; } .stile:hover { border-color: var(--ink3); } .stile.on { border-color: var(--ink); }
 .lib-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; } .lib-tools .search { width: 240px; } .lib-none { margin: 4px 0 16px; } .mine-filter select { padding-right: 22px; }
 
@@ -857,7 +868,7 @@ img { -webkit-user-drag: none; }
 .list.discs-on > .disc-add, .list.discs-on > .pfoot { grid-column: 1 / -1; }
 .discol { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-bottom: 8px; border-radius: 12px; } .discol.over, .discol:has(> .dischead.over) { background: var(--hover); }
 .discol .dischead { margin-top: 0; }
-.discol .row { grid-template-columns: 36px minmax(0, 1fr) 92px 46px 32px; } .discol .row .hov, .discol .row .c-add { display: none; }
+.discol .row { grid-template-columns: 36px minmax(0, 1fr) 92px 58px 46px 32px; } .discol .row .hov { display: none; } .list.ro .discol .row .c-add { display: none; }
 .colhead:has(+ .list.discs-on) { display: none; }
 .discol { gap: 3px; } /* one line per song in disc columns */
 .discol .row { padding: 7px 10px; min-height: 0; }
@@ -1133,6 +1144,7 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
   <p class="vw-hint">Drag to rotate · Scroll to zoom · <kbd>?</kbd> Shortcuts</p>
 </section>
 <section class="credits" id="credits" aria-label="Credits" data-act="credits-close" inert><canvas id="crcv"></canvas><div class="cr-inner" id="crinner"></div><p class="cr-hint">Click anywhere to go back</p></section>
+<button class="side-show" data-act="side-toggle" title="Show sidebar (Ctrl+B)" aria-label="Show sidebar"></button>
 <button class="acct-chip" id="acctchip" data-act="acct-pop" aria-label="Account" title="Account"></button>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="drop" id="drop" hidden>Drop audio, or an Untitled download (.zip), to import it</div>
@@ -1332,13 +1344,13 @@ function applyEq() { filters.forEach((f, i) => { const v = S.eq.on ? S.eq.g[i] :
 const verSrc = t => srcs[t.ver] || srcs[t.id] || '';
 const verDur = t => { const v = t.versions.find(x => x.id === t.ver); return v ? v.dur : t.dur; };
 const Engine = {
-  load(t) { audio.pause(); const o = otherPlayer(); if (o.dataset.tid === t.id && o.dataset.src === verSrc(t)) { audio = o; audio.currentTime = 0; } else { audio.src = verSrc(t); audio.dataset.tid = t.id; audio.dataset.src = verSrc(t); } audio.volume = S.vol; clearTimeout(Engine.pt); Engine.pt = setTimeout(preloadNext, 1200); },
+  load(t) { try { mediaMeta(t); } catch (e) {} audio.pause(); const o = otherPlayer(); if (o.dataset.tid === t.id && o.dataset.src === verSrc(t)) { audio = o; audio.currentTime = 0; } else { audio.src = verSrc(t); audio.dataset.tid = t.id; audio.dataset.src = verSrc(t); } audio.volume = S.vol; clearTimeout(Engine.pt); Engine.pt = setTimeout(preloadNext, 1200); },
   play() { ensureGraph(); audio.play().catch(() => toast('Press play again to start audio')); },
   pause() { audio.pause(); },
   pos() { return audio.currentTime || 0; },
   dur() { const t = trk(S.cur); return isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (t ? verDur(t) : 0); },
   seek(x) { audio.currentTime = x; },
-  vol(v) { audio.volume = v; }
+  vol(v) { audio.volume = Math.min(1, Math.max(0, v)) ** 2; } // perceptual: half the slider sounds about half as loud
 };
 function playTrack(id, queue) {
   const t = trk(id); if (!t) return;
@@ -1419,7 +1431,7 @@ const discLabel = (c, d) => d.name || 'Disc ' + (c.discs.indexOf(d) + 1);
 const isMine = c => !!(c && c.mine);
 const CONTENT = [['main', 'Main'], ['bonus', 'Bonus'], ['demo', 'Demo'], ['instrumental', 'Instrumental'], ['interlude', 'Interlude']];
 const publishBlock = c => { const ts = colTracks(c); if (!ts.length) return 'Add songs first'; const n = ts.filter(t => t.status !== 'final').length; return n ? `Mark every song Final to publish (${n} left)` : ''; };
-const isFrozen = c => !!(c && (c.mine || c.archived)); // digital albums and archived projects can't be edited
+const isFrozen = c => !!(c && (c.archived || (c.mine && (!S.ledger || typeof isVerified !== 'function' || isVerified(c))))); // verified digital albums and archived projects can't be edited; local ones can // digital albums and archived projects can't be edited
 const kidsOf = f => (f && f.kids || []).map(col).filter(Boolean);
 const shown = c => !c.archived && !c.parent;
 const meName = () => (S.concept && S.concept.artist && S.concept.artist !== 'Artist Name' ? S.concept.artist : '') || 'My';
@@ -1524,15 +1536,15 @@ function toast(msg) { const e = $('#toast'); e.textContent = msg; e.classList.ad
 function renderSide() {
   const nav = [['library', 'lib', 'Library', projCount()], ['launcher', 'cube', 'Launcher'], ['cd', 'disc', 'CD Creator'], ['store', 'music', 'Music Store'], ['market', 'grid', 'Marketplace'], ['settings', 'gear', 'Settings']];
   $('#side').innerHTML = `
-  <div class="brand">${logo(26)}<span class="brand-t" aria-label="Compass Music Player">Music Player</span></div>
+  <div class="brand">${logo(26)}<span class="brand-t" aria-label="Compass Music Player">Music Player</span><button class="ico side-x" data-act="side-toggle" title="Hide sidebar (Ctrl+B)" aria-label="Hide sidebar">${ico('chevL', 15)}</button></div>
   <nav class="snav" data-slide="nav"><i class="thumb"></i>${nav.map(([v, i, l, n]) => `<button class="navbtn ${S.view === v ? 'on' : ''}" data-act="nav" data-view="${v}">${ico(i)}<span>${l}</span>${n !== undefined ? `<em>${n}</em>` : ''}</button>`).join('')}</nav>
   <div class="shead"><button class="shead-l" data-act="side-projects" title="All projects">Projects</button><button class="ico ${S.side.sort !== 'custom' || S.side.type !== 'all' || S.side.rel !== 'all' ? 'on' : ''}" data-act="side-menu" aria-label="Sort and filter projects" title="Sort and filter">${ico('list', 15)}</button><button class="ico" data-act="newcol" aria-label="New project" title="New project">${ico('plus', 16)}</button></div>
   <div class="colswrap"><div class="cols" data-slide="cols"><i class="thumb"></i>${(() => { let last = null; const ps = sideProjects().slice(0, 6), one = ps.length > 1 && new Set(ps.map(projArtist)).size < 2; return ps.map(c => { const a = projArtist(c), head = S.side.sort === 'artist' && a !== last ? `<p class="sgrp">${esc(a || 'No artist')}</p>` : ''; last = a; return `${head}
     <button class="colitem ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" data-drop="${c.id}">
-      <span class="mini" style="${pcov(c)}"></span><span class="cn"><span class="cn-t">${esc(c.name)}</span><span class="cn-k">${esc([KINDS[c.type], S.side.sort === 'artist' || one ? '' : a].filter(Boolean).join(' · '))}</span></span>
+      <span class="mini" style="${pcov(c)}"><i class="sp-play" data-act="play-col" data-id="${c.id}" title="Play">${ico(S.playing && c.tracks.includes(S.cur) ? 'pause' : 'play', 12)}</i></span><span class="cn"><span class="cn-t">${esc(c.name)}</span><span class="cn-k">${esc([KINDS[c.type], S.side.sort === 'artist' || one ? '' : a].filter(Boolean).join(' · '))}</span></span>
     </button>`; }).join(''); })() || `<p class="faint pad small">${S.cols.some(c => !isFolder(c) && !isMine(c)) ? 'No matching projects.' : 'No projects yet.'}</p>`}</div></div>
   ${(() => { const lp = c => Math.max(0, ...colTracks(c).map(t => t.lastPlayed || 0)), da = S.cols.filter(c => isMine(c) && !isFolder(c) && !c.archived).sort((a, b) => lp(b) - lp(a)).slice(0, 9);
-    return da.length ? `<div class="side-da"><div class="shead"><button class="shead-l" data-act="side-mine" title="All digital albums">Digital albums</button><button class="ico" data-act="side-mine" aria-label="All digital albums" title="All digital albums">${ico('grid', 15)}</button></div><div class="side-tiles">${da.map(c => `<button class="stile ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" title="${esc(c.name)}" style="${pcov(c)}"></button>`).join('')}</div></div>` : ''; })()}
+    return da.length ? `<div class="side-da"><div class="shead"><button class="shead-l" data-act="side-mine" title="All digital albums">Digital albums</button><button class="ico" data-act="side-mine" aria-label="All digital albums" title="All digital albums">${ico('grid', 15)}</button></div><div class="side-tiles">${da.map(c => `<button class="stile ${S.view === 'collection' && S.colId === c.id ? 'on' : ''}" data-act="col" data-id="${c.id}" title="${esc(c.name)}" style="${pcov(c)}"><i class="sp-play" data-act="play-col" data-id="${c.id}" title="Play">${ico(S.playing && c.tracks.includes(S.cur) ? 'pause' : 'play', 14)}</i></button>`).join('')}</div></div>` : ''; })()}
   <div class="sfoot"><button class="credbtn" data-act="credits" aria-label="Credits" title="Credits">${ico('star', 14)}</button>${window.tpDesktop ? `<button class="credbtn upd" data-act="desk-update" aria-label="Check for updates" title="Check for updates">${ico('update', 15)}</button><button class="sver" data-act="desk-update" title="Version ${esc(tpDesktop.version)}. Check for updates">v${esc(tpDesktop.version)}</button>` : ''}</div>`;
 }
 
@@ -1584,12 +1596,12 @@ function rowHTML(t, i, inCol) {
     <span class="meta"><b>${esc(dispTitle(t))}</b><span>${esc([inCol && col(S.colId) && dispArtist(t) === projArtist(col(S.colId)) ? '' : dispArtist(t), t.tags].filter(Boolean).join(' · '))}</span></span>
     <span class="mono hov">${[t.bpm ? t.bpm + ' BPM' : '', t.key ? esc(t.key) : ''].filter(Boolean).join(' · ')}</span>
     <button class="pill st-${t.status}" data-act="cycle-st" data-id="${t.id}" title="Change status">${ST[t.status]}</button>
-    <span class="c-add mono" title="${inCol ? 'Added to this project' : 'Added'}">${addedOn(t)}</span>
+    <span class="c-add mono" title="${t.ver !== t.id ? 'Date of this version' : inCol ? 'Added to this project' : 'Added'}">${(v => v && v.added ? new Date(v.added).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : addedOn(t))(t.versions.find(x => x.id === t.ver))}</span>
     <span class="mono c-dur">${fmt(verDur(t))}</span>
     <span class="acts"><button class="ico" data-act="row-menu" data-id="${t.id}" aria-label="More options for ${esc(t.title)}" title="More">${ico('dots', 18)}</button></span>
   </div>`;
 }
-const colhead = `<div class="colhead"><span></span><span>Title</span><span></span><span>Status</span><span>Added</span><span class="c-dur">Time</span><span></span></div>`;
+const colhead = `<div class="colhead"><span></span><span>Title</span><span></span><span>Status</span><span>Date</span><span class="c-dur">Time</span><span></span></div>`;
 
 function metaFoot(c) { const m = c.meta || {}, yr = (c.targetDate || '').slice(0, 4); const ls = [m.copyright ? '© ' + (yr && !/\d{4}/.test(m.copyright) ? yr + ' ' : '') + m.copyright : '', m.phono ? '℗ ' + (yr && !/\d{4}/.test(m.phono) ? yr + ' ' : '') + m.phono : '', m.label ? 'Label: ' + m.label : '', m.upc ? 'UPC ' + m.upc : '', m.cat ? 'Cat. ' + m.cat : '', m.genre ? m.genre : ''].filter(Boolean); return ls.length ? `<div class="pfoot">${c.targetDate ? `<b>${esc(fdate(c.targetDate))}</b>` : ''}${ls.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''; }
 function renderList() {
@@ -1757,9 +1769,9 @@ function renderProject(m) {
       <p class="pmeta">${projArtist(c) ? `<button class="pm-art" data-act="proj-edit" data-id="${c.id}" title="Edit artists">${esc(projArtist(c))}</button>` : `<button class="pm-art faint" data-act="proj-edit" data-id="${c.id}">Add artist</button>`}<span>${ts.length} ${ts.length === 1 ? 'song' : 'songs'}${ts.length ? ', ' + total(ts) : ''}${c.verified ? `<button class="vbadge" data-act="verified-info" title="This album is verified by its distributors and is an official release. Your digital token is irreplicable and you retain sole ownership of this copy of this release." aria-label="Verified release">${ico('check', 11)}</button>` : ''}</span>${!fol && c.targetDate ? `<span>${esc(relText(c))}</span>` : ''}${c.sequelOf && col(c.sequelOf) ? `<span>Sequel to <button data-act="col" data-id="${c.sequelOf}">${esc(col(c.sequelOf).name)}</button></span>` : ''}</p>
       ${ts.length && !fol && !c.released && !isMine(c) ? `<p class="stat"><span><i class="pill st-final"></i>${nF} final</span><span><i class="pill st-demo"></i>${nD} ${nD === 1 ? 'demo' : 'demos'}</span>${nU ? `<span><i class="pill st-unmixed"></i>${nU} unmixed</span>` : ''}</p>` : ''}
       <div class="pact">
-        <button class="playbig" data-act="play-col" data-id="${c.id}" aria-label="${playing ? 'Pause' : 'Play'}" title="${playing ? 'Pause' : 'Play'}">${ico(playing ? 'pause' : 'play', 22)}</button>
+        ${isFolder(c) ? '' : `<button class="ico pa" data-act="cd-vis" data-id="${c.id}" title="CD visualizer" aria-label="CD visualizer">${logo(22)}</button>`}<button class="playbig" data-act="play-col" data-id="${c.id}" aria-label="${playing ? 'Pause' : 'Play'}" title="${playing ? 'Pause' : 'Play'}">${ico(playing ? 'pause' : 'play', 22)}</button>
         ${isFrozen(c) ? '' : `<button class="ico pa" data-act="add" title="Add songs" aria-label="Add songs">${ico('plus', 20)}</button>`}
-        ${!isFrozen(c) && !isFolder(c) ? (b => b ? `<span class="pub-wrap"><button class="pub-pill off" data-act="publish" data-id="${c.id}" aria-describedby="pub-tip">${ico('upload', 14)} Publish</button><span class="pub-tip" id="pub-tip" role="tooltip">${colTracks(c).length ? `${ico('alert', 14)}<span>Finalize all tracks to publish</span><button class="btn sm" data-act="pub-finalize" data-id="${c.id}">Finalize</button>` : `${ico('alert', 14)}<span>Add songs to publish</span>`}</span></span>` : `<button class="pub-pill" data-act="publish" data-id="${c.id}" title="Publish as a digital album">${ico('upload', 14)} Publish</button>`)(publishBlock(c)) : ''}
+        ${!isFrozen(c) && !isFolder(c) && !isMine(c) ? (b => b ? `<span class="pub-wrap"><button class="pub-pill off" data-act="publish" data-id="${c.id}" aria-describedby="pub-tip">${ico('upload', 14)} Publish</button><span class="pub-tip" id="pub-tip" role="tooltip">${colTracks(c).length ? `${ico('alert', 14)}<span>Finalize all tracks to publish</span><button class="btn sm" data-act="pub-finalize" data-id="${c.id}">Finalize</button>` : `${ico('alert', 14)}<span>Add songs to publish</span>`}</span></span>` : `<button class="pub-pill" data-act="publish" data-id="${c.id}" title="Publish as a digital album">${ico('upload', 14)} Publish</button>`)(publishBlock(c)) : ''}
         ${isMine(c) && S.ledger && (() => { const a = Ledger.access(c); return a.state === 'owned' && a.tk.tradable && a.r.resale; })() ? `<button class="ico pa" data-act="tok-sell" data-id="${c.id}" title="Sell this album" aria-label="Sell this album">${ico('dollar', 20)}</button>` : ''}
         ${isFolder(c) ? '' : `<button class="ico pa" data-act="ctx-dlproj" data-id="${c.id}" title="Export" aria-label="Export">${ico('update', 20)}</button>`}
         <span class="pa-share"><button class="ico pa" data-act="share" aria-label="Share" title="Share">${ico('share', 20)}</button>
@@ -1835,6 +1847,7 @@ function openModal(kind, id, x = {}) {
     <label class="lab">What is this?</label>${seg('mdest', [['proj', 'Add project'], ['mine', 'Add digital product']], UI.importMine ? 'mine' : 'proj', 'm-dest', 'full')}
     <div id="m-dtypebox" class="${UI.importMine ? '' : 'hide-folder'}"><label class="lab" for="m-dtype">Type</label><div class="sel box wide"><select id="m-dtype">${[['album', 'Album'], ['mixtape', 'Mixtape'], ['ep', 'EP'], ['single', 'Single']].map(([k, l]) => `<option value="${k}" ${x.dtype === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div><p class="faint small" style="margin:6px 0 0">Read-only. Shows under Digital albums.</p></div>
     <label class="lab" for="m-name">Name</label><input class="field" id="m-name" value="${esc(x.def)}" placeholder="${esc(x.def)}" autocomplete="off">
+    <label class="lab" for="m-artist">Artist</label><input class="field" id="m-artist" value="${esc(myArtist())}" placeholder="Artist name" autocomplete="off">
     ${coverPickHTML(UI.mCoverDef, UI.mCoverHint)}`;
   } else if (kind === 'proj') {
     const c = col(id); const arts = Array.isArray(c.artists) && c.artists.length ? c.artists : [''];
@@ -2596,7 +2609,7 @@ function vwStepCD(k) { const L = UI.vwList || [], i = L.indexOf(UI.vwCol || (cdC
 function vwTitle() { const c = cdCol(); if (!c) return; $('#vwtitle').innerHTML = `${(UI.vwList || []).length > 1 ? `<button class="vw-cd" data-act="vw-prevcd" title="Previous CD ([)" aria-label="Previous CD">${ico('chevL', 18)}</button>` : logo(28)}<span>${c.logo && srcs[c.logo] ? `<img class="vw-logo" src="${srcs[c.logo]}" alt="${esc(c.name)}">` : `<b>${esc(c.name)}</b>`}<small>${esc(projArtist(c))}${projArtist(c) ? ' · ' : ''}${colTracks(c).length} songs</small></span>${(UI.vwList || []).length > 1 ? `<button class="vw-cd" data-act="vw-nextcd" title="Next CD (])" aria-label="Next CD">${ico('chevR', 18)}</button>` : ''}`; }
 function renderVwList() {
   const el = $('#vwlist'), c = cdCol(); if (!el || !c) return; el.hidden = !(UI.vw && UI.vw.list); if (el.hidden) return;
-  el.innerHTML = `<header><b>${esc(c.name)}</b><button class="ico" data-act="vw-list" aria-label="Hide songs">${ico('x', 15)}</button></header>${discGroups(c).map(g => `${g.disc ? `<p class="vwl-d">${ico('disc', 13)} ${esc(discLabel(c, g.disc))}</p>` : ''}${g.tracks.map(t => `<button class="vwl-t ${S.cur === t.id ? 'on' : ''}" data-act="vw-track" data-id="${t.id}"><span class="vwl-n">${S.cur === t.id && S.playing ? ico('pause', 12) : colTracks(c).indexOf(t) + 1}</span><span>${esc(dispTitle(t))}</span><em>${fmt(verDur(t))}</em></button>`).join('')}`).join('')}`;
+  el.innerHTML = `<header><b>${esc(c.name)}</b><span class="vwl-ctl"><button class="ico" data-act="vw-prev" aria-label="Previous song">${ico('prev', 14)}</button><button class="ico" data-act="vw-pp" aria-label="Play or pause">${ico(S.playing ? 'pause' : 'play', 14)}</button><button class="ico" data-act="vw-next" aria-label="Next song">${ico('next', 14)}</button></span><button class="ico" data-act="vw-list" aria-label="Hide songs">${ico('x', 15)}</button></header>${discGroups(c).map(g => `${g.disc ? `<p class="vwl-d">${ico('disc', 13)} ${esc(discLabel(c, g.disc))}</p>` : ''}${g.tracks.map(t => `<button class="vwl-t ${S.cur === t.id ? 'on' : ''}" data-act="vw-track" data-id="${t.id}"><span class="vwl-n">${S.cur === t.id && S.playing ? ico('pause', 12) : colTracks(c).indexOf(t) + 1}</span><span>${esc(dispTitle(t))}</span><em>${fmt(verDur(t))}</em></button>`).join('')}`).join('')}`;
 }
 function storePreview(id) {
   const t = trk(id); if (!t) return; clearTimeout(UI.prevT); playTrack(id, [id]); if (UI.vw) UI.vw.playing = true;
@@ -3679,6 +3692,7 @@ document.addEventListener('dragstart', e => { const el = e.target && e.target.cl
 
 /* ---------- changelog: newest first. Add an entry for every release; the Windows build copies it into CHANGELOG.md and the update file ---------- */
 const CHANGELOG = [
+  { v: '1.17.3', d: '2026-11-16', items: ['Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.', 'Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.', 'Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.', 'Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files).', 'Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even.', 'Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.'] },
   { v: '1.17.2', d: '2026-11-16', items: ['Sidebar: Digital albums starts higher, under a shorter Projects list that scrolls.'] },
   { v: '1.17.1', d: '2026-11-16', items: ['Sidebar: nine most recently played digital albums, starting just above halfway.'] },
   { v: '1.17.0', d: '2026-11-16', items: ['Updates reload by themselves once they’ve downloaded, waiting until nothing is playing and no window is open.', 'Sidebar: Digital albums starts halfway down, Projects has the top half.'] },
@@ -4360,7 +4374,7 @@ function openDrawer(id) {
   <label class="lab" for="d-title">Title</label><input class="field" id="d-title" data-f="title" value="${esc(t.title)}">
   <label class="lab" for="d-artist">Main artist</label><input class="field" id="d-artist" data-f="artist" value="${esc(t.artist)}" placeholder="${esc(artistOf())} (project artist)">
   <div class="crow" style="margin-top:8px"><button class="btn sm" data-act="meta-open" data-id="${t.id}">${ico('list', 14)} Details & credits</button><button class="btn sm" data-act="feat-open" data-id="${t.id}" title="${esc(feats(t).join(', ') || 'Add featured artists')}">${ico('user', 14)} Features${feats(t).length ? ' · ' + feats(t).length : ''}</button><button class="btn sm" data-act="meta-export" data-id="${t.id}" title="Save this song's info as a text file">${ico('save', 14)} Export info</button></div>
-  <div class="three four"><div><label class="lab">Status</label>${picker('tstatus', '', ST, t.status, 'status')}</div><div><label class="lab" for="d-content">Type</label><div class="sel box wide"><select id="d-content">${CONTENT.map(([k, l]) => `<option value="${k}" ${(t.content || 'main') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div><div><label class="lab" for="d-bpm">BPM</label><input class="field" id="d-bpm" data-f="bpm" type="number" min="0" max="300" value="${t.bpm || ''}"></div><div><label class="lab" for="d-key">Key</label><input class="field" id="d-key" data-f="key" value="${esc(t.key)}"></div></div>
+  <div class="three four"><div><label class="lab" for="d-kind">Kind</label><div class="sel box wide"><select id="d-kind">${[['song', 'Song'], ['instrumental', 'Instrumental'], ['audio', 'Audio file'], ['sfx', 'SFX']].map(([k, l]) => `<option value="${k}" ${(t.kind || 'song') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div><div><label class="lab">Status</label>${picker('tstatus', '', ST, t.status, 'status')}</div><div><label class="lab" for="d-content">Type</label><div class="sel box wide"><select id="d-content">${CONTENT.map(([k, l]) => `<option value="${k}" ${(t.content || 'main') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div><div><label class="lab" for="d-bpm">BPM</label><input class="field" id="d-bpm" data-f="bpm" type="number" min="0" max="300" value="${t.bpm || ''}"></div><div><label class="lab" for="d-key">Key</label><input class="field" id="d-key" data-f="key" value="${esc(t.key)}"></div></div>
   <label class="lab">Versions</label><div class="vers" id="d-vers">${versHTML(t)}</div>
   <div class="crow" style="margin-top:6px"><button class="btn sm" data-act="ver-add">${ico('plus', 14)} Add a version</button></div>
   <label class="lab" for="d-lyr">Lyrics</label><textarea class="field" id="d-lyr" data-f="lyrics" rows="5" style="resize:vertical;min-height:96px" placeholder="One line per row.">${esc(t.lyrics || '')}</textarea>
@@ -4369,7 +4383,19 @@ function openDrawer(id) {
 }
 function versHTML(t) {
   const all = [{ id: t.id, name: 'Original', dur: t.dur, orig: true }, ...t.versions];
-  return all.map(v => `<div class="ver ${t.ver === v.id ? 'on' : ''}"><button class="radio" data-act="ver-set" data-id="${v.id}" aria-label="Use ${esc(v.name)}"></button>${v.orig ? `<b>Original</b>` : `<input type="text" data-vname="${v.id}" value="${esc(v.name)}" aria-label="Version name">`}<span class="mono">${fmt(v.dur)}</span>${v.orig ? '<span></span>' : `<button class="ico ver-x" data-act="ver-rm" data-id="${v.id}" aria-label="Delete version" title="Delete version">${ico('x', 11)}</button>`}</div>`).join('');
+  return all.map(v => `<div class="ver ${t.ver === v.id ? 'on' : ''}"><button class="radio" data-act="ver-set" data-id="${v.id}" aria-label="Use ${esc(v.name)}"></button>${v.orig ? `<b>Original</b>` : `<input type="text" data-vname="${v.id}" value="${esc(v.name)}" aria-label="Version name">`}<span class="mono">${fmt(v.dur)}</span>${v.orig ? '<span></span>' : `<input type="text" class="ver-note" data-vnote="${v.id}" value="${esc(v.note || '')}" placeholder="Notes for this version" aria-label="Version notes"><button class="ico ver-x" data-act="ver-rm" data-id="${v.id}" aria-label="Delete version" title="Delete version">${ico('x', 11)}</button>`}</div>`).join('');
+}
+function coverPop(from) {
+  const c = S.view === 'collection' && col(S.colId), url = c && artFull(c); if (!url) return; let el = $('#coverpop'); if (el) el.remove();
+  el = document.createElement('div'); el.id = 'coverpop'; el.className = 'coverpop'; el.innerHTML = `<img src="${url}" alt="${esc(c.name)} cover">${(c.covers || []).length > 1 ? `<div class="cp-dots">${c.covers.map(cv => `<i class="${cv.id === c.cover ? 'on' : ''}"></i>`).join('')}</div>` : ''}<span>Click anywhere to close</span>`;
+  document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('open'));
+}
+addEventListener('keydown', e => { if (e.key === 'Escape') { const p = $('#coverpop'); if (p) p.remove(); } });
+function mediaMeta(t) {
+  if (!('mediaSession' in navigator) || !t) return; const c = (UI.playColId && col(UI.playColId)) || projOf(t), art = c && artFull(c);
+  navigator.mediaSession.metadata = new MediaMetadata({ title: dispTitle(t), artist: dispArtist(t) || '', album: c ? c.name : '', artwork: art ? [{ src: art, sizes: '512x512' }] : [] });
+  if (!mediaMeta.on) { mediaMeta.on = 1; const h = (k, f) => { try { navigator.mediaSession.setActionHandler(k, f); } catch (e) {} };
+    h('play', () => { if (!S.playing) toggle(); }); h('pause', () => { if (S.playing) toggle(); }); h('nexttrack', () => act('next', { dataset: {} })); h('previoustrack', () => act('prev', { dataset: {} })); }
 }
 function closeDrawer() { S.editId = null; const d = $('#drawer'); d.classList.remove('open'); d.inert = true; }
 const updPreview = t => { const p = $('#d-prev'); if (p) p.innerHTML = `<b>${esc(dispTitle(t))}</b><span>${esc(dispArtist(t))}</span>`; };
@@ -4693,6 +4719,7 @@ async function importFiles(files) {
   }
   const chosen = await askName(pname, P.length, zname, found, P.length === 1 ? 'single' : P.length <= 6 ? 'ep' : 'album'); if (chosen == null) { toast('Import cancelled'); return; }
   const c = newProject(chosen.name); c.type = P.length === 1 ? 'single' : P.length <= 6 ? 'ep' : 'album'; c.mine = !!chosen.mine; if (c.mine) c.fromProject = false; if (c.mine && KINDS[chosen.dtype]) { c.type = chosen.dtype; c.released = true; } UI.importMine = false;
+  if (chosen.artist) c.artists = [chosen.artist];
   if (UI.importLink) c.source = UI.importLink;
   if (partist) c.artists = [partist.split(/\s*(?:,|&|\bfeat\.?|\bft\.?|\bfeaturing)\s*/i)[0].trim()];
   for (const p of P) {
@@ -4841,6 +4868,8 @@ function act(a, el, e) {
         save(); S.view = 'library'; S.libTab = 'mine'; refresh(); toast('Published. The project is now in Archive. Use New version there to keep working on it.'); openModal('publish', n.id); }); break; }
     case 'pb-save': publishSave(); break;
     case 'side-projects': S.view = 'library'; S.libTab = 'projects'; refresh(); break;
+    case 'cd-vis': { const c = col(id); if (!c) break; viewerFor(c.id, { play: true }); setTimeout(() => { const v = $('#viewer'); if (v && UI.vw) v.classList.add('bare'); }, 200); break; }
+    case 'side-toggle': S.sideOff = !S.sideOff; document.body.classList.toggle('side-off', S.sideOff); save(); break;
     case 'side-mine': S.view = 'library'; S.libTab = 'mine'; refresh(); break;
     case 'acct-lib': acctLibSync(true); break;
     case 'acct-pop': acctPop(); break;
@@ -4970,7 +4999,7 @@ function act(a, el, e) {
     case 'ver-set': { const t = trk(S.editId); t.ver = id; const wasCur = S.cur === t.id; if (wasCur) { const p = Engine.pos(); Engine.load(t); if (S.playing) Engine.play(); audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = Math.min(p, audio.duration - .5); } catch (e) { } }, { once: true }); } $('#d-vers').innerHTML = versHTML(t); renderList(); renderBar(); save(); toast('Now using ' + (id === t.id ? 'Original' : t.versions.find(v => v.id === id).name)); break; }
     case 'ver-rm': { const t0 = trk(S.editId), v0 = t0 && t0.versions.find(v => v.id === id); if (!v0) break; askSure(`Delete “${v0.name}”?`, 'This version and its audio file are removed. The other versions stay.', 'Delete version').then(ok => { if (ok) act('ver-rm-yes', { dataset: { id } }); }); break; }
     case 'ver-rm-yes': { const t = trk(S.editId); t.versions = t.versions.filter(v => v.id !== id); DB.del(id); delete srcs[id]; if (t.ver === id) { t.ver = t.id; if (S.cur === t.id) { Engine.load(t); if (S.playing) Engine.play(); } } $('#d-vers').innerHTML = versHTML(t); renderList(); save(); break; }
-    case 'play-col': { const c = col(id); const ids = c.tracks.filter(trk); if (S.playing && ids.includes(S.cur)) toggle(); else playQueue(ids, false); break; }
+    case 'play-col': { const c = col(id); const ids = colTracks(c).map(t => t.id); if (S.playing && ids.includes(S.cur)) toggle(); else playQueue(ids, false); break; }
     case 'proj-more': { const c = col(id), r = el.getBoundingClientRect(); if (c) ctxMenu(r.left, r.bottom + 6, projectMenu(c)); break; }
     case 'meta-export': exportSongInfo(id || S.editId); break;
     case 'meta-export-all': exportProjectInfo(id || S.colId); break;
@@ -5050,14 +5079,18 @@ function act(a, el, e) {
     case 'mod-menu': { const [mid, iid] = String(k).split(':'), f = MODS.frames[mid]; if (!f) break; const t = trk(id), c = col(id);
       f.contentWindow.postMessage({ __compass: 1, type: 'call', id: iid, data: t ? modTrackInfo(t) : c ? { id: c.id, name: c.name, artist: projArtist(c), songs: colTracks(c).map(modTrackInfo) } : { id } }, '*'); break; }
     case 'ask-ok': closeModal($('#m-ask').value); break;
-    case 'name-ok': { const i = $('#m-name'), d = $('#modal [data-act="m-dest"].on'); closeModal({ name: i.value.trim() || i.placeholder, cover: UI.mCover, mine: !!(d && d.dataset.k === 'mine'), dtype: ($('#m-dtype') || {}).value }); break; }
+    case 'name-ok': { const i = $('#m-name'), d = $('#modal [data-act="m-dest"].on'); closeModal({ name: i.value.trim() || i.placeholder, cover: UI.mCover, mine: !!(d && d.dataset.k === 'mine'), dtype: ($('#m-dtype') || {}).value, artist: (($('#m-artist') || {}).value || '').trim() }); break; }
     case 'target-clear': col(S.colId).targetDate = null; refresh(); break;
     case 'dl-proj': downloadProject(col(S.colId)); break;
     case 'noop': break;
   }
 }
+addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); act('side-toggle', { dataset: {} }); } });
+addEventListener('keydown', e => { if (e.key === 'Shift') document.body.classList.add('shift-down'); }); addEventListener('keyup', e => { if (e.key === 'Shift') document.body.classList.remove('shift-down'); }); addEventListener('blur', () => document.body.classList.remove('shift-down'));
+document.addEventListener('pointerdown', e => { const d = $('#drawer'); if (d && d.classList.contains('open') && !e.target.closest('#drawer, #ctx, #ctxsub, #modal, .toast, [data-act="edit"], [data-act="row-menu"]')) closeDrawer(); }, true);
 document.addEventListener('click', e => {
   UI.shiftClick = e.shiftKey;
+  { const cv = e.target.closest && e.target.closest('.bigcov'); if (cv) { coverPop(cv); return; } const lb = e.target.closest && e.target.closest('#coverpop'); if (lb) { lb.remove(); return; } }
   if (UI.noClick && Date.now() - UI.noClick < 350) { e.preventDefault(); e.stopPropagation(); return; }
   { const r = e.target.closest && e.target.closest('#list .row'); if (r && !e.target.closest('button, input, a, select, textarea, [data-act]')) selectRow(r.dataset.id, e); else if (!r && !e.target.closest('#ctx') && UI.sel && UI.sel.size && !e.target.closest('.bar, #modal, #drawer')) { UI.sel.clear(); $$('#list .row.picked').forEach(x => x.classList.remove('picked')); } if (false) { const id = r.dataset.id; if (S.cur === id) toggle(); else playTrack(id, curListIds.length ? curListIds : null); return; } }
   { const m = $('#ctx'); if (m) { const it = e.target.closest('.ctx-i'); if (it && it.classList.contains('has-sub')) ctxOpenSub(it); else if (!it || !(it.dataset.confirm && !it.dataset.armed)) setTimeout(closeCtx, 0); } }
@@ -5086,6 +5119,7 @@ document.addEventListener('input', e => {
   else if (t.id === 'vol' || t.dataset.vol !== undefined) { S.vol = +t.value; Engine.vol(S.vol); $$('input[type=range][data-vol], #vol').forEach(r => { if (r !== t) r.value = S.vol; }); save(); }
   else if (t.dataset.eqb !== undefined) { S.eq.g[+t.dataset.eqb] = +t.value; S.eq.preset = 'custom'; S.eq.on = true; if (AC) applyEq(); t.parentElement.firstElementChild.textContent = (t.value > 0 ? '+' : '') + t.value + ' dB'; const on = $('#eqpop [data-slide="eqp"] .on'); if (!on || on.dataset.k !== 'custom') { $$('#eqpop [data-slide="eqp"] > button').forEach(b => b.classList.toggle('on', b.dataset.k === 'custom')); applySlides(); } $('#eqpop .switch').setAttribute('aria-checked', 'true'); $('#eqpop').classList.remove('off'); save(); }
   else if (t.dataset.f) { const tr = trk(S.editId); if (t.dataset.f === 'bpm') tr.bpmAuto = false; if (t.dataset.f === 'key') tr.keyAuto = false; if (t.dataset.f === 'features') tr.features = t.value.split(',').map(s => s.trim()).filter(Boolean); else tr[t.dataset.f] = t.dataset.f === 'bpm' ? +t.value : t.value; updPreview(tr); renderList(); renderBar(); save(); }
+  else if (t.dataset.vnote) { const tr = trk(S.editId), v = tr && tr.versions.find(x => x.id === t.dataset.vnote); if (v) { v.note = t.value.slice(0, 300); save(); } }
   else if (t.dataset.vname) { const tr = trk(S.editId), v = tr.versions.find(x => x.id === t.dataset.vname); v.name = t.value || 'Untitled version'; renderList(); save(); }
   else if (t.dataset.cf) { const c = col(S.colId); c[t.dataset.cf] = t.value; if (t.dataset.cf === 'name') renderSide(); save(); }
   else if (t.dataset.cc && t.type !== 'checkbox') { S.concept[t.dataset.cc] = t.value; save(); renderBar(); if (t.dataset.cc === 'artist') acctPush(); }
@@ -5095,6 +5129,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.id === 'd-kind') { const tr = trk(S.editId); if (tr) { tr.kind = t.value; save(); renderList(); } return; }
   if (t.id === 'd-content') { const tr = trk(S.editId); if (tr) { tr.content = t.value; save(); renderList(); } return; }
   if (t.id === 'pb-unl') { const q = $('#pb-qty'); if (q) q.disabled = t.checked; return; }
   if (t.id === 'pb-cdon') { $$('#pb-cdbox .field, #pb-upbox .field').forEach(x => { x.disabled = !t.checked; }); return; }
@@ -5240,11 +5275,11 @@ document.addEventListener('dragleave', e => { if (!e.relatedTarget || !(e.relate
 function flipSwap(c, a, b) {
   document.body.classList.add('flip-now'); clearTimeout(flipSwap.t); flipSwap.t = setTimeout(() => document.body.classList.remove('flip-now'), 700); // rows measured at their real height, not content-visibility's placeholder
   const top = r => r.getBoundingClientRect().top - $('#list').getBoundingClientRect().top, before = {}; $$('#list .row').forEach(r => before[r.dataset.id] = top(r));
-  const i = c.tracks.indexOf(a), j = c.tracks.indexOf(b); [c.tracks[i], c.tracks[j]] = [c.tracks[j], c.tracks[i]];
+  const i = c.tracks.indexOf(a), j = c.tracks.indexOf(b); c.tracks.splice(i, 1); c.tracks.splice(c.tracks.indexOf(b) + (i < j ? 1 : 0), 0, a); // move, don't swap
   renderList(); save(); curListIds = c.tracks.filter(trk);
   const discs = hasDiscs(c) ? new Set([discOf(c, a), discOf(c, b)]) : null; // only the disc(s) the songs are on move
   $$('#list .row').forEach(r => { if (discs) { const dc = r.closest('.discol'); if (!dc || !discs.has(dc.dataset.disc)) return; } const dy = (before[r.dataset.id] ?? top(r)) - top(r); if (Math.abs(dy) >= 1) { r.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.32,1.18,.46,1)' }); } });
-  toast(`Swapped songs ${i + 1} and ${j + 1}`);
+  toast(`Moved ${dispTitle(trk(a))}`);
 }
 document.addEventListener('drop', e => {
   $('#drop').hidden = true; const z = $('#m-drop'); if (z) z.classList.remove('hot'); $$('.mcover.hot').forEach(x => x.classList.remove('hot'));
@@ -5679,7 +5714,7 @@ function digitalMenuBase(c) {
   return [{ head: c.name + (projArtist(c) ? ' · ' + projArtist(c) : '') }, { label: 'Make My Version', act: 'ctx-myver', id: c.id, icon: 'copy' },
     ...(isMyArtist(c) ? [{ label: 'Make deluxe', act: 'ctx-deluxe', id: c.id, icon: 'disc' }, { label: 'New sequel…', act: 'ctx-sequel', id: c.id, icon: 'plus' }] : []),
     ...(STORE_OPEN_TO_ALL || isMyArtist(c) ? [{ label: c.release ? 'Store settings…' : 'Put in the Store…', act: 'ctx-release', id: c.id, icon: 'upload' }] : []),
-    ...(cdOk(c) ? [{ sep: 1 }, { label: 'View CD', act: 'ctx-viewcd', id: c.id, icon: 'disc' }, { label: 'Edit CD', act: 'ctx-editcd', id: c.id, icon: 'edit' }] : []),
+    ...(cdOk(c) ? [{ sep: 1 }, { label: 'Go to CD Creator', act: 'ctx-editcd', id: c.id, icon: 'disc' }] : []),
     { sep: 1 }, { label: 'Download', act: 'ctx-dlproj', id: c.id, icon: 'save' }, { label: 'Delete', act: 'ctx-delcol', id: c.id, icon: 'trash', danger: 1 }];
 }
 function projectMenu(c) { const base = projectMenuBase(c), mi = isFolder(c) ? [] : modItems('project', c.id); return mi.length ? [...base, { sep: 1 }, ...mi] : base; }
@@ -5695,8 +5730,8 @@ function projectMenuInner(c) {
     { label: 'Duplicate', act: 'ctx-dupcol', id: c.id, icon: 'copy' }, ...(isFolder(c) ? [] : [{ label: 'Make deluxe', act: 'ctx-deluxe', id: c.id, icon: 'disc' }]), { label: 'New sequel…', act: 'ctx-sequel', id: c.id, icon: 'plus' }, { sep: 1 },
     ...(c.covers.length > 1 ? c.covers.map((cv, i) => ({ label: (cv.id === c.cover ? 'Using cover ' : 'Use cover ') + (i + 1), act: 'ctx-usecover', id: c.id, k: cv.id, icon: cv.id === c.cover ? 'check' : null, disabled: cv.id === c.cover })) : []),
     ...(c.covers.length > 1 ? [{ sep: 1 }] : []),
-    ...(isFolder(c) || isMine(c) ? [] : [{ label: 'View CD', act: 'ctx-viewcd', id: c.id, icon: 'disc' }, { label: 'Edit CD', act: 'ctx-editcd', id: c.id, icon: 'edit' }]),
-    { label: isFolder(c) ? 'Export folder' : 'Export CD package', act: 'ctx-disc', id: c.id, icon: 'save' }, { label: 'Download', act: 'ctx-dlproj', id: c.id, icon: 'save' }, { sep: 1 },
+    ...(isFolder(c) || isMine(c) ? [] : [{ label: 'Go to CD Creator', act: 'ctx-editcd', id: c.id, icon: 'disc' }]),
+    { label: isFolder(c) ? 'Export folder' : 'Export', act: 'ctx-disc', id: c.id, icon: 'save' }, { label: 'Download', act: 'ctx-dlproj', id: c.id, icon: 'save' }, { sep: 1 },
     ...(isMine(c) ? [{ label: 'Make My Version', act: 'ctx-myver', id: c.id, icon: 'copy' }] : []),
     ...(isFolder(c) ? [] : [{ label: 'Publish…', act: 'publish', id: c.id, icon: 'upload', disabled: !!publishBlock(c), title: publishBlock(c) }]),
     ...(c.parent ? [{ label: 'Remove from folder', act: 'ctx-unfold', id: c.id, icon: 'back' }] : []),
@@ -5751,7 +5786,7 @@ addEventListener('blur', closeCtx); addEventListener('resize', closeCtx);
   if (S.cur) Engine.load(trk(S.cur));
   if (S.view === 'collection' && !col(S.colId)) S.view = 'library';
   verifyMigrate();
-  applyPrefs(); refresh(); renderEq();
+  applyPrefs(); refresh(); renderEq(); document.body.classList.toggle('side-off', !!S.sideOff); { const b = $('.side-show'); if (b) b.innerHTML = ico('chevR', 15); }
   if (!S.tracks.length && !S.cols.length) setTimeout(() => recoverOffer(true), 900);
   setInterval(tick, 250); setInterval(modTick, 500); setInterval(tokenTick, 20000); setTimeout(tokenTick, 1500);
   modsLoad(); acctLoad();

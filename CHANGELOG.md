@@ -2,6 +2,15 @@
 
 Every Compass release, newest first. The app shows the same list under Settings › Changelog.
 
+## 1.17.3 · 2026-11-16
+
+- Play starts at disc 1. Dragging a song moves it into place instead of swapping two songs. Clicking outside the Edit song panel closes it.
+- Song lists show the date of the version in use between status and time (projects and folders). Versions have notes. Songs have a Kind: Song, Instrumental, Audio file or SFX.
+- Sidebar: hover a project or album cover for a play button; Shift+click an album tile just opens it. Hide the sidebar with the arrow by the logo or Ctrl+B.
+- Click a project cover to see it large. Local digital albums can be edited. Import asks for the artist. Project menu: Go to CD Creator, and Export (the whole project with its CD files).
+- Windows media overlay shows the song, artist, album and cover. CD viewer song list has playback controls. New CD visualizer button on project pages. Volume slider is finer and more even.
+- Updates go back to the installer: Compass checks for a new version, downloads it and installs it. The check now sees new versions right away.
+
 ## 1.17.2 · 2026-11-16
 
 - Sidebar: Digital albums starts higher, under a shorter Projects list that scrolls.
